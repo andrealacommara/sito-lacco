@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@heroui/button": "2.2.27",
     "@heroui/code": "2.2.21",
     "@heroui/dropdown": "2.3.27",
@@ -17,6 +18,7 @@
     "@heroui/kbd": "2.2.22",
     "@heroui/link": "2.2.23",
     "@heroui/navbar": "2.2.25",
+    "@heroui/react": "^2.8.5",
     "@heroui/snippet": "2.2.28",
     "@heroui/switch": "2.2.24",
     "@heroui/system": "2.4.23",
@@ -44,7 +46,7 @@
     "@typescript-eslint/eslint-plugin": "8.31.1",
     "@typescript-eslint/parser": "8.31.1",
     "@vitejs/plugin-react": "4.7.0",
-    "eslint": "9.25.1",
+    "eslint": "^9.39.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
@@ -57,7 +59,7 @@
     "postcss": "8.5.6",
     "prettier": "3.5.3",
     "typescript": "5.6.3",
-    "vite": "6.0.11",
+    "vite": "^6.4.1",
     "vite-tsconfig-paths": "5.1.4"
   }
 }
