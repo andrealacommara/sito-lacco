@@ -1,7 +1,6 @@
 import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import emailjs from "@emailjs/browser";
-
 import { Form, Input, Button, Textarea, addToast } from "@heroui/react";
 import { useState } from "react";
 
@@ -16,15 +15,15 @@ export default function DocsPage() {
     setFormData({ name: "", email: "", message: "" });
   };
 
+  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
   const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     emailjs
-      .send(
-        "service_cl6ok9e",
-        "template_k7cg5id",
-        formData,
-        "SAappjO2xQb1M0N5o"
-      )
+      .send(serviceId, templateId, formData, publicKey)
       .then(() => {
         addToast({
           title: "✅ Messaggio inviato con successo!",
@@ -52,15 +51,16 @@ export default function DocsPage() {
 
   return (
     <DefaultLayout>
-      <section className="flex flex-col items-center justify-center">
-        <div className="inline-block max-w-lg text-center justify-center">
-          <h1 className={title()}>Contatti</h1>
+      <section className="flex flex-col items-center justify-center-safe w-full  px-4">
+        <div className="w-full max-w-3xl mx-auto text-center">
+          <h1 className={`${title()} text-center mb-8`}>Contatti</h1>
+
           <Form
-            className="w-full justify-center items-center space-y-4 mt-8"
+            className="w-full space-y-6 justify-around"
             onReset={formReset}
             onSubmit={sendEmail}
           >
-            <div className="flex flex-col gap-4 max-w-md">
+            <div className="flex grid-cols-1 md:grid-raws-2 gap-6 mt-8 w-full justify-center-safe">
               <Input
                 isRequired
                 label="Nome"
@@ -85,26 +85,34 @@ export default function DocsPage() {
                   setFormData({ ...formData, email: e.target.value })
                 }
               />
+            </div>
 
-              <Textarea
-                isRequired
-                className="max-w-xs"
-                label="Messaggio"
-                placeholder="Inserisci il tuo messaggio qui"
-                value={formData.message}
-                onChange={(e) =>
-                  setFormData({ ...formData, message: e.target.value })
-                }
-              />
+            <Textarea
+              isRequired
+              label="Messaggio"
+              placeholder="Inserisci il tuo messaggio qui"
+              minRows={5}
+              value={formData.message}
+              onChange={(e) =>
+                setFormData({ ...formData, message: e.target.value })
+              }
+            />
 
-              <div className="flex gap-4">
-                <Button className="w-full" color="primary" type="submit">
-                  Invia
-                </Button>
-                <Button type="reset" variant="bordered">
-                  Pulisci
-                </Button>
-              </div>
+            <div className="flex flex-row gap-2 justify-center flex-wrap w-full">
+              <Button
+                className="w-full sm:w-auto"
+                color="primary"
+                type="submit"
+              >
+                Invia
+              </Button>
+              <Button
+                className="w-full sm:w-auto"
+                type="reset"
+                variant="bordered"
+              >
+                Pulisci
+              </Button>
             </div>
           </Form>
         </div>

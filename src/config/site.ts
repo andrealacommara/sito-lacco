@@ -21,8 +21,8 @@ export const siteConfig = {
       href: "/blog",
     },
     {
-      label: "About",
-      href: "/about",
+      label: "Contatti",
+      href: "/contatti",
     },
   ],
   navMenuItems: [

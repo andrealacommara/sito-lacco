@@ -3,7 +3,6 @@ import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { SwitchProps, useSwitch } from "@heroui/switch";
 import clsx from "clsx";
 import { useTheme } from "@heroui/use-theme";
-
 import { SunFilledIcon, MoonFilledIcon } from "@/components/icons";
 
 export interface ThemeSwitchProps {
@@ -11,31 +10,39 @@ export interface ThemeSwitchProps {
   classNames?: SwitchProps["classNames"];
 }
 
-export const ThemeSwitch: FC<ThemeSwitchProps> = ({
-  className,
-  classNames,
-}) => {
-  const [isMounted, setIsMounted] = useState(false);
+const THEME_EXPIRATION_MS = 24 * 60 * 60 * 1000;
 
+export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => {
+  const [isMounted, setIsMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
-  const {
-    Component,
-    slots,
-    isSelected,
-    getBaseProps,
-    getInputProps,
-    getWrapperProps,
-  } = useSwitch({
-    isSelected: theme === "light",
-    onChange: () => setTheme(theme === "light" ? "dark" : "light"),
-  });
-
   useEffect(() => {
-    setIsMounted(true);
-  }, [isMounted]);
+    const timestamp = localStorage.getItem("user-theme-timestamp");
+    const expired = timestamp && Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
 
-  // Prevent Hydration Mismatch
+    if (expired) {
+      localStorage.removeItem("user-theme");
+      localStorage.removeItem("user-theme-timestamp");
+
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
+    }
+  }, [setTheme]);
+
+  const handleThemeChange = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("user-theme", newTheme);
+    localStorage.setItem("user-theme-timestamp", Date.now().toString());
+  };
+
+  const { Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps } =
+    useSwitch({
+      isSelected: theme === "light",
+      onChange: handleThemeChange,
+    });
+
+  useEffect(() => setIsMounted(true), []);
   if (!isMounted) return <div className="w-6 h-6" />;
 
   return (
@@ -52,30 +59,18 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
       <VisuallyHidden>
         <input {...getInputProps()} />
       </VisuallyHidden>
+
       <div
         {...getWrapperProps()}
         className={slots.wrapper({
           class: clsx(
-            [
-              "w-auto h-auto",
-              "bg-transparent",
-              "rounded-lg",
-              "flex items-center justify-center",
-              "group-data-[selected=true]:bg-transparent",
-              "!text-default-500",
-              "pt-px",
-              "px-0",
-              "mx-0",
-            ],
+            "w-auto h-auto bg-transparent rounded-lg flex items-center justify-center",
+            "group-data-[selected=true]:bg-transparent !text-default-500 pt-px px-0 mx-0",
             classNames?.wrapper,
           ),
         })}
       >
-        {isSelected ? (
-          <MoonFilledIcon size={22} />
-        ) : (
-          <SunFilledIcon size={22} />
-        )}
+        {isSelected ? <MoonFilledIcon size={22} /> : <SunFilledIcon size={22} />}
       </div>
     </Component>
   );
