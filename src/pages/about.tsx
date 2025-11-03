@@ -2,11 +2,10 @@ import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import emailjs from "@emailjs/browser";
 
-import { Form, Input, Button, Textarea } from "@heroui/react";
+import { Form, Input, Button, Textarea, addToast } from "@heroui/react";
 import { useState } from "react";
 
 export default function DocsPage() {
-  // State to hold form data
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,12 +26,27 @@ export default function DocsPage() {
         "SAappjO2xQb1M0N5o"
       )
       .then(() => {
-        alert("✅ Messaggio inviato con successo!");
+        addToast({
+          title: "✅ Messaggio inviato con successo!",
+          description: "Riceverai una risposta al più presto.",
+          timeout: 5000,
+          color: "success",
+          variant: "solid",
+          radius: "full",
+        });
         formReset();
       })
       .catch((error) => {
         console.error("Errore:", error);
-        alert("❌ Errore durante l'invio, riprova più tardi.");
+        addToast({
+          title: "❌ Errore durante l'invio del messaggio.",
+          description:
+            "Si è verificato un errore. Per favore, riprova più tardi.",
+          timeout: 5000,
+          color: "danger",
+          variant: "solid",
+          radius: "full",
+        });
       });
   };
 

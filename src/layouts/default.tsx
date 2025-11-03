@@ -1,6 +1,7 @@
 import { Link } from "@heroui/link";
 
 import { Navbar } from "@/components/navbar";
+import { Provider } from "../provider.tsx";
 
 export default function DefaultLayout({
   children,
@@ -11,7 +12,7 @@ export default function DefaultLayout({
     <div className="relative flex flex-col h-screen">
       <Navbar />
       <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
-        {children}
+        <Provider>{children}</Provider>
       </main>
       <footer className="w-full flex items-center justify-center py-3">
         <Link

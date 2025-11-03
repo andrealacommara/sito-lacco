@@ -1,7 +1,7 @@
 import type { NavigateOptions } from "react-router-dom";
 
 import { HeroUIProvider } from "@heroui/react";
-import { ToastProvider } from "@heroui/toast";
+import {addToast, ToastProvider} from "@heroui/toast";
 import { useHref, useNavigate } from "react-router-dom";
 
 declare module "@react-types/shared" {
@@ -15,6 +15,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
 
   return (
     <HeroUIProvider navigate={navigate} useHref={useHref}>
+      <ToastProvider placement="top-center"/>
       {children}
     </HeroUIProvider>
   );
