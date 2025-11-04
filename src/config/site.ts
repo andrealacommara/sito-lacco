@@ -1,24 +1,24 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Vite + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
+  name: "Lacco",
+  description: "Scopri Lacco, la sua musica e ciò che la ispira!",
   navItems: [
     {
       label: "Home",
       href: "/",
     },
     {
-      label: "Docs",
-      href: "/docs",
+      label: "La mia musica",
+      href: "/la-mia-musica",
     },
     {
-      label: "Pricing",
-      href: "/pricing",
+      label: "Su di me",
+      href: "/su-di-me",
     },
     {
-      label: "Blog",
-      href: "/blog",
+      label: "Merch",
+      href: "/merch",
     },
     {
       label: "Contatti",
@@ -27,43 +27,31 @@ export const siteConfig = {
   ],
   navMenuItems: [
     {
-      label: "Profile",
-      href: "/profile",
+      label: "Home",
+      href: "/",
     },
     {
-      label: "Dashboard",
-      href: "/dashboard",
+      label: "La mia musica",
+      href: "/la-mia-musica",
     },
     {
-      label: "Projects",
-      href: "/projects",
+      label: "Su di me",
+      href: "/su-di-me",
     },
     {
-      label: "Team",
-      href: "/team",
+      label: "Merch",
+      href: "/merch",
     },
     {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
+      label: "Contatti",
+      href: "/contatti",
     },
   ],
   links: {
-    github: "https://github.com/heroui-inc/heroui",
-    twitter: "https://twitter.com/hero_ui",
+    spotify: "https://open.spotify.com/intl-it/artist/6viihrUFd4eGCfv9w61tL7?si=CDBCI2pYT2axereXjLHUJA",
+    tiktok: "https://tiktok.com/@laccoverse",
     docs: "https://heroui.com",
-    discord: "https://discord.gg/9b6yyZKmH4",
+    instagram: "https://instagram.com/laccoverse",
     sponsor: "https://patreon.com/jrgarciadev",
   },
 };

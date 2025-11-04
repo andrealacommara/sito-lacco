@@ -30,8 +30,8 @@ export default function DocsPage() {
           description: "Riceverai una risposta al più presto.",
           timeout: 5000,
           color: "success",
-          variant: "solid",
-          radius: "full",
+          variant: "flat",
+          radius: "lg",
         });
         formReset();
       })
@@ -43,24 +43,24 @@ export default function DocsPage() {
             "Si è verificato un errore. Per favore, riprova più tardi.",
           timeout: 5000,
           color: "danger",
-          variant: "solid",
-          radius: "full",
+          variant: "flat",
+          radius: "lg",
         });
       });
   };
 
   return (
     <DefaultLayout>
-      <section className="flex flex-col items-center justify-center-safe w-full  px-4">
+      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="w-full max-w-3xl mx-auto text-center">
-          <h1 className={`${title()} text-center mb-8`}>Contatti</h1>
+          <h1 className={`${title()}`}>Contatti</h1>
 
           <Form
             className="w-full space-y-6 justify-around"
             onReset={formReset}
             onSubmit={sendEmail}
           >
-            <div className="flex grid-cols-1 md:grid-raws-2 gap-6 mt-8 w-full justify-center-safe">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
               <Input
                 isRequired
                 label="Nome"
@@ -98,7 +98,7 @@ export default function DocsPage() {
               }
             />
 
-            <div className="flex flex-row gap-2 justify-center flex-wrap w-full">
+            <div className="flex flex-col md:flex-row gap-2 w-full md:w-full md:justify-center">
               <Button
                 className="w-full sm:w-auto"
                 color="primary"
