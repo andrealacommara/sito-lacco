@@ -72,13 +72,13 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden md:flex gap-2">
-                    <Link isExternal href={siteConfig.links.spotify} title="GitHub">
+                    <Link isExternal href={siteConfig.links.spotify} title="Spotify">
             <SpotifyIcon className="text-default-500" />
           </Link>
-          <Link isExternal href={siteConfig.links.tiktok} title="Twitter">
+          <Link isExternal href={siteConfig.links.tiktok} title="TikTok">
             <TikTokIcon className="text-default-500" />
           </Link>
-          <Link isExternal href={siteConfig.links.instagram} title="Discord">
+          <Link isExternal href={siteConfig.links.instagram} title="Instagram">
             <InstagramIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
@@ -89,10 +89,10 @@ export const Navbar = () => {
         <Link isExternal href={siteConfig.links.spotify}>
           <SpotifyIcon className="text-default-500" />
         </Link>
-                  <Link isExternal href={siteConfig.links.tiktok} title="Twitter">
+                  <Link isExternal href={siteConfig.links.tiktok} title="TikTok">
             <TikTokIcon className="text-default-500" />
           </Link>
-          <Link isExternal href={siteConfig.links.instagram} title="Discord">
+          <Link isExternal href={siteConfig.links.instagram} title="Instagram">
             <InstagramIcon className="text-default-500" />
           </Link>
         <ThemeSwitch />

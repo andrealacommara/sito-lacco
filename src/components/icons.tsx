@@ -16,7 +16,7 @@ match = logoTikTok.match(/<path[^>]*d="([^"]*)"/);
 const tikTokPath = match ? match[1] : "";
 
 export const Logo: React.FC<IconSvgProps> = ({
-  size = 90,
+  size = 100,
   height,
   ...props
 }) => (
@@ -46,7 +46,7 @@ export const InstagramIcon: React.FC<IconSvgProps> = ({
   return (
     <svg
       height={size || height}
-      viewBox="0 0 264.5833 264.5833"
+      viewBox="0 0 512 512"
       width={size || width}
       {...props}
     >
@@ -56,7 +56,7 @@ export const InstagramIcon: React.FC<IconSvgProps> = ({
 };
 
 export const TikTokIcon: React.FC<IconSvgProps> = ({
-  size = 20,
+  size = 24,
   width,
   height,
   ...props
@@ -64,7 +64,7 @@ export const TikTokIcon: React.FC<IconSvgProps> = ({
   return (
     <svg
       height={size || height}
-      viewBox="0 0 96 96"
+      viewBox="0 0 512 512"
       width={size || width}
       {...props}
     >
@@ -74,7 +74,7 @@ export const TikTokIcon: React.FC<IconSvgProps> = ({
 };
 
 export const SpotifyIcon: React.FC<IconSvgProps> = ({
-  size = 20,
+  size = 24,
   width,
   height,
   ...props
@@ -82,7 +82,7 @@ export const SpotifyIcon: React.FC<IconSvgProps> = ({
   return (
     <svg
       height={size || height}
-      viewBox="0 0 496 512"
+      viewBox="0 0 512 512"
       width={size || width}
       {...props}
     >
