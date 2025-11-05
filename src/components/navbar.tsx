@@ -15,11 +15,7 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TikTokIcon,
-  SpotifyIcon,
-  InstagramIcon,
-} from "@/components/icons";
+import { TikTokIcon, SpotifyIcon, InstagramIcon } from "@/components/icons";
 import { Logo } from "@/components/icons";
 import { useEffect, useState } from "react";
 
@@ -29,7 +25,6 @@ export const Navbar = () => {
 
   useEffect(() => {
     setPathname(location.pathname);
-    console.log(location.pathname);
   }, [location]);
 
   return (
@@ -72,35 +67,17 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden md:flex gap-2">
-                    <Link isExternal href={siteConfig.links.spotify} title="Spotify">
-            <SpotifyIcon className="text-default-500" />
-          </Link>
-          <Link isExternal href={siteConfig.links.tiktok} title="TikTok">
-            <TikTokIcon className="text-default-500" />
-          </Link>
-          <Link isExternal href={siteConfig.links.instagram} title="Instagram">
-            <InstagramIcon className="text-default-500" />
-          </Link>
           <ThemeSwitch />
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="md:hidden  gap-2" justify="end">
-        <Link isExternal href={siteConfig.links.spotify}>
-          <SpotifyIcon className="text-default-500" />
-        </Link>
-                  <Link isExternal href={siteConfig.links.tiktok} title="TikTok">
-            <TikTokIcon className="text-default-500" />
-          </Link>
-          <Link isExternal href={siteConfig.links.instagram} title="Instagram">
-            <InstagramIcon className="text-default-500" />
-          </Link>
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
 
       <NavbarMenu>
-        <div className="mx-4 mt-2 flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center min-h-full">
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
