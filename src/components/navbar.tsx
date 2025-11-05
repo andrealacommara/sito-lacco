@@ -15,7 +15,6 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { TikTokIcon, SpotifyIcon, InstagramIcon } from "@/components/icons";
 import { Logo } from "@/components/icons";
 import { useEffect, useState } from "react";
 
@@ -41,8 +40,8 @@ export const Navbar = () => {
         </NavbarBrand>
       </NavbarContent>
 
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="center">
-        <div className="hidden md:flex gap-4 justify-start ml-2">
+      <NavbarContent className="flex justify-center" justify="center">
+        <div className="hidden md:flex gap-4 justify-center ml-2">
           {siteConfig.navItems.map((item) => (
             <NavbarItem key={item.href}>
               <Link
@@ -63,7 +62,7 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent
-        className="hidden md:flex basis-1/5 md:basis-full"
+        className="hidden md:flex"
         justify="end"
       >
         <NavbarItem className="hidden md:flex gap-2">
@@ -77,13 +76,13 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarMenu>
-        <div className="flex flex-col items-center justify-center min-h-full">
+        <div className="flex flex-col items-center justify-center min-h-[80vh] gap-4 p-6">
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
                 color={pathname === item.href ? "danger" : "foreground"}
                 href={item.href}
-                size="lg"
+                className="text-xl"
               >
                 {item.label}
               </Link>
