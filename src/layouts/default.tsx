@@ -22,7 +22,7 @@ export default function DefaultLayout({
       <main className="container mx-auto max-w-7xl px-6 flex-grow">
         <Provider>{children}</Provider>
       </main>
-      <footer className="w-full flex items-center justify-center py-5 gap-2">
+      <footer className="w-full flex items-center justify-center py-8 gap-2">
         <Link isExternal href={siteConfig.links.spotify} title="Spotify">
           <SpotifyIcon className="text-default-500" />
         </Link>
