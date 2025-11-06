@@ -31,7 +31,7 @@ export const Navbar = () => {
       <NavbarContent justify="start" className="basis-1/5 sm:basis-full">
         <NavbarBrand className="gap-3 max-w-fit">
           <Link
-            className="flex justify-start items-center gap-1"
+            className="flex justify-start items-center gap-1 transition-colors duration-300 hover:text-danger dark:hover:text-danger"
             color="foreground"
             href="/"
           >

@@ -12,19 +12,25 @@ export interface ThemeSwitchProps {
 
 const THEME_EXPIRATION_MS = 24 * 60 * 60 * 1000;
 
-export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => {
+export const ThemeSwitch: FC<ThemeSwitchProps> = ({
+  className,
+  classNames,
+}) => {
   const [isMounted, setIsMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const timestamp = localStorage.getItem("user-theme-timestamp");
-    const expired = timestamp && Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
+    const expired =
+      timestamp && Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
 
     if (expired) {
       localStorage.removeItem("user-theme");
       localStorage.removeItem("user-theme-timestamp");
 
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
       setTheme(prefersDark ? "dark" : "light");
     }
   }, [setTheme]);
@@ -36,11 +42,17 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => 
     localStorage.setItem("user-theme-timestamp", Date.now().toString());
   };
 
-  const { Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps } =
-    useSwitch({
-      isSelected: theme === "light",
-      onChange: handleThemeChange,
-    });
+  const {
+    Component,
+    slots,
+    isSelected,
+    getBaseProps,
+    getInputProps,
+    getWrapperProps,
+  } = useSwitch({
+    isSelected: theme === "light",
+    onChange: handleThemeChange,
+  });
 
   useEffect(() => setIsMounted(true), []);
   if (!isMounted) return <div className="w-6 h-6" />;
@@ -52,7 +64,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => 
         className: clsx(
           "px-px transition-opacity hover:opacity-80 cursor-pointer",
           className,
-          classNames?.base,
+          classNames?.base
         ),
       })}
     >
@@ -66,11 +78,21 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => 
           class: clsx(
             "w-auto h-auto bg-transparent rounded-lg flex items-center justify-center",
             "group-data-[selected=true]:bg-transparent !text-default-500 pt-px px-0 mx-0",
-            classNames?.wrapper,
+            classNames?.wrapper
           ),
         })}
       >
-        {isSelected ? <MoonFilledIcon size={22} /> : <SunFilledIcon size={22} />}
+        {isSelected ? (
+          <MoonFilledIcon
+            size={24}
+            className="transition-colors duration-300 hover:text-danger dark:hover:text-danger"
+          />
+        ) : (
+          <SunFilledIcon
+            size={24}
+            className="transition-colors duration-300 hover:text-danger dark:hover:text-danger"
+          />
+        )}
       </div>
     </Component>
   );

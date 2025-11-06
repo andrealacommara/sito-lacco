@@ -24,19 +24,19 @@ export default function DefaultLayout({
       </main>
       <footer className="w-full flex items-center justify-center py-8 gap-2">
         <Link isExternal href={siteConfig.links.spotify} title="Spotify">
-          <SpotifyIcon className="text-default-500" />
+          <SpotifyIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </Link>
         <Link isExternal href={siteConfig.links.instagram} title="Instagram">
-          <InstagramIcon className="text-default-500" />
+          <InstagramIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </Link>
         <Link isExternal href={siteConfig.links.tiktok} title="TikTok">
-          <TikTokIcon className="text-default-500" />
+          <TikTokIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </Link>
         <Link isExternal href={siteConfig.links.appleMusic} title="Apple Music">
-          <AppleMusicIcon className="text-default-500" />
+          <AppleMusicIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </Link>
         <Link isExternal href={siteConfig.links.youtube} title="YouTube">
-          <YouTubeIcon className="text-default-500" />
+          <YouTubeIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </Link>
       </footer>
     </div>
