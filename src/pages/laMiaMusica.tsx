@@ -127,10 +127,6 @@ export default function DocsPage() {
             </div>
           ))}
         </div>
-
-        {/* Gradienti laterali */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white/90 to-transparent dark:from-black/70" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white/90 to-transparent dark:from-black/70" />
       </div>
     </DefaultLayout>
   );
