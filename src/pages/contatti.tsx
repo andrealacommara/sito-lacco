@@ -11,42 +11,56 @@ export default function DocsPage() {
     message: "",
   });
 
-  const formReset = () => {
-    setFormData({ name: "", email: "", message: "" });
+  const formReset = (data: string) => {
+    if (data === "name") {
+      setFormData({ ...formData, name: "" });
+      return;
+    }
+    if (data === "email") {
+      setFormData({ ...formData, email: "" });
+      return;
+    }
+    if (data === "message") {
+      setFormData({ ...formData, message: "" });
+      return;
+    }
+    if (data === "all") setFormData({ name: "", email: "", message: "" });
   };
 
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-  const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
+  const [isLoading, setLoading] = useState(false);
+  const sendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
-    emailjs
-      .send(serviceId, templateId, formData, publicKey)
-      .then(() => {
-        addToast({
-          title: "✅ Messaggio inviato con successo!",
-          description: "Riceverai una risposta al più presto.",
-          timeout: 5000,
-          color: "success",
-          variant: "flat",
-          radius: "lg",
-        });
-        formReset();
-      })
-      .catch((error) => {
-        console.error("Errore:", error);
-        addToast({
-          title: "❌ Errore durante l'invio del messaggio.",
-          description:
-            "Si è verificato un errore. Per favore, riprova più tardi.",
-          timeout: 5000,
-          color: "danger",
-          variant: "flat",
-          radius: "lg",
-        });
+    try {
+      await emailjs.send(serviceId, templateId, formData, publicKey);
+      addToast({
+        title: "Messaggio inviato con successo!",
+        description: "Riceverai una risposta al più presto.",
+        timeout: 5000,
+        color: "success",
+        variant: "flat",
+        radius: "lg",
       });
+      formReset("all");
+    } catch (error) {
+      console.error("Errore:", error);
+      addToast({
+        title: "Errore durante l'invio del messaggio.",
+        description:
+          "Si è verificato un errore. Per favore, riprova più tardi.",
+        timeout: 5000,
+        color: "danger",
+        variant: "flat",
+        radius: "lg",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,7 +71,7 @@ export default function DocsPage() {
 
           <Form
             className="w-full space-y-6 justify-around"
-            onReset={formReset}
+            onReset={() => formReset("all")}
             onSubmit={sendEmail}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
@@ -71,6 +85,7 @@ export default function DocsPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
+                onClear={() => formReset("name")}
               />
 
               <Input
@@ -84,6 +99,7 @@ export default function DocsPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
+                onClear={() => formReset("email")}
               />
             </div>
 
@@ -96,15 +112,17 @@ export default function DocsPage() {
               onChange={(e) =>
                 setFormData({ ...formData, message: e.target.value })
               }
+              onClear={() => formReset("message")}
             />
 
-            <div className="flex flex-col md:flex-row gap-2 w-full md:w-full md:justify-center">
+            <div className="flex flex-col md:flex-row gap-2 w-full md:justify-center">
               <Button
                 className="w-full sm:w-auto"
                 color="primary"
                 type="submit"
+                isLoading={isLoading}
               >
-                Invia
+                {isLoading ? "Invio..." : "Invia"}
               </Button>
               <Button
                 className="w-full sm:w-auto"

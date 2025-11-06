@@ -5,5 +5,9 @@
   scrollbar-gutter: stable;
 }
 
+.hidden.group-data-\[has-helper\=true\]\:flex.p-1.relative.flex-col.gap-1\.5 {
+    text-align: left;
+}
+
 @config "../../tailwind.config.js"
 
