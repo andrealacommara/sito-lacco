@@ -10,7 +10,7 @@ export default function SpotifyPlayer({ srcPlayer, size }: SpotifyPlayerProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <Card className="p-4 flex justify-center items-center relative overflow-hidden">
+    <Card className="p-4 flex justify-center items-center relative overflow-hidden mx-auto w-full max-w-5xl">
       {!isLoaded && (
         <Skeleton className="absolute inset-0 rounded-lg">
           <div className="h-full w-full bg-default-300 rounded-lg" />
