@@ -70,7 +70,7 @@ export const Navbar = () => {
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarContent className="md:hidden  gap-2" justify="end">
+      <NavbarContent className="md:hidden  gap-3" justify="end">
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
