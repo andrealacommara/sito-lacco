@@ -69,28 +69,25 @@ export default function DocsPage() {
       </div>
       <h2 className={subtitle()}>Scopri la storia di ogni brano</h2>
 
-      {/* Contenitore relativo per gradienti + carosello */}
-      <div className="relative">
-        <div
-          ref={carouselRef}
-          className="flex p-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing"
-        >
-          {songList.map((song) => (
-            <div
-              key={song.title}
-              className="shrink-0 snap-center px-6 first:ml-[calc(50vw-140px)] last:mr-[calc(50vw-140px)] transition-transform hover:scale-105 active:scale-95"
-            >
-              <CardSongExposer
-                artworkAlt={song.alt}
-                artworkSrc={song.src}
-                songTitle={song.title}
-                songDescription={song.description}
-                songSpotifyLink={song.spotifyLink}
-                preSaveMode={song.preSaveMode}
-              />
-            </div>
-          ))}
-        </div>
+      <div
+        ref={carouselRef}
+        className="flex p-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing"
+      >
+        {songList.map((song) => (
+          <div
+            key={song.title}
+            className="shrink-0 snap-center px-2 max-w-full first:ml-[calc(50vw-140px)] last:mr-[calc(50vw-140px)] transition-transform hover:scale-105 active:scale-95"
+          >
+            <CardSongExposer
+              artworkAlt={song.alt}
+              artworkSrc={song.src}
+              songTitle={song.title}
+              songDescription={song.description}
+              songSpotifyLink={song.spotifyLink}
+              preSaveMode={song.preSaveMode}
+            />
+          </div>
+        ))}
       </div>
     </DefaultLayout>
   );
