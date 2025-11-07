@@ -17,10 +17,6 @@ export const siteConfig = {
       href: "/su-di-me",
     },
     {
-      label: "Merch",
-      href: "/merch",
-    },
-    {
       label: "Contatti",
       href: "/contatti",
     },
@@ -37,10 +33,6 @@ export const siteConfig = {
     {
       label: "Su di me",
       href: "/su-di-me",
-    },
-    {
-      label: "Merch",
-      href: "/merch",
     },
     {
       label: "Contatti",
