@@ -55,14 +55,14 @@ export default function CardSongExposer({
         <div>
           <Card className="border-none" radius="lg">
             <Badge
-              content="PROSSIMAMENTE"
+              content="COMING SOON"
               color="success"
-              placement="bottom-right"
+              placement="top-right"
               disableAnimation
               isInvisible={!preSaveMode}
               classNames={{
                 badge:
-                  "translate-x-1 translate-y-1 font-semibold !border-none max-w-full",
+                  "translate-x-0 translate-y-0 font-semibold !border-black max-w-full",
               }}
             >
               <Image
@@ -84,8 +84,11 @@ export default function CardSongExposer({
         placement="center"
         isOpen={isOpen}
         onClose={onClose}
+        classNames={{
+          wrapper: "flex items-center justify-center !m-0 px-4 sm:px-6 w-full max-w-none",
+        }}
       >
-        <ModalContent className="bg-white text-black dark:!bg-white dark:!text-black p-2">
+        <ModalContent className="bg-white text-black dark:!bg-white dark:!text-black p-4 rounded-2xl shadow-xl max-w-[480px] mx-auto">
           {(onClose) => (
             <>
               <ModalHeader className="items-center justify-center">
@@ -96,11 +99,13 @@ export default function CardSongExposer({
                   {songTitle}
                 </Card>
               </ModalHeader>
+
               <ModalBody>
-                <div>
-                  <p className="text-center font-medium ">{songDescription}</p>
-                </div>
+                <p className="text-left font-medium whitespace-break-spaces">
+                  {songDescription}
+                </p>
               </ModalBody>
+
               <ModalFooter className="flex flex-col md:flex-row items-center justify-center">
                 <Link isExternal href={songSpotifyLink}>
                   <Button color="success" onPress={onClose}>
