@@ -79,8 +79,10 @@ export default function CardSongExposer({
           {songTitle}
         </h1>
       </Card>
-      <div className="p-2">
-      <Modal backdrop="blur" placement="center" isOpen={isOpen} onClose={onClose}>
+      <Modal backdrop="blur" placement="center" isOpen={isOpen} onClose={onClose}classNames={{
+    wrapper: "m-4",
+  }}
+>
         <ModalContent className="bg-white text-black dark:!bg-white dark:!text-black p-2">
           {(onClose) => (
             <>
@@ -109,7 +111,6 @@ export default function CardSongExposer({
           )}
         </ModalContent>
       </Modal>
-      </div>
     </div>
   );
 }
