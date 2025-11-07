@@ -62,7 +62,7 @@ export default function CardSongExposer({
               isInvisible={!preSaveMode}
               classNames={{
                 badge:
-                  "translate-x-1 translate-y-1 text-sm font-semibold !border-none",
+                  "translate-x-1 translate-y-1 font-semibold !border-none max-w-full",
               }}
             >
               <Image
@@ -79,7 +79,12 @@ export default function CardSongExposer({
           {songTitle}
         </h1>
       </Card>
-      <Modal backdrop="blur" placement="center" isOpen={isOpen} onClose={onClose}>
+      <Modal
+        backdrop="blur"
+        placement="center"
+        isOpen={isOpen}
+        onClose={onClose}
+      >
         <ModalContent className="bg-white text-black dark:!bg-white dark:!text-black p-2">
           {(onClose) => (
             <>
@@ -99,7 +104,7 @@ export default function CardSongExposer({
               <ModalFooter className="flex flex-col md:flex-row items-center justify-center">
                 <Link isExternal href={songSpotifyLink}>
                   <Button color="success" onPress={onClose}>
-                    {preSaveMode? "Pre-Salva" : "Ascolta"} su Spotify
+                    {preSaveMode ? "Pre-Salva" : "Ascolta"} su Spotify
                     <SpotifyIcon />
                   </Button>
                 </Link>
