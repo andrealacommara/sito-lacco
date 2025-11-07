@@ -34,7 +34,9 @@ export default function IndexPage() {
         <div className="p-2 md:p-4">
           <h1 className={subtitle()}>
             Lacco unisce R&B e sonorità hip-hop in un viaggio introspettivo alla
-            scoperta di sé. L'obiettivo è quello di raccontare in musica ciò che è solito
+            scoperta di sé.
+            <br />
+            L'obiettivo è quello di raccontare in musica ciò che è solito
             rimanere nascosto, in assordante silezio, dentro ognuno di noi.
           </h1>
         </div>

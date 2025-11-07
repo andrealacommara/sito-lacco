@@ -2,45 +2,7 @@ import { subtitle, title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import CardSongExposer from "@/components/cardSongExposer";
 import { useRef, useEffect } from "react";
-
-import cercamiArtwork from "@/assets/images/artworks/cercamiArtwork.jpg";
-import mondoDentroArtwork from "@/assets/images/artworks/mondoDentroArtwork.jpg";
-import rumoreDiFondoArtwork from "@/assets/images/artworks/rumoreDiFondoArtwork.jpg";
-import tempoPersoArtwork from "@/assets/images/artworks/tempoPersoArtwork.jpg";
-import traLeNuvoleArtwork from "@/assets/images/artworks/traLeNuvoleArtwork.jpg";
-
-const songList = [
-  {
-    title: "rumore di fondo",
-    src: rumoreDiFondoArtwork,
-    alt: "Cover artwork di 'rumore di fondo'",
-    description: "",
-  },
-  {
-    title: "cercami",
-    src: cercamiArtwork,
-    alt: "Cover artwork di 'cercami'",
-    description: "",
-  },
-  {
-    title: "tra le nuvole",
-    src: traLeNuvoleArtwork,
-    alt: "Cover artwork di 'tra le nuvole'",
-    description: "",
-  },
-  {
-    title: "mondo dentro",
-    src: mondoDentroArtwork,
-    alt: "Cover artwork di 'mondo dentro'",
-    description: "",
-  },
-  {
-    title: "tempo perso",
-    src: tempoPersoArtwork,
-    alt: "Cover artwork di 'tempo perso'",
-    description: "",
-  },
-];
+import { songList } from "@/config/songList";
 
 export default function DocsPage() {
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -121,8 +83,10 @@ export default function DocsPage() {
               <CardSongExposer
                 artworkAlt={song.alt}
                 artworkSrc={song.src}
-                artworkTitle={song.title}
-                artworkDescription={song.description}
+                songTitle={song.title}
+                songDescription={song.description}
+                songSpotifyLink={song.spotifyLink}
+                preSaveMode={song.preSaveMode}
               />
             </div>
           ))}

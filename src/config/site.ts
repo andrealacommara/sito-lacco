@@ -50,10 +50,8 @@ export const siteConfig = {
   links: {
     spotify: "https://open.spotify.com/intl-it/artist/6viihrUFd4eGCfv9w61tL7?si=CDBCI2pYT2axereXjLHUJA",
     tiktok: "https://tiktok.com/@laccoverse",
-    docs: "https://heroui.com",
     instagram: "https://instagram.com/laccoverse",
     appleMusic: "https://music.apple.com/it/artist/lacco/1773060241",
     youtube: "https://www.youtube.com/@Laccoverse",
-    sponsor: "https://patreon.com/jrgarciadev",
   },
 };
