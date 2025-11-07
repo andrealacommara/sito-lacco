@@ -46,6 +46,10 @@ export const subtitle = tv({
     fullWidth: {
       true: "!w-full",
     },
+    color: {
+      danger: "text-danger",
+      success: "text-success",
+    },
   },
   defaultVariants: {
     fullWidth: true,
