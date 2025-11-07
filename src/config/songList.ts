@@ -29,7 +29,7 @@ export const songList = [
     title: "tra le nuvole - sunset version",
     src: traLeNuvoleSVArtwork,
     alt: "Cover artwork di 'tra le nuvole - sunset version'",
-    description: "“tra le nuvole – Sunset Version” è un respiro lento al calare del sole.\nSpogliata di tutto, resta solo una voce e una chitarra a raccontare la distanza tra ciò che è stato e ciò che manca.\nOgni corda vibra come un pensiero che non si spegne, ogni parola è un ricordo che torna a bussare piano.\nÈ la malinconia che si illumina d’arancio, quando anche il silenzio sa di te.",
+    description: "“tra le nuvole – sunset version” è un respiro lento al calare del sole.\nSpogliata di tutto, resta solo una voce e una chitarra a raccontare la distanza tra ciò che è stato e ciò che manca.\nOgni corda vibra come un pensiero che non si spegne, ogni parola è un ricordo che torna a bussare piano.\nÈ la malinconia che si illumina d’arancio, quando anche il silenzio sa di te.",
     spotifyLink:
       "https://open.spotify.com/intl-it/track/45CEyfLKXPZON36PyevLDA?si=e378c4663b90499d",
     preSaveMode: false,
