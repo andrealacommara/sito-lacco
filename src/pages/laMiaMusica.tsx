@@ -48,12 +48,12 @@ export default function DocsPage() {
     const el = carouselRef.current;
     if (!el) return;
 
-    const delta = 60;
-    const duration = 350;
-    const pauseAfter = 0;
+    const delta = el.clientWidth * 0.1;
+    const duration = 700; // più morbido
+    const pauseAfter = 150;
 
     const easeInOutCubic = (t: number) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
     const animateScroll = (from: number, to: number, dur: number) =>
       new Promise<void>((resolve) => {

@@ -1,5 +1,6 @@
-import { Card } from "@heroui/react";
+import { Card, Skeleton } from "@heroui/react";
 import { Image } from "@heroui/image";
+import { useState } from "react";
 
 interface CardSongExposerProps {
   artworkAlt: string;
@@ -14,6 +15,7 @@ export default function CardSongExposer({
   artworkTitle,
   // artworkDescription, da integrare in seguito nella modale
 }: CardSongExposerProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
   return (
     <Card
       className="group p-6 bg-white transition-colors duration-300 hover:bg-danger"
@@ -22,12 +24,18 @@ export default function CardSongExposer({
       isPressable
       onPress={() => console.log("pressed")}
     >
+      {!isLoaded && (
+        <Skeleton className="absolute inset-0 rounded-lg">
+          <div className="h-full w-full bg-default-300 rounded-lg" />
+        </Skeleton>
+      )}
       <Card className="border-none" radius="lg">
         <Image
           alt={artworkAlt}
           className="rounded-lg"
           src={artworkSrc}
           width={280}
+          onLoad={() => setIsLoaded(true)}
         />
       </Card>
       <h1 className="text-center mt-4 font-medium text-black transition-colors duration-300 group-hover:text-white">
