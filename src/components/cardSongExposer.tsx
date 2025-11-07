@@ -62,7 +62,7 @@ export default function CardSongExposer({
               isInvisible={!preSaveMode}
               classNames={{
                 badge:
-                  "translate-x-1 translate-y-1 text-sm font-semibold",
+                  "translate-x-1 translate-y-1 text-sm font-semibold !border-none",
               }}
             >
               <Image
