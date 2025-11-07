@@ -3,7 +3,7 @@ import DefaultLayout from "@/layouts/default";
 import CardSongExposer from "@/components/cardSongExposer";
 import { songList } from "@/config/songList";
 
-export default function DocsPage() {
+export default function MusicPage() {
   return (
     <DefaultLayout>
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
@@ -27,6 +27,11 @@ export default function DocsPage() {
               />
             </div>
           ))}
+        </div>
+        <div className="flex justify-center">
+          <h3 className="w-full md:w-1/2 my-2 text-default-400 block max-w-full text-center font-light text-small">
+            Ogni brano è una parte di me, buon ascolto.
+          </h3>
         </div>
       </div>
     </DefaultLayout>
