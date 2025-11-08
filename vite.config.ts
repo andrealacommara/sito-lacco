@@ -17,8 +17,12 @@ export default defineConfig({
     svgr(),
   ],
   build: {
+    assetsDir: "",
     rollupOptions: {
       output: {
+        entryFileNames: `[name].js`,
+        chunkFileNames: `[name].js`,
+        assetFileNames: `[name].[ext]`,
         manualChunks: {
           react: ["react", "react-dom"],
           ui: ["@heroui/react"],
