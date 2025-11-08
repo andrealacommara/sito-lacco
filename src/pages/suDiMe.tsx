@@ -5,7 +5,7 @@ import { Image } from "@heroui/image"; // Componente immagine con gestione autom
 import { useEffect, useRef, useState } from "react"; // Hook React per stato, effetti e riferimenti DOM
 // Import di immagini statiche e componenti di supporto
 import { Card, Skeleton } from "@heroui/react"; // Componenti UI per struttura e caricamento
-
+import { Helmet } from "react-helmet-async"; // <--- Import di Helmet per SEO e meta tag
 import aboutPic1 from "@/assets/images/lacco/aboutPic1.avif";
 import aboutPic2 from "@/assets/images/lacco/aboutPic2.avif";
 import aboutPic3 from "@/assets/images/lacco/aboutPic3.avif";
@@ -118,6 +118,17 @@ function AboutSection({
 export default function AboutPage() {
   return (
     <DefaultLayout>
+      {/* ========================== HELMET ========================== */}
+      {/* Titolo e description dinamici per SEO Google */}
+      <Helmet>
+        <title>Lacco | Su di me</title>
+        <meta
+          name="description"
+          content="Scopri Lacco: la sua storia, il percorso musicale e la filosofia dietro la sua musica."
+        />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+
       <div>
         {/* Titolo della pagina */}
         <section className="flex flex-row text-center justify-center gap-4 py-8 md:py-10">

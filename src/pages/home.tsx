@@ -4,6 +4,7 @@
 import { Image } from "@heroui/image"; // Componente ottimizzato per immagini (con supporto blur e loading)
 import { Card, Skeleton } from "@heroui/react"; // Componenti UI per contenitori e placeholder
 import { useState } from "react"; // Hook React per la gestione dello stato locale
+import { Helmet } from "react-helmet-async"; // <--- Import di Helmet per SEO e meta tag
 
 import DefaultLayout from "@/layouts/default"; // Layout generale del sito (navbar + footer)
 import SpotifyPlayer from "@/components/spotifyPlayer"; // Componente personalizzato per il player Spotify
@@ -20,6 +21,17 @@ export default function IndexPage() {
 
   return (
     <DefaultLayout>
+      {/* ========================== HELMET ========================== */}
+      {/* Titolo e description dinamici per SEO Google */}
+      <Helmet>
+        <title>Lacco | Home</title>
+        <meta
+          name="description"
+          content="Scopri Lacco: R&B e hip-hop in un viaggio introspettivo alla scoperta di sé."
+        />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+      
       {/* ========================== SEZIONE INTRODUTTIVA ========================== */}
       <section className="flex flex-row text-center justify-center gap-4 py-8 md:py-10">
         <h1 className={title()}>Scopri di più su Lacco</h1>

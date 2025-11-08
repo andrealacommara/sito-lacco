@@ -4,6 +4,7 @@
 import emailjs from "@emailjs/browser"; // Libreria per l'invio di email lato client
 import { Form, Input, Button, Textarea, addToast } from "@heroui/react"; // Componenti UI forniti da HeroUI
 import { useState } from "react"; // Hook per la gestione dello stato locale del componente
+import { Helmet } from "react-helmet-async"; // <--- Import di Helmet per SEO e meta tag
 
 import DefaultLayout from "@/layouts/default"; // Layout principale del sito (Navbar + Footer)
 import { title } from "@/components/primitives"; // Stile tipografico predefinito per i titoli
@@ -24,24 +25,21 @@ export default function DocsPage() {
   const formReset = (data: string) => {
     if (data === "name") {
       setFormData({ ...formData, name: "" });
-
       return;
     }
     if (data === "email") {
       setFormData({ ...formData, email: "" });
-
       return;
     }
     if (data === "message") {
       setFormData({ ...formData, message: "" });
-
       return;
     }
     if (data === "all") setFormData({ name: "", email: "", message: "" });
   };
 
   // ========================== CONFIGURAZIONE EMAILJS ========================== //
-  // Le chiavi vengono lette dalle variabili d’ambiente definite nel file `.env`.
+  // Le chiavi vengono lette dalle variabili d’ambiente definite nel file `.env` (per il locale) o su GitHub Action.
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -92,6 +90,16 @@ export default function DocsPage() {
 
   return (
     <DefaultLayout>
+      {/* ========================== HELMET ========================== */}
+      <Helmet>
+        <title>Lacco | Contatti</title>
+        <meta
+          name="description"
+          content="Contatta Lacco per collaborazioni, informazioni o semplicemente per lasciare un messaggio."
+        />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 mx-auto w-full max-w-5xl">
         {/* Contenitore centrale del form */}
         <div className="w-full max-w-3xl mx-auto text-center">
