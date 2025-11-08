@@ -1,14 +1,20 @@
-import { motion } from "framer-motion";
-import { Image } from "@heroui/image";
-import { useEffect, useRef, useState } from "react";
+// ========================== IMPORT PRINCIPALI ========================== //
+// Librerie e componenti usati per animazioni, immagini, stato e layout.
+import { motion } from "framer-motion"; // Per le animazioni di entrata (scroll reveal)
+import { Image } from "@heroui/image"; // Componente immagine con gestione automatica del caricamento
+import { useEffect, useRef, useState } from "react"; // Hook React per stato, effetti e riferimenti DOM
+// Import di immagini statiche e componenti di supporto
+import { Card, Skeleton } from "@heroui/react"; // Componenti UI per struttura e caricamento
 
-import aboutPic1 from "@/assets/images/lacco/aboutPic1.jpg";
-import aboutPic2 from "@/assets/images/lacco/aboutPic2.jpg";
-import aboutPic3 from "@/assets/images/lacco/aboutPic3.jpg";
-import DefaultLayout from "@/layouts/default";
-import { subtitle, title } from "@/components/primitives";
-import { Card, Skeleton } from "@heroui/react";
+import aboutPic1 from "@/assets/images/lacco/aboutPic1.avif";
+import aboutPic2 from "@/assets/images/lacco/aboutPic2.avif";
+import aboutPic3 from "@/assets/images/lacco/aboutPic3.avif";
+import DefaultLayout from "@/layouts/default"; // Layout base (navbar + footer)
+import { subtitle, title } from "@/components/primitives"; // Stili dinamici per testi
 
+// ========================== CONTENUTO TESTUALE ========================== //
+// Array che definisce i blocchi della pagina "Su di me".
+// Ogni sezione contiene un testo descrittivo e un’immagine associata.
 const sections = [
   {
     text: "Sono Andrea, ma tutti mi chiamano Lacco. Sono nato nel ‘99 a Torino ed ho iniziato a fare musica sotto il nome di “Checkmate“, un progetto che mi ha permesso di capire chi sono e cosa voglio.",
@@ -24,15 +30,20 @@ const sections = [
   },
 ];
 
+// ========================== HOOK PERSONALIZZATO: useInView ========================== //
+// Controlla se un elemento è visibile all’interno del viewport (scroll reveal).
+// Usa IntersectionObserver per attivare le animazioni solo quando l’elemento entra a schermo.
 function useInView(ref: React.RefObject<HTMLDivElement>, threshold = 0.2) {
   const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),
-      { threshold }
+      { threshold }, // Percentuale di visibilità per considerare "in view"
     );
+
     if (ref.current) observer.observe(ref.current);
+
     return () => {
       if (ref.current) observer.unobserve(ref.current);
     };
@@ -40,6 +51,10 @@ function useInView(ref: React.RefObject<HTMLDivElement>, threshold = 0.2) {
 
   return isInView;
 }
+
+// ========================== COMPONENTE: AboutSection ========================== //
+// Rappresenta una singola sezione "Su di me" con testo e immagine animati.
+// Accetta props: testo, immagine e opzione "reversed" per invertire il layout.
 
 function AboutSection({
   text,
@@ -50,37 +65,45 @@ function AboutSection({
   image: string;
   reversed?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const ref = useRef<HTMLDivElement>(null); // Riferimento DOM per l’osservazione
+  const inView = useInView(ref); // Verifica se la sezione è visibile
+  const [isLoaded, setIsLoaded] = useState(false); // Stato di caricamento immagine
 
   return (
+    // motion.div permette l'animazione all'apparizione su schermo
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: reversed ? 100 : -100 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.8, ease: "easeOut" }}
+      animate={inView ? { opacity: 1, x: 0 } : {}} // Attiva solo quando visibile
+      initial={{ opacity: 0, x: reversed ? 100 : -100 }} // Entrata laterale dinamica
+      transition={{ duration: 0.8, ease: "easeOut" }} // Durata e tipo di animazione
     >
+      {/* Card che contiene testo e immagine, disposti in righe o colonne */}
       <Card
         className={`flex flex-col-reverse md:flex-row ${
           reversed ? "md:flex-row-reverse" : ""
         } items-center md:items-center justify-center md:justify-center p-2 md:p-4 gap-2 md:gap-4 mx-auto  w-full max-w-5xl`}
       >
+        {/* Scheletro mostrato finché l’immagine non è caricata */}
         {!isLoaded && (
           <Skeleton className="absolute inset-0 rounded-lg">
             <div className="h-full w-full bg-default-300 rounded-lg" />
           </Skeleton>
         )}
+
+        {/* Testo descrittivo */}
         <div className="p-2 md:p-4">
           <h1 className={subtitle()}>{text}</h1>
         </div>
+
+        {/* Immagine con effetto blur e caricamento controllato */}
         <div className="p-4 md:p-4 w-fit md:w-full items-center">
           <Image
-            src={image}
             alt="Lacco"
             className="item-center"
+            src={image}
             width={400}
-            onLoad={() => setIsLoaded(true)}
+            loading="eager"
+            onLoad={() => setIsLoaded(true)} // Rimuove lo scheletro al caricamento
           />
         </div>
       </Card>
@@ -88,13 +111,20 @@ function AboutSection({
   );
 }
 
+// ========================== COMPONENTE PRINCIPALE: AboutPage ========================== //
+// Struttura generale della pagina “Su di me”.
+// Mostra il titolo principale e itera le sezioni definite in `sections`.
+
 export default function AboutPage() {
   return (
     <DefaultLayout>
       <div>
+        {/* Titolo della pagina */}
         <section className="flex flex-row text-center justify-center gap-4 py-8 md:py-10">
           <h1 className={title()}>Su di me</h1>
         </section>
+
+        {/* Mappa tutte le sezioni con layout alternato (sinistra/destra) */}
         <div className="flex flex-col gap-4">
           {sections.map((s, i) => (
             <AboutSection key={i} {...s} reversed={i % 2 === 1} />
