@@ -70,7 +70,8 @@ export default function DocsPage() {
 
       // Pulizia dei campi dopo l’invio
       formReset("all");
-    } catch {
+    } catch (e) {
+      console.error("error: ", e);
       // Notifica di errore
       addToast({
         title: "Errore durante l'invio del messaggio.",
