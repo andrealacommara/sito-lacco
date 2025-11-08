@@ -1,0 +1,38 @@
+name: Build and Deploy to Aruba
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Scarica il codice dal repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Installa le dipendenze
+      - name: Install dependencies
+        run: npm install
+
+      # Build del progetto (React + Vite)
+      - name: Build project
+        run: npm run build
+
+      # Deploy via FTP su Aruba
+      - name: Deploy via FTP to Aruba
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_DIR }}
+          local-dir: ./dist/
+          protocol: ftps
+
+      # Cache bust (opzionale ma utile)
+      - name: Bust cache
+        run: curl https://www.lacco.it/?cache_bust=${{ github.run_id }}
