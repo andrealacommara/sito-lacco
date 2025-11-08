@@ -17,6 +17,10 @@ Redirect 301 /tra-le-nuvole-sv https://distrokid.com/hyperfollow/lacco/tra-le-nu
 Redirect 301 /cercami https://distrokid.com/hyperfollow/lacco/cercami-4
 Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-fondo
 
+# --- Servi direttamente i file esistenti (es. immagini, CSS, JS, favicon, ecc.) ---
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
 # --- SPA fallback: se la risorsa richiesta NON esiste, serviamo index.html ---
 # (utile per React/Vite single-page app — mantiene funzionanti le route client-side)
 RewriteCond %{REQUEST_FILENAME} !-f
