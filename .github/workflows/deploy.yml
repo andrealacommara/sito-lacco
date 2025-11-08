@@ -15,8 +15,8 @@ jobs:
         uses: actions/checkout@v4
 
       # Installa le dipendenze
-      # - name: Install dependencies
-      #   run: npm install
+      - name: Install dependencies
+        run: npm install
 
       # Build del progetto (React + Vite)
       - name: Build project
