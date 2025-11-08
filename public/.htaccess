@@ -1,10 +1,8 @@
-# Abilita rewrite
+# Abilita rewrite e forza HTTPS
 RewriteEngine On
-RewriteBase /
-
-# --- Forza HTTPS ---
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [L,R=301]
+RewriteBase /
 
 # --- Redirect esterni permanenti (301) ---
 Redirect 301 /spotify https://open.spotify.com/intl-it/artist/6viihrUFd4eGCfv9w61tL7?si=CDBCI2pYT2axereXjLHUJA
