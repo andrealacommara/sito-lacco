@@ -66,7 +66,7 @@ export default function IndexPage() {
             Lacco unisce R&B e sonorità hip-hop in un viaggio introspettivo alla
             scoperta di sé.
             <br />
-            L‘obiettivo è quello di raccontare in musica ciò che è solito
+            Racconta in musica ciò che è solito
             rimanere nascosto, in assordante silezio, dentro ognuno di noi.
           </h1>
         </div>
