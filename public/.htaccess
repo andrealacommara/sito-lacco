@@ -1,0 +1,24 @@
+# Abilita rewrite
+RewriteEngine On
+RewriteBase /
+
+# --- Redirect esterni permanenti (301) ---
+Redirect 301 /spotify https://open.spotify.com/intl-it/artist/6viihrUFd4eGCfv9w61tL7?si=CDBCI2pYT2axereXjLHUJA
+Redirect 301 /instagram https://instagram.com/laccoverse
+Redirect 301 /tiktok https://tiktok.com/@laccoverse
+Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
+Redirect 301 /youtube https://www.youtube.com/@Laccoverse
+
+# Redirect per singoli brani (permanenti)
+Redirect 301 /tempo-perso https://distrokid.com/hyperfollow/lacco/tempo-perso-intro
+Redirect 301 /mondo-dentro https://distrokid.com/hyperfollow/lacco/mondo-dentro
+Redirect 301 /tra-le-nuvole https://distrokid.com/hyperfollow/lacco/tra-le-nuvole
+Redirect 301 /tra-le-nuvole-sv https://distrokid.com/hyperfollow/lacco/tra-le-nuvole-sunset-version
+Redirect 301 /cercami https://distrokid.com/hyperfollow/lacco/cercami-4
+Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-fondo
+
+# --- SPA fallback: se la risorsa richiesta NON esiste, serviamo index.html ---
+# (utile per React/Vite single-page app — mantiene funzionanti le route client-side)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
