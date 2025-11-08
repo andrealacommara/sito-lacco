@@ -12,11 +12,6 @@ RewriteBase /
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Forza lacco.it (senza www)
-
-RewriteCond %{HTTP_HOST} ^www\.lacco\.it [NC]
-RewriteRule ^(.\*)$ https://lacco.it/$1 [L,R=301]
-
 # ===============================
 
 # Redirect esterni permanenti
