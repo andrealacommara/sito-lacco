@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import svgr from "vite-plugin-svgr";
 import VitePluginSitemap from "vite-plugin-sitemap";
 
+
 export default defineConfig({
   plugins: [
     react(),
@@ -17,12 +18,8 @@ export default defineConfig({
     svgr(),
   ],
   build: {
-    assetsDir: "",
     rollupOptions: {
       output: {
-        entryFileNames: `[name].js`,
-        chunkFileNames: `[name].js`,
-        assetFileNames: `[name].[ext]`,
         manualChunks: {
           react: ["react", "react-dom"],
           ui: ["@heroui/react"],
