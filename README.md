@@ -1,50 +1,129 @@
-# Vite & HeroUI Template
+# 🎵 Lacco — Official Website
 
-This is a template for creating applications using Vite and HeroUI (v2).
+Un progetto **React + TypeScript + Vite** che racconta **Lacco**, la sua musica e la sua identità artistica.  
+Il sito presenta una struttura moderna, responsive e ottimizzata per la performance, con animazioni fluide e integrazione diretta con **Spotify**, **Apple Music**, **YouTube**, **Instagram** e **TikTok**.
 
-[Try it on CodeSandbox](https://githubbox.com/heroui-inc/vite-template)
+---
 
-## Technologies Used
+## 🚀 Stack Tecnologico
 
-- [Vite](https://vitejs.dev/guide/)
-- [HeroUI](https://heroui.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Framer Motion](https://www.framer.com/motion)
+| Categoria | Tecnologie |
+|------------|-------------|
+| **Frontend Framework** | [React 18+](https://react.dev/) con [Vite](https://vitejs.dev/) |
+| **Linguaggio** | [TypeScript](https://www.typescriptlang.org/) |
+| **UI Library** | [HeroUI](https://heroui.dev/) (basata su NextUI e TailwindCSS) |
+| **Styling** | [TailwindCSS](https://tailwindcss.com/) |
+| **Animazioni** | [Framer Motion](https://www.framer.com/motion/) |
+| **Email Service** | [EmailJS](https://www.emailjs.com/) per l’invio di messaggi dal form contatti |
+| **Gestione Immagini** | `@heroui/image` |
+| **Player Spotify** | IFrame Embed API |
 
-## How to Use
+---
 
-To clone the project, run the following command:
+## 🧩 Struttura del Progetto
 
-```bash
-git clone https://github.com/heroui-inc/vite-template.git
+```
+src/
+├── assets/                 # Immagini e risorse statiche
+│   └── images/lacco/
+├── components/             # Componenti UI riutilizzabili
+│   ├── cardSongExposer.tsx
+│   ├── icons.tsx
+│   ├── navbar.tsx
+│   └── spotifyPlayer.tsx
+├── config/                 # File di configurazione del sito e delle tracce
+│   ├── site.ts
+│   └── songList.ts
+├── layouts/                # Layout principali condivisi (es. DefaultLayout)
+│   └── default.tsx
+├── pages/                  # Pagine principali del sito
+│   ├── index.tsx           # Home
+│   ├── la-mia-musica.tsx   # Sezione musica
+│   ├── su-di-me.tsx        # Biografia
+│   └── contatti.tsx        # Form di contatto con EmailJS
+├── provider.tsx            # Provider globale HeroUI + Toast
+└── types/                  # Tipi TypeScript condivisi
 ```
 
-### Install dependencies
+---
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+## ✨ Funzionalità Principali
 
+- **Homepage:** introduzione a Lacco e player Spotify integrato.  
+- **La mia musica:** carosello orizzontale di singoli, con descrizione e link diretti alle piattaforme.  
+- **Su di me:** biografia animata con effetti di scorrimento progressivo (Framer Motion).  
+- **Contatti:** form interattivo per inviare messaggi direttamente via EmailJS.  
+- **Footer:** link rapidi ai profili social e musicali.  
+
+---
+
+## ⚙️ Setup Locale
+
+### 1. Clona il repository
+```bash
+git clone https://github.com/<tuo-username>/<nome-repo>.git
+cd <nome-repo>
+```
+
+### 2. Installa le dipendenze
 ```bash
 npm install
+# oppure
+yarn install
 ```
 
-### Run the development server
+### 3. Configura le variabili d’ambiente
+Crea un file `.env` nella root del progetto e inserisci i parametri EmailJS:
 
+```bash
+VITE_EMAILJS_SERVICE_ID=tuo_service_id
+VITE_EMAILJS_TEMPLATE_ID=tuo_template_id
+VITE_EMAILJS_PUBLIC_KEY=tuo_public_key
+```
+
+### 4. Avvia il server di sviluppo
 ```bash
 npm run dev
 ```
+Il sito sarà disponibile su [http://localhost:5173](http://localhost:5173)
 
-### Setup pnpm (optional)
+---
 
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
+## 🧱 Build per la Produzione
 
 ```bash
-public-hoist-pattern[]=*@heroui/*
+npm run build
 ```
 
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
+I file ottimizzati saranno generati nella cartella `/dist`.  
+Puoi servirli con un qualsiasi hosting statico (es. Netlify, Vercel, GitHub Pages, Cloudflare Pages).
 
-## License
+---
 
-Licensed under the [MIT license](https://github.com/heroui-inc/vite-template/blob/main/LICENSE).
+## 🧠 Convenzioni di Codice
+
+- Tutti i componenti React sono **funzionali** e scritti in **TypeScript**.  
+- Stile gestito tramite **TailwindCSS** e **HeroUI**.  
+- Ogni componente è autocontenuto e documentato.  
+- Import assoluti (`@/...`) per una struttura più pulita.  
+
+---
+
+## 🎤 Link all'artista (me)
+
+**Lacco**  
+🎧 [Spotify](https://open.spotify.com/artist/6viihrUFd4eGCfv9w61tL7)  
+📸 [Instagram](https://instagram.com/laccoverse)  
+🎵 [TikTok](https://tiktok.com/@laccoverse)  
+📺 [YouTube](https://www.youtube.com/@Laccoverse)
+
+---
+
+## 🧑‍💻 Autore
+Andrea La Commara
+
+---
+## 📜 Licenza
+
+Questo progetto è distribuito sotto licenza **MIT**.  
+Puoi modificarlo e riutilizzarlo liberamente, citando la fonte.
