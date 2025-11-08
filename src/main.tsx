@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-
+import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import { Provider } from "./provider.tsx";
 import "@/styles/globals.css";
@@ -16,12 +16,15 @@ import "@/styles/globals.css";
  */
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* Router per la gestione delle rotte dell'app */}
-    <BrowserRouter>
-      {/* Provider globale per stato, tema o configurazioni condivise */}
-      <Provider>
-        <App />
-      </Provider>
-    </BrowserRouter>
-  </React.StrictMode>,
+    {/* HelmetProvider avvolge tutta l'app per gestire meta tag dinamici */}
+    <HelmetProvider>
+      {/* Router per la gestione delle rotte dell'app */}
+      <BrowserRouter>
+        {/* Provider globale per stato, tema o configurazioni condivise */}
+        <Provider>
+          <App />
+        </Provider>
+      </BrowserRouter>
+    </HelmetProvider>
+  </React.StrictMode>
 );

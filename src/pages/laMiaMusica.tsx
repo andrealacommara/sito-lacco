@@ -5,6 +5,7 @@ import { subtitle, title } from "@/components/primitives"; // Classi di stile pe
 import DefaultLayout from "@/layouts/default"; // Layout base (include navbar e footer)
 import CardSongExposer from "@/components/cardSongExposer"; // Componente personalizzato per mostrare ogni singolo musicale
 import { songList } from "@/config/songList"; // Dati statici dei brani (titolo, descrizione, artwork, link, ecc.)
+import { Helmet } from "react-helmet-async"; // <--- Import di Helmet per SEO e meta tag
 
 // ========================== COMPONENTE PRINCIPALE ========================== //
 // Pagina “La mia musica” – visualizza tutti i singoli con descrizione e copertina.
@@ -12,6 +13,17 @@ import { songList } from "@/config/songList"; // Dati statici dei brani (titolo,
 export default function MusicPage() {
   return (
     <DefaultLayout>
+      {/* ========================== HELMET ========================== */}
+      {/* Titolo e description dinamici per SEO Google */}
+      <Helmet>
+        <title>Lacco | La mia musica</title>
+        <meta
+          name="description"
+          content="Scopri la musica di Lacco: la storia di ogni brano, l‘artwork e il link per ascoltarlo su Spotify."
+        />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+
       {/* ========================== SEZIONE TITOLO ========================== */}
       {/* Titolo principale della pagina */}
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
