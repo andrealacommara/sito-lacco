@@ -2,7 +2,6 @@ import { FC, useState, useEffect } from "react";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { SwitchProps, useSwitch } from "@heroui/switch";
 import clsx from "clsx";
-import { useTheme } from "@heroui/use-theme";
 
 import { SunFilledIcon, MoonFilledIcon } from "@/components/icons";
 
@@ -27,10 +26,21 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
   // Stato che indica se il componente è montato (necessario per SSR/CSR)
   const [isMounted, setIsMounted] = useState(false);
 
-  // Hook fornito da HeroUI per gestire il tema globale (chiaro/scuro)
-  const { theme, setTheme } = useTheme();
+  // Gestione tema manuale
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    const saved = localStorage.getItem("user-theme");
+    if (saved === "light" || saved === "dark") return saved;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  });
 
-  // Effetto eseguito al montaggio per controllare la validità del tema salvato
+  // Aggiorna classe del documento quando cambia il tema
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
+
+  // Controlla scadenza del tema salvato
   useEffect(() => {
     const timestamp = localStorage.getItem("user-theme-timestamp");
     const expired =
@@ -42,17 +52,16 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
       localStorage.removeItem("user-theme-timestamp");
 
       const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
+        "(prefers-color-scheme: dark)"
       ).matches;
 
       setTheme(prefersDark ? "dark" : "light");
     }
-  }, [setTheme]);
+  }, []);
 
-  // Funzione che gestisce il cambio tema e aggiorna il localStorage
+  // Funzione per alternare il tema
   const handleThemeChange = () => {
     const newTheme = theme === "light" ? "dark" : "light";
-
     setTheme(newTheme);
     localStorage.setItem("user-theme", newTheme);
     localStorage.setItem("user-theme-timestamp", Date.now().toString());
@@ -86,7 +95,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
         className: clsx(
           "px-px transition-opacity hover:opacity-80 cursor-pointer",
           className,
-          classNames?.base,
+          classNames?.base
         ),
       })}
     >
@@ -102,7 +111,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
           class: clsx(
             "w-auto h-auto bg-transparent rounded-lg flex items-center justify-center",
             "group-data-[selected=true]:bg-transparent text-default-500! pt-px px-0 mx-0",
-            classNames?.wrapper,
+            classNames?.wrapper
           ),
         })}
       >

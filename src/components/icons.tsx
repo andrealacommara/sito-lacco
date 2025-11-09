@@ -122,3 +122,52 @@ export const SunFilledIcon = ({
     </g>
   </svg>
 );
+
+/**
+ * Icone Chevron — utilizzate per il movimento orizzontale.
+ *
+ * Anche qui `currentColor` consente di ereditare automaticamente
+ * il colore del tema o del testo circostante.
+ */
+
+export const ChevronLeftIcon = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}: IconSvgProps) => (
+  <svg
+    viewBox="0 0 24 24"
+    width={size || width}
+    height={size || height}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <polyline points="15 18 9 12 15 6" />
+  </svg>
+);
+
+export const ChevronRightIcon = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}: IconSvgProps) => (
+  <svg
+    viewBox="0 0 24 24"
+    width={size || width}
+    height={size || height}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <polyline points="9 6 15 12 9 18" />
+  </svg>
+);
