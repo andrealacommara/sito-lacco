@@ -7,7 +7,7 @@ import CardSongExposer from "@/components/cardSongExposer"; // Componente person
 import { songList } from "@/config/songList"; // Dati statici dei brani (titolo, descrizione, artwork, link, ecc.)
 import { Helmet } from "react-helmet-async"; // <--- Import di Helmet per SEO e meta tag
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons"; // <--- Icone per lo scroll
-import { useRef } from "react"; // <--- Hook per riferimento al contenitore scrollabile
+import { useRef, useState, useEffect } from "react"; // <--- Hook per riferimento al contenitore scrollabile
 import { Button } from "@heroui/react";
 
 // ========================== COMPONENTE PRINCIPALE ========================== //
@@ -17,14 +17,17 @@ export default function MusicPage() {
   // Riferimento al contenitore scrollabile
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Stati per gestire visibilità (opacity) delle frecce
+  const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
+
   // ========================== FUNZIONI DI SCORRIMENTO ========================== //
   // Scorre il contenitore di una card alla volta, a destra o sinistra
   const scroll = (direction: "left" | "right") => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // Trova la prima card per calcolare larghezza + margini
-    const card = container.querySelector("div > div");
+    const card = container.querySelector(".card-song");
     if (!card) return;
 
     const cardWidth = (card as HTMLElement).offsetWidth + 16; // 16px ≈ somma margini laterali (px-2)
@@ -36,6 +39,36 @@ export default function MusicPage() {
     });
   };
 
+  // ========================== GESTIONE EVENTO SCROLL ========================== //
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const card = container.querySelector(".card-song") as HTMLElement;
+    if (!card) return;
+
+    const cardWidth = card.offsetWidth;
+    container.style.scrollPadding = `0px calc(50% - ${cardWidth / 2}px)`;
+
+    // ==========================
+    // SCROLL INIZIALE PER CENTRARE LA PRIMA CARD
+    // ==========================
+    // La prima card parte centrata rispetto al viewport
+    container.scrollTo({ left: 0, behavior: "auto" });
+
+    const handleScroll = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = container;
+
+      setIsAtStart(scrollLeft <= (2*cardWidth));
+      setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - (2*cardWidth));
+    };
+
+    handleScroll();
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // ========================== RENDER ========================== //
   return (
     <DefaultLayout>
       {/* ========================== HELMET ========================== */}
@@ -63,51 +96,59 @@ export default function MusicPage() {
         {/* ========================== WRAPPER COMPLETO CAROSELLO + FRECCE ========================== */}
         {/* Le frecce restano ai lati del carosello, senza sovrapporsi alle card */}
         <div className="flex items-center justify-center gap-2 md:gap-4 w-full">
-          {/* Freccia sinistra */}
-          <Button
-            isIconOnly
-            variant="flat"
-            radius="full"
-            onPress={() => scroll("left")}
-            className="hidden md:flex bg-default-400 hover:bg-danger shadow-md transition hover:scale-110"
-            aria-label="Scorri a sinistra"
-          >
-            <ChevronLeftIcon className="h-6 w-6 text-white" />
-          </Button>
+          <div className="flex flex-row items-center gap-4 max-w-full">
+            {/* Freccia sinistra */}
+            <Button
+              isIconOnly
+              variant="flat"
+              radius="full"
+              onPress={() => scroll("left")}
+              className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition hover:scale-110 ${
+                isAtStart ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
+              aria-label="Scorri a sinistra"
+            >
+              <ChevronLeftIcon className="h-6 w-6 text-white" />
+            </Button>
 
-          {/* ========================== CAROSELLO CANZONI ========================== */}
-          <div
-            ref={scrollContainerRef}
-            className="flex p-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing w-full max-w-[90vw]"
-          >
-            {songList.map((song) => (
-              <div
-                key={song.title}
-                className="shrink-0 snap-center px-2 max-w-full first:ml-[calc(50vw-140px)] last:mr-[calc(50vw-140px)] transition-transform hover:scale-105 active:scale-95"
-              >
-                <CardSongExposer
-                  artworkAlt={song.alt}
-                  artworkSrc={song.src}
-                  preSaveMode={song.preSaveMode}
-                  songDescription={song.description}
-                  songSpotifyLink={song.spotifyLink}
-                  songTitle={song.title}
-                />
-              </div>
-            ))}
+            {/* ========================== CAROSELLO CANZONI ========================== */}
+            <div
+              ref={scrollContainerRef}
+              className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full"
+            >
+              <div className="pl-200"/> {/*carousel off-set*/}
+              {songList.map((song) => (
+                <div
+                  key={song.title}
+                  className="card-song shrink-0 snap-center px-4 max-w-full transition-transform hover:scale-105 active:scale-95"
+                >
+                  <CardSongExposer
+                    artworkAlt={song.alt}
+                    artworkSrc={song.src}
+                    preSaveMode={song.preSaveMode}
+                    songDescription={song.description}
+                    songSpotifyLink={song.spotifyLink}
+                    songTitle={song.title}
+                  />
+                </div>
+              ))}
+              <div className="pr-200"/> {/*carousel off-set*/}
+            </div>
+
+            {/* Freccia destra */}
+            <Button
+              isIconOnly
+              variant="flat"
+              radius="full"
+              onPress={() => scroll("right")}
+              className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition hover:scale-110 ${
+                isAtEnd ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
+              aria-label="Scorri a destra"
+            >
+              <ChevronRightIcon className="h-6 w-6 text-white" />
+            </Button>
           </div>
-
-          {/* Freccia destra */}
-          <Button
-            isIconOnly
-            variant="flat"
-            radius="full"
-            onPress={() => scroll("right")}
-            className="hidden md:flex bg-default-400 hover:bg-danger shadow-md transition hover:scale-110"
-            aria-label="Scorri a destra"
-          >
-            <ChevronRightIcon className="h-6 w-6 text-white" />
-          </Button>
         </div>
 
         {/* ========================== SEZIONE CONCLUSIVA ========================== */}
