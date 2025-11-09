@@ -26,6 +26,10 @@ function App() {
 
       {/* Pagina contatti con form di collegamento */}
       <Route element={<ContattiPage />} path="/contatti" />
+
+      {/* Fallback: qualsiasi percorso non definito qui reindirizza alla Home */}
+      {/* Utile per gestire URL non previsti e evitare pagine bianche */}
+      <Route path="*" element={<HomePage />} />
     </Routes>
   );
 }
