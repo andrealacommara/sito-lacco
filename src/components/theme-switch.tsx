@@ -26,27 +26,40 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
   // Stato che indica se il componente è montato (necessario per SSR/CSR)
   const [isMounted, setIsMounted] = useState(false);
 
-  // Gestione tema manuale
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
+  // ========================== LOGICA TEMA ========================== //
+
+  // Funzione che determina il tema iniziale da usare
+  const getInitialTheme = (): "light" | "dark" => {
     const saved = localStorage.getItem("user-theme");
-    if (saved === "light" || saved === "dark") return saved;
+    const timestamp = localStorage.getItem("user-theme-timestamp");
+
+    // Se esiste un tema salvato e non è scaduto → usalo
+    if (saved && timestamp) {
+      const expired = Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
+      if (!expired) return saved as "light" | "dark";
+    }
+
+    // Se non c'è tema valido → usa il tema di sistema
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
-  });
+  };
+
+  // Gestione tema manuale
+  const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
 
   // Aggiorna classe del documento quando cambia il tema
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
-  // Controlla scadenza del tema salvato
+  // Controlla scadenza del tema salvato all’avvio
   useEffect(() => {
     const timestamp = localStorage.getItem("user-theme-timestamp");
     const expired =
       timestamp && Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
 
-    // Se il salvataggio è scaduto, resetta il tema e applica la preferenza di sistema
+    // Se il tema salvato è scaduto, resetta e applica la preferenza di sistema
     if (expired) {
       localStorage.removeItem("user-theme");
       localStorage.removeItem("user-theme-timestamp");
@@ -59,13 +72,35 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
     }
   }, []);
 
+  // Segui i cambiamenti del tema di sistema se l'utente non ha ancora fatto una scelta
+  useEffect(() => {
+    const saved = localStorage.getItem("user-theme");
+    if (!saved) {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const handleChange = (e: MediaQueryListEvent) =>
+        setTheme(e.matches ? "dark" : "light");
+
+      // Applica subito il tema corrente del sistema
+      setTheme(mediaQuery.matches ? "dark" : "light");
+
+      // Ascolta i cambiamenti futuri
+      mediaQuery.addEventListener("change", handleChange);
+
+      // Pulisci listener quando il componente viene smontato
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+  }, []);
+
   // Funzione per alternare il tema
   const handleThemeChange = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
+    // Salva la scelta dell’utente con timestamp
     localStorage.setItem("user-theme", newTheme);
     localStorage.setItem("user-theme-timestamp", Date.now().toString());
   };
+
+  // ========================== HOOK HEROUI ========================== //
 
   // Hook di HeroUI che fornisce logica e accessibilità per lo switch
   const {
