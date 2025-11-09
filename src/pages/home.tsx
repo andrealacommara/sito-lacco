@@ -67,7 +67,7 @@ export default function IndexPage() {
             scoperta di sé.
             <br />
             Racconta in musica ciò che è solito
-            rimanere nascosto, in assordante silezio, dentro ognuno di noi.
+            rimanere nascosto, in assordante silenzio, dentro ognuno di noi.
           </h1>
         </div>
       </Card>
