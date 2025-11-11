@@ -1,7 +1,6 @@
-// ========================== IMPORT DELLE COVER ART ========================== //
-// Importa le immagini di copertina (artwork) dei singoli brani dal percorso
-// definito nella cartella assets. Questi file sono utilizzati per popolare
-// visivamente la sezione musicale del sito.
+// ========================== MAIN IMPORTS ========================== //
+// Import cover artwork images for each song from the assets folder.
+// These images visually populate the music section of the site.
 
 import cercamiArtwork from "@/assets/images/artworks/cercamiArtwork.avif";
 import mondoDentroArtwork from "@/assets/images/artworks/mondoDentroArtwork.avif";
@@ -10,35 +9,22 @@ import tempoPersoArtwork from "@/assets/images/artworks/tempoPersoArtwork.avif";
 import traLeNuvoleArtwork from "@/assets/images/artworks/traLeNuvoleArtwork.avif";
 import traLeNuvoleSVArtwork from "@/assets/images/artworks/traLeNuvoleSunsetVersionArtwork.avif";
 
-// ========================== DEFINIZIONE TIPO ========================== //
-// Esporta un tipo TypeScript basato sulla struttura dell’array `songList`.
-// Permette di riutilizzare questa tipizzazione per garantire coerenza e
-// completamento automatico nelle altre parti dell’applicazione.
+// ========================== TYPE DEFINITION ========================== //
+// Export a TypeScript type based on the `songList` array structure.
+// Ensures type safety and autocompletion across the application.
 export type songList = typeof songList;
 
-// ========================== LISTA DEI BRANI ========================== //
-// Array che raccoglie tutti i brani pubblicati, ognuno rappresentato come
-// oggetto con informazioni su titolo, copertina, descrizione e link Spotify.
+// ========================== SONG LIST ========================== //
+// Array of published songs, each object containing title, artwork, description, Spotify link (or pre-save link) and pre-save flag.
 
 export const songList = [
   {
-    // Titolo del brano
     title: "rumore di fondo",
-
-    // Percorso all’immagine di copertina
     src: rumoreDiFondoArtwork,
-
-    // Testo alternativo per l’accessibilità
     alt: "Cover artwork di 'rumore di fondo'",
-
-    // Descrizione testuale: spiega il significato e il tono del brano
     description:
       "“rumore di fondo” è il suono che resta quando tutto il resto tace.\nÈ il pensiero che non smette mai di girare, la voce che continua a parlarti anche quando vorresti solo silenzio.\nRacconta una relazione che brucia ancora nelle vene, fatta di contrasti, di errori, di colpe condivise.\nÈ un viaggio nel caos interiore, tra nostalgia e consapevolezza, dove l’amore si confonde con il rumore e non sai più se ti tiene a galla o ti trascina giù.",
-
-    // Link diretto al brano su Spotify o al “pre-save“
     spotifyLink: "https://www.lacco.it/rumore-di-fondo",
-
-    // Flag che indica se il brano è in modalità “pre-save” (non ancora pubblicato)
     preSaveMode: true,
   },
   {

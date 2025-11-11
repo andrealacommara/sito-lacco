@@ -7,7 +7,8 @@
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     />
 
-    <!-- SEO base -->
+    <!-- ========================== BASIC SEO ========================== -->
+    <!-- Core metadata for search engines and browser previews -->
     <title>Lacco | Official Website</title>
     <meta name="title" content="Lacco | Official Website" />
     <meta
@@ -20,7 +21,8 @@
     />
     <meta name="author" content="Lacco" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- ========================== OPEN GRAPH / FACEBOOK ========================== -->
+    <!-- Enables rich previews when the site is shared on Facebook and other platforms -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Lacco.it" />
     <meta property="og:title" content="Lacco | Official Website" />
@@ -34,7 +36,8 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
-    <!-- Twitter -->
+    <!-- ========================== TWITTER CARD ========================== -->
+    <!-- Twitter metadata for link previews -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Lacco | Official Website" />
     <meta
@@ -43,14 +46,16 @@
     />
     <meta name="twitter:image" content="https://www.lacco.it/og-image.jpg" />
 
-    <!-- Icons -->
+    <!-- ========================== ICONS ========================== -->
+    <!-- Favicon and app icons for different devices and browsers -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Theme colors -->
+    <!-- ========================== THEME COLORS ========================== -->
+    <!-- Defines colors for light and dark mode browser UI -->
     <meta
       name="theme-color"
       media="(prefers-color-scheme: light)"
@@ -62,17 +67,20 @@
       content="#000000"
     />
 
-    <!-- Microsoft -->
+    <!-- ========================== MICROSOFT ========================== -->
+    <!-- Pinned site tile color and config for Windows browsers -->
     <meta name="msapplication-TileColor" content="#000000" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
 
-    <!-- Google Search Console -->
+    <!-- ========================== GOOGLE SEARCH CONSOLE ========================== -->
+    <!-- Site ownership verification for Google indexing -->
     <meta
       name="google-site-verification"
       content="181FTmk6Q3tTuacqdHrjJiRoA2gt_UodmPeRWt_UYmA"
     />
 
-    <!-- Schema.org JSON-LD (aiuta Google a riconoscere il brand) -->
+    <!-- ========================== STRUCTURED DATA (JSON-LD) ========================== -->
+    <!-- Helps Google recognize the artist as a verified brand entity -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -91,8 +99,14 @@
       }
     </script>
   </head>
+
   <body>
+    <!-- ========================== ROOT ELEMENT ========================== -->
+    <!-- React mounts the entire app inside this container -->
     <div id="root"></div>
+
+    <!-- ========================== ENTRY SCRIPT ========================== -->
+    <!-- Main entry point: initializes React app and providers -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

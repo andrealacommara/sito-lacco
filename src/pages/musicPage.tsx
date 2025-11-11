@@ -1,28 +1,28 @@
-// ========================== IMPORT DIPENDENZE PRINCIPALI ========================== //
-// Importa funzioni di stile, layout e componenti personalizzati per la pagina “La mia musica”.
+// ========================== MAIN IMPORTS ========================== //
+// Import style functions, layout, and custom components for the “La mia musica” page.
 
-import { subtitle, title } from "@/components/primitives"; // Classi di stile per i titoli principali e secondari
-import DefaultLayout from "@/layouts/default"; // Layout base (include navbar e footer)
-import CardSongExposer from "@/components/cardSongExposer"; // Componente personalizzato per mostrare ogni singolo musicale
-import { songList } from "@/config/songList"; // Dati statici dei brani (titolo, descrizione, artwork, link, ecc.)
-import { Helmet } from "react-helmet-async"; // <--- Import di Helmet per SEO e meta tag
-import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons"; // <--- Icone per lo scroll
-import { useRef, useState, useEffect } from "react"; // <--- Hook per riferimento al contenitore scrollabile
+import { subtitle, title } from "@/components/primitives"; // Style classes for main and secondary titles
+import DefaultLayout from "@/layouts/default"; // Base layout (includes navbar and footer)
+import CardSongExposer from "@/components/cardSongExposer"; // Custom component to display each song
+import { songList } from "@/config/songList"; // Static song data (title, description, artwork, link, etc.)
+import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
+import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons"; // Icons for carousel scroll
+import { useRef, useState, useEffect } from "react"; // Hooks for scroll container reference and state
 import { Button } from "@heroui/react";
 
-// ========================== COMPONENTE PRINCIPALE ========================== //
-// Pagina “La mia musica” – visualizza tutti i singoli con descrizione e copertina.
+// ========================== MUSIC PAGE COMPONENT ========================== //
+// “La mia musica” page – displays all singles with descriptions and cover art.
 
 export default function MusicPage() {
-  // Riferimento al contenitore scrollabile
+  // Reference to the scrollable container
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Stati per gestire visibilità (opacity) delle frecce
+  // States to handle arrow visibility (opacity)
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
 
-  // ========================== FUNZIONI DI SCORRIMENTO ========================== //
-  // Scorre il contenitore di una card alla volta, a destra o sinistra
+  // ========================== SCROLL FUNCTIONS ========================== //
+  // Scrolls one card at a time, left or right
   const scroll = (direction: "left" | "right") => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -30,7 +30,7 @@ export default function MusicPage() {
     const card = container.querySelector(".card-song");
     if (!card) return;
 
-    const cardWidth = (card as HTMLElement).offsetWidth + 16; // 16px ≈ somma margini laterali (px-2)
+    const cardWidth = (card as HTMLElement).offsetWidth + 16; // 16px ≈ total horizontal margin (px-2)
     const scrollAmount = direction === "left" ? -cardWidth : cardWidth;
 
     container.scrollBy({
@@ -39,7 +39,7 @@ export default function MusicPage() {
     });
   };
 
-  // ========================== GESTIONE EVENTO SCROLL ========================== //
+  // ========================== SCROLL EVENT HANDLER ========================== //
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -50,17 +50,15 @@ export default function MusicPage() {
     const cardWidth = card.offsetWidth;
     container.style.scrollPadding = `0px calc(50% - ${cardWidth / 2}px)`;
 
-    // ==========================
-    // SCROLL INIZIALE PER CENTRARE LA PRIMA CARD
-    // ==========================
-    // La prima card parte centrata rispetto al viewport
+    // ========================== INITIAL SCROLL CENTERING ========================== //
+    // The first card starts centered within the viewport
     container.scrollTo({ left: 0, behavior: "auto" });
 
     const handleScroll = () => {
       const { scrollLeft, scrollWidth, clientWidth } = container;
 
-      setIsAtStart(scrollLeft <= (2*cardWidth));
-      setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - (2*cardWidth));
+      setIsAtStart(scrollLeft <= 2 * cardWidth);
+      setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 2 * cardWidth);
     };
 
     handleScroll();
@@ -72,7 +70,7 @@ export default function MusicPage() {
   return (
     <DefaultLayout>
       {/* ========================== HELMET ========================== */}
-      {/* Titolo e description dinamici per SEO Google */}
+      {/* Dynamic title and description for Google SEO */}
       <Helmet>
         <title>Lacco | La mia musica</title>
         <meta
@@ -82,22 +80,22 @@ export default function MusicPage() {
         <meta name="robots" content="index, follow" />
       </Helmet>
 
-      {/* ========================== SEZIONE TITOLO ========================== */}
-      {/* Titolo principale della pagina */}
+      {/* ========================== TITLE SECTION ========================== */}
+      {/* Main page title */}
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <h1 className={title()}>La mia musica</h1>
       </div>
 
-      {/* ========================== SEZIONE CONTENUTI ========================== */}
+      {/* ========================== CONTENT SECTION ========================== */}
       <div className="flex flex-col justify-center min-h-fit md:min-h-fit">
-        {/* Sottotitolo introduttivo */}
+        {/* Intro subtitle */}
         <h2 className={subtitle()}>Scopri la storia di ogni singolo</h2>
 
-        {/* ========================== WRAPPER COMPLETO CAROSELLO + FRECCE ========================== */}
-        {/* Le frecce restano ai lati del carosello, senza sovrapporsi alle card */}
+        {/* ========================== FULL WRAPPER: CAROUSEL + ARROWS ========================== */}
+        {/* The arrows remain beside the carousel without overlapping cards */}
         <div className="flex items-center justify-center gap-2 md:gap-4 w-full">
-          <div className="flex flex-row items-center gap-4 max-w-full">
-            {/* Freccia sinistra */}
+          <div className="flex flex-row items-center gap-4 max-w-full max-h-fit">
+            {/* Left arrow */}
             <Button
               isIconOnly
               variant="flat"
@@ -111,16 +109,16 @@ export default function MusicPage() {
               <ChevronLeftIcon className="h-6 w-6 text-white" />
             </Button>
 
-            {/* ========================== CAROSELLO CANZONI ========================== */}
+            {/* ========================== SONG CAROUSEL ========================== */}
             <div
               ref={scrollContainerRef}
-              className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full"
+              className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full px-6 sm:px-12 md:px-0"
             >
-              <div className="pl-200"/> {/*carousel off-set*/}
+              <div className="pl-200" /> {/* carousel offset */}
               {songList.map((song) => (
                 <div
                   key={song.title}
-                  className="card-song shrink-0 snap-center px-4 max-w-full transition-transform hover:scale-105 active:scale-95"
+                  className="card-song shrink-0 snap-center px-2 max-w-full transition-transform hover:scale-105 active:scale-95"
                 >
                   <CardSongExposer
                     artworkAlt={song.alt}
@@ -132,10 +130,10 @@ export default function MusicPage() {
                   />
                 </div>
               ))}
-              <div className="pr-200"/> {/*carousel off-set*/}
+              <div className="pr-200" /> {/* carousel offset */}
             </div>
 
-            {/* Freccia destra */}
+            {/* Right arrow */}
             <Button
               isIconOnly
               variant="flat"
@@ -151,8 +149,8 @@ export default function MusicPage() {
           </div>
         </div>
 
-        {/* ========================== SEZIONE CONCLUSIVA ========================== */}
-        {/* Breve messaggio finale all’utente */}
+        {/* ========================== CLOSING SECTION ========================== */}
+        {/* Short closing message for the user */}
         <div className="flex justify-center">
           <h3 className="w-full md:w-1/2 my-2 text-default-400 block max-w-full text-center font-light text-small">
             Ogni brano è una parte di me, buon ascolto.

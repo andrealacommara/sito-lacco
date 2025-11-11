@@ -1,14 +1,18 @@
-import type { NavigateOptions } from "react-router-dom";
+// ========================== MAIN IMPORTS ========================== //
+// Type definitions and core dependencies for global app providers.
 
-import { HeroUIProvider } from "@heroui/react";
-import { ToastProvider } from "@heroui/toast";
-import { useHref, useNavigate } from "react-router-dom";
+import type { NavigateOptions } from "react-router-dom"; // Navigation options type for router integration
+import { HeroUIProvider } from "@heroui/react"; // HeroUI global provider (component styling, theme context)
+import { ToastProvider } from "@heroui/toast"; // Toast system provider for global notifications
+import { useHref, useNavigate } from "react-router-dom"; // React Router hooks for navigation and URL resolution
 
+// ========================== MODULE EXTENSION ========================== //
 /**
- * Estensione del modulo @react-types/shared per configurare
- * le opzioni di navigazione personalizzate del router.
- * Serve a tipizzare correttamente i parametri usati da HeroUI
- * in combinazione con React Router.
+ * Extends the @react-types/shared module to define
+ * the custom router configuration used by HeroUI.
+ *
+ * This ensures proper type-checking for navigation options
+ * when integrating HeroUI with React Router.
  */
 declare module "@react-types/shared" {
   interface RouterConfig {
@@ -16,22 +20,24 @@ declare module "@react-types/shared" {
   }
 }
 
+// ========================== PROVIDER COMPONENT ========================== //
 /**
- * Provider globale dell'applicazione.
+ * Global application provider.
  *
- * - Inietta il contesto di HeroUI (libreria di componenti React basata su Tailwind).
- * - Collega il sistema di routing interno di HeroUI a React Router
- *   attraverso i metodi `navigate` e `useHref`.
- * - Aggiunge il ToastProvider per la gestione centralizzata delle notifiche.
+ * Responsibilities:
+ * - Injects the HeroUI context (React component library built on Tailwind).
+ * - Connects HeroUI’s internal navigation system with React Router
+ *   through the `navigate` and `useHref` hooks.
+ * - Wraps the app in a centralized ToastProvider for global notifications.
  */
 export function Provider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   return (
     <HeroUIProvider navigate={navigate} useHref={useHref}>
-      {/* Provider globale per notifiche toast */}
+      {/* Global toast provider for app-wide notifications */}
       <ToastProvider placement="bottom-right" />
-      {/* Contenuto dell'applicazione */}
+      {/* Render the wrapped application content */}
       {children}
     </HeroUIProvider>
   );

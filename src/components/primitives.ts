@@ -1,17 +1,18 @@
+// ========================== MAIN IMPORT ========================== //
+// Tailwind Variants (tv) allows creating reusable and dynamic Tailwind classes
+// based on variants, simplifying the management of complex styles.
 import { tv } from "tailwind-variants";
-// Importa la funzione `tv` di Tailwind Variants,
-// che permette di creare stili dinamici e riutilizzabili basati su varianti.
 
 // ========================== TITLE ========================== //
-// Definisce lo stile del titolo principale del sito (h1, headings, ecc.)
-// Usa un sistema di varianti per colore, dimensione e larghezza.
+// Defines the main title style of the site (h1, headings, etc.)
+// Uses variants for color, size, and width.
 export const title = tv({
-  // Stili di base applicati a tutti i titoli
+  // Base styles applied to all titles
   base: "tracking-tight inline font-semibold text-center",
 
-  // Varianti configurabili per personalizzare il titolo
+  // Configurable variants to customize the title
   variants: {
-    // Colore del testo (gradienti)
+    // Text color (gradients)
     color: {
       violet: "from-[#FF1CF7] to-[#b249f8]",
       yellow: "from-[#FF705B] to-[#FFB457]",
@@ -19,28 +20,28 @@ export const title = tv({
       cyan: "from-[#00b7fa] to-[#01cfea]",
       green: "from-[#6FEE8D] to-[#17c964]",
       pink: "from-[#FF72E1] to-[#F54C7A]",
-      foreground: "dark:from-[#FFFFFF] dark:to-[#4B4B4B]", // Colore neutro per modalità scura
+      foreground: "dark:from-[#FFFFFF] dark:to-[#4B4B4B]", // Neutral color for dark mode
     },
 
-    // Dimensione del titolo
+    // Title size
     size: {
       sm: "text-3xl lg:text-4xl",
       md: "text-[2.3rem] lg:text-5xl",
       lg: "text-4xl lg:text-6xl",
     },
 
-    // Opzione per rendere il titolo a tutta larghezza
+    // Option to make the title full width
     fullWidth: {
       true: "w-full block",
     },
   },
 
-  // Imposta i valori di default
+  // Default variant values
   defaultVariants: {
     size: "md",
   },
 
-  // Varianti composte — applicano classi aggiuntive in base a combinazioni
+  // Compound variants — apply additional classes based on combinations
   compoundVariants: [
     {
       color: [
@@ -52,33 +53,33 @@ export const title = tv({
         "pink",
         "foreground",
       ],
-      // Applica un effetto gradiente al testo
+      // Apply gradient effect to the text
       class: "bg-clip-text text-transparent bg-linear-to-b",
     },
   ],
 });
 
 // ========================== SUBTITLE ========================== //
-// Stili per i sottotitoli o paragrafi introduttivi sotto i titoli principali.
+// Styles for subtitles or introductory paragraphs below main titles.
 export const subtitle = tv({
-  // Stili di base per il sottotitolo
+  // Base styles for the subtitle
   base: "w-full md:w-1/2 my-2 text-lg lg:text-xl text-default-600 block max-w-full font-semibold text-center",
 
-  // Varianti configurabili
+  // Configurable variants
   variants: {
-    // 📏 Opzione per forzare larghezza piena
+    // Option to force full width
     fullWidth: {
       true: "w-full!",
     },
 
-    // 🎨 Colori opzionali per il testo
+    // Optional text colors
     color: {
-      danger: "text-danger", // Rosso
-      success: "text-success", // Verde
+      danger: "text-danger", // Red
+      success: "text-success", // Green
     },
   },
 
-  // Valori di default
+  // Default variant values
   defaultVariants: {
     fullWidth: true,
   },

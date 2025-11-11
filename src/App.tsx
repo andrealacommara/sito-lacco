@@ -1,34 +1,39 @@
-import { Route, Routes } from "react-router-dom";
+// ========================== MAIN IMPORTS ========================== //
+// Main libraries and page components for route management.
 
-import HomePage from "@/pages/home";
-import LaMiaMusicaPage from "@/pages/laMiaMusica";
-import SuDiMePage from "@/pages/suDiMe";
-import ContattiPage from "@/pages/contatti";
+import { Route, Routes } from "react-router-dom"; // Client-side routing for page navigation without reloads
 
+// Import delle pagine principali del sito
+import HomePage from "@/pages/homePage"; // "Home" page
+import MusicPage from "@/pages/musicPage"; // “La mia musica” page
+import AboutPage from "@/pages/aboutPage"; // “Su di me” page
+import ContactsPage from "@/pages/contactsPage"; // "Contatti" page
+
+// ========================== MAIN COMPONENT: App ========================== //
 /**
- * Componente principale dell'applicazione.
- * Gestisce la definizione delle rotte e il mapping tra URL e pagine.
+ * Main application component.
+ * Defines all routes and maps URLs to the corresponding pages.
  *
- * Ogni rotta utilizza React Router per rendere il contenuto
- * senza ricaricare la pagina, garantendo un'esperienza fluida in stile SPA.
+ * Each route uses React Router to render content dynamically
+ * without reloading, ensuring a smooth SPA experience.
  */
 function App() {
   return (
     <Routes>
-      {/* Pagina principale (Home) */}
+      {/* "Home" page */}
       <Route element={<HomePage />} path="/" />
 
-      {/* Sezione dedicata alla musica dell'artista */}
-      <Route element={<LaMiaMusicaPage />} path="/la-mia-musica" />
+      {/* “La mia musica” page */}
+      <Route element={<MusicPage />} path="/la-mia-musica" />
 
-      {/* Pagina biografica */}
-      <Route element={<SuDiMePage />} path="/su-di-me" />
+      {/* “Su di me” page */}
+      <Route element={<AboutPage />} path="/su-di-me" />
 
-      {/* Pagina contatti con form di collegamento */}
-      <Route element={<ContattiPage />} path="/contatti" />
+      {/* "Contatti" page */}
+      <Route element={<ContactsPage />} path="/contatti" />
 
-      {/* Fallback: qualsiasi percorso non definito qui reindirizza alla Home */}
-      {/* Utile per gestire URL non previsti e evitare pagine bianche */}
+      {/* Fallback route: redirects undefined paths to Home */}
+      {/* Useful to handle unknown URLs and avoid blank pages */}
       <Route path="*" element={<HomePage />} />
     </Routes>
   );

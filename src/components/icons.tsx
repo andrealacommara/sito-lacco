@@ -1,6 +1,6 @@
-// Importa i file SVG come stringhe raw (contenuto SVG puro)
-// In questo modo possiamo manipolare direttamente i path SVG
-// e creare componenti React altamente personalizzabili.
+// ========================== MAIN IMPORTS ========================== //
+// Core imports and utilities used to manage SVG icons, create React components,
+// and define types. This includes raw SVG imports.
 import logoLacco from "../assets/icons/logo-lacco.svg?raw";
 import logoSpotify from "../assets/icons/logo-spotify.svg?raw";
 import logoInstagram from "../assets/icons/logo-instagram.svg?raw";
@@ -8,25 +8,24 @@ import logoTikTok from "../assets/icons/logo-tiktok.svg?raw";
 import logoAppleMusic from "../assets/icons/logo-apple-music.svg?raw";
 import logoYouTube from "../assets/icons/logo-youtube.svg?raw";
 
-import { createIcon } from "@/utils/createIcon";
-import { IconSvgProps } from "@/types";
+import { createIcon } from "@/utils/createIcon"; // Icon creation helper
+import { IconSvgProps } from "@/types"; // TypeScript props definitions
 
 /**
- * Estrae il tracciato principale (`<path>`) da un file SVG.
+ * Extracts the main `<path>` from an SVG file.
  *
- * Questa funzione consente di utilizzare solo la parte utile del file SVG,
- * evitando markup superfluo e garantendo un rendering pulito.
+ * This function allows using only the useful part of the SVG,
+ * avoiding unnecessary markup and ensuring clean rendering.
  *
- * @param svg - Contenuto SVG importato come stringa
- * @returns Il valore dell’attributo `d` del primo path trovato
+ * @param svg - Imported SVG content as a string
+ * @returns The `d` attribute value of the first path found
  */
 const extractPath = (svg: string): string => {
   const match = svg.match(/<path[^>]*d="([^"]*)"/);
-
   return match ? match[1] : "";
 };
 
-// ================== ESTRAZIONE DEI PATH ================== //
+// ================== PATH EXTRACTION ================== //
 const logoPath = extractPath(logoLacco);
 const spotifyPath = extractPath(logoSpotify);
 const instagramPath = extractPath(logoInstagram);
@@ -34,13 +33,13 @@ const tikTokPath = extractPath(logoTikTok);
 const appleMusicPath = extractPath(logoAppleMusic);
 const youtubePath = extractPath(logoYouTube);
 
-// ================== DEFINIZIONE ICONE ================== //
+// ================== ICON DEFINITIONS ================== //
 
 /**
- * Logo principale del progetto.
+ * Main project logo.
  *
- * SVG scalabile che utilizza il path estratto dal file sorgente.
- * Colore e dimensioni sono controllati via props, per adattarsi al tema corrente.
+ * Scalable SVG using the extracted path from the source file.
+ * Color and size are controlled via props to match the current theme.
  */
 export const Logo = ({ size = 100, height, ...props }: IconSvgProps) => (
   <svg
@@ -59,8 +58,8 @@ export const Logo = ({ size = 100, height, ...props }: IconSvgProps) => (
   </svg>
 );
 
-// Icone dei principali social e piattaforme musicali
-// Generate dinamicamente tramite utility `createIcon()` per mantenere consistenza
+// Main social and music platform icons
+// Dynamically generated using the `createIcon()` utility for consistency
 export const InstagramIcon = createIcon(instagramPath);
 export const TikTokIcon = createIcon(tikTokPath);
 export const SpotifyIcon = createIcon(spotifyPath);
@@ -68,10 +67,10 @@ export const AppleMusicIcon = createIcon(appleMusicPath);
 export const YouTubeIcon = createIcon(youtubePath);
 
 /**
- * Icona “Luna” — utilizzata per la modalità scura (dark mode).
+ * “Moon” icon — used for dark mode.
  *
- * Implementata come SVG inline per pieno controllo stilistico
- * e compatibilità con Tailwind (uso di `currentColor`).
+ * Implemented as inline SVG for full stylistic control
+ * and Tailwind compatibility (uses `currentColor`).
  */
 export const MoonFilledIcon = ({
   size = 24,
@@ -96,10 +95,9 @@ export const MoonFilledIcon = ({
 );
 
 /**
- * Icona “Sole” — utilizzata per la modalità chiara (light mode).
+ * “Sun” icon — used for light mode.
  *
- * Anche qui `currentColor` consente di ereditare automaticamente
- * il colore del tema o del testo circostante.
+ * `currentColor` inherits automatically from the theme or surrounding text color.
  */
 export const SunFilledIcon = ({
   size = 24,
@@ -124,12 +122,10 @@ export const SunFilledIcon = ({
 );
 
 /**
- * Icone Chevron — utilizzate per il movimento orizzontale.
+ * Chevron icons — used for horizontal movement.
  *
- * Anche qui `currentColor` consente di ereditare automaticamente
- * il colore del tema o del testo circostante.
+ * `currentColor` inherits automatically from the theme or surrounding text color.
  */
-
 export const ChevronLeftIcon = ({
   size = 24,
   width,

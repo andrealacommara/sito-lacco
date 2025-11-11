@@ -1,26 +1,32 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
-import App from "./App.tsx";
-import { Provider } from "./provider.tsx";
-import "@/styles/globals.css";
+// ========================== MAIN IMPORTS ========================== //
+// Core React libraries, app entry point, and global providers.
 
+import React from "react"; // React core library
+import ReactDOM from "react-dom/client"; // ReactDOM for rendering the app into the DOM
+import { BrowserRouter } from "react-router-dom"; // Client-side routing
+import { HelmetProvider } from "react-helmet-async"; // SEO and dynamic meta tags manager
+import App from "./App.tsx"; // Main App component
+import { Provider } from "./provider.tsx"; // Global context provider (theme, state, etc.)
+import "@/styles/globals.css"; // Global stylesheet
+
+// ========================== ENTRY POINT ========================== //
 /**
- * Punto di ingresso principale dell'applicazione React.
- * Qui viene creata la root ReactDOM e montata l'app all'interno dell'elemento #root.
- * L'app è racchiusa in diversi wrapper globali:
- * - React.StrictMode: abilita controlli aggiuntivi in sviluppo.
- * - BrowserRouter: gestisce la navigazione client-side.
- * - Provider: fornisce contesto e stato condiviso a tutto il progetto.
+ * Main entry point of the React application.
+ * Creates the ReactDOM root and mounts the app into the #root element.
+ *
+ * The app is wrapped in multiple global providers:
+ * - React.StrictMode: enables additional checks during development.
+ * - BrowserRouter: handles client-side navigation.
+ * - HelmetProvider: manages SEO and meta tag updates.
+ * - Provider: provides shared context and configuration across the app.
  */
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* HelmetProvider avvolge tutta l'app per gestire meta tag dinamici */}
+    {/* HelmetProvider wraps the app to enable dynamic SEO meta tags */}
     <HelmetProvider>
-      {/* Router per la gestione delle rotte dell'app */}
+      {/* BrowserRouter handles the routing logic for the app */}
       <BrowserRouter>
-        {/* Provider globale per stato, tema o configurazioni condivise */}
+        {/* Global Provider for shared state, theme, or configurations */}
         <Provider>
           <App />
         </Provider>
