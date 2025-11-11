@@ -1,15 +1,18 @@
-# Abilita rewrite
+# Enable rewrite engine
+
 RewriteEngine On
 RewriteBase /
 
-# --- Redirect esterni permanenti (301) ---
+# --- Permanent external redirects (301) ---
+
 Redirect 301 /spotify https://open.spotify.com/intl-it/artist/6viihrUFd4eGCfv9w61tL7?si=CDBCI2pYT2axereXjLHUJA
 Redirect 301 /instagram https://instagram.com/laccoverse
 Redirect 301 /tiktok https://tiktok.com/@laccoverse
 Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
 Redirect 301 /youtube https://www.youtube.com/@Laccoverse
 
-# Redirect per singoli brani (permanenti)
+# Permanent redirects for individual tracks
+
 Redirect 301 /tempo-perso https://distrokid.com/hyperfollow/lacco/tempo-perso-intro
 Redirect 301 /mondo-dentro https://distrokid.com/hyperfollow/lacco/mondo-dentro
 Redirect 301 /tra-le-nuvole https://distrokid.com/hyperfollow/lacco/tra-le-nuvole
@@ -17,12 +20,33 @@ Redirect 301 /tra-le-nuvole-sv https://distrokid.com/hyperfollow/lacco/tra-le-nu
 Redirect 301 /cercami https://distrokid.com/hyperfollow/lacco/cercami-4
 Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-fondo
 
-# --- Servi direttamente i file esistenti (es. immagini, CSS, JS, favicon, ecc.) ---
+# --- Serve existing static files directly (e.g. images, CSS, JS, favicon, etc.) ---
+
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# --- SPA fallback: se la risorsa richiesta NON esiste, serviamo index.html ---
-# (utile per React/Vite single-page app — mantiene funzionanti le route client-side)
+# --- Single Page Application fallback ---
+
+# If the requested resource does NOT exist, serve index.html
+
+# (required for React/Vite client-side routing to work)
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.html [L]
+
+# --- Cache control rules ---
+
+# Force browsers to fetch new versions of JS and CSS after each deploy
+
+<FilesMatch "\.(js|css)$">
+Header set Cache-Control "no-cache, no-store, must-revalidate"
+Header set Pragma "no-cache"
+Header set Expires 0
+</FilesMatch>
+
+# Allow caching for images and other static assets
+
+<FilesMatch "\.(png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|woff2|ttf|eot)$">
+Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
