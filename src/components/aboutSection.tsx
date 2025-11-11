@@ -1,10 +1,10 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import core libraries and components for animations, image handling, state management, and layout.
 import { motion } from "framer-motion"; // Provides scroll-based entrance animations
-import { Image } from "@heroui/image"; // Image component with automatic loading management
 import { useEffect, useRef, useState } from "react"; // React hooks for state, effects, and DOM references
 import { Card, Skeleton } from "@heroui/react"; // UI components for layout and loading placeholders
 import { subtitle } from "./primitives"; // Predefined styling function for subtitles
+import SmartImage from "./smartImage"; // Optimized image component with automatic loading
 
 // ========================== CUSTOM HOOK: useInView ========================== //
 // Detects if a DOM element is currently visible in the viewport (scroll reveal).
@@ -79,12 +79,11 @@ export function AboutSection({
 
           {/* Section image with controlled loading and styling */}
           <div className="p-4 md:p-4 w-fit md:w-full items-center">
-            <Image
+            <SmartImage
               alt="Lacco"
               className="item-center"
               src={image}
               width={400}
-              loading="eager"
               onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded
             />
           </div>

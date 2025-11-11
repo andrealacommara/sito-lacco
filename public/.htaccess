@@ -10,9 +10,6 @@ Redirect 301 /instagram https://instagram.com/laccoverse
 Redirect 301 /tiktok https://tiktok.com/@laccoverse
 Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
 Redirect 301 /youtube https://www.youtube.com/@Laccoverse
-
-# Permanent redirects for individual tracks
-
 Redirect 301 /tempo-perso https://distrokid.com/hyperfollow/lacco/tempo-perso-intro
 Redirect 301 /mondo-dentro https://distrokid.com/hyperfollow/lacco/mondo-dentro
 Redirect 301 /tra-le-nuvole https://distrokid.com/hyperfollow/lacco/tra-le-nuvole
@@ -20,32 +17,32 @@ Redirect 301 /tra-le-nuvole-sv https://distrokid.com/hyperfollow/lacco/tra-le-nu
 Redirect 301 /cercami https://distrokid.com/hyperfollow/lacco/cercami-4
 Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-fondo
 
-# --- Serve existing static files directly (e.g. images, CSS, JS, favicon, etc.) ---
+# --- Serve existing static files ---
 
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# --- Single Page Application fallback ---
-
-# If the requested resource does NOT exist, serve index.html
-
-# (required for React/Vite client-side routing to work)
+# --- SPA fallback ---
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.html [L]
 
-# --- Cache control rules ---
+# --- Compression ---
 
-# Force browsers to fetch new versions of JS and CSS after each deploy
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
+  BrotliCompressionQuality 5
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
+</IfModule>
+
+# --- Cache control ---
 
 <FilesMatch "\.(js|css)$">
-Header set Cache-Control "no-cache, no-store, must-revalidate"
-Header set Pragma "no-cache"
-Header set Expires 0
+Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>
-
-# Allow caching for images and other static assets
 
 <FilesMatch "\.(png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|woff2|ttf|eot)$">
 Header set Cache-Control "public, max-age=31536000, immutable"

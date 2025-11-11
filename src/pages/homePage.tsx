@@ -1,7 +1,6 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import layout, UI components, and assets used to build the homepage.
 
-import { Image } from "@heroui/image"; // Optimized image component (supports blur and lazy loading)
 import { Card, Skeleton } from "@heroui/react"; // UI components for containers and loading placeholders
 import { useState } from "react"; // React hook for local state management
 import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
@@ -9,6 +8,7 @@ import DefaultLayout from "@/layouts/default"; // General site layout (navbar + 
 import SpotifyPlayer from "@/components/spotifyPlayer"; // Custom component for Spotify player
 import { subtitle, title } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
 import totalPurpleLacco from "/images/totalPurpleLacco.avif"; // Main artist image
+import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
 
 // ========================== HOME PAGE COMPONENT ========================== //
 // Displays an introduction to the artist and includes a Spotify player.
@@ -48,13 +48,13 @@ export default function HomePage() {
 
         {/* ========================== ARTIST IMAGE ========================== */}
         <div className="p-4 md:p-4 w-fit md:w-full items-center">
-          <Image
+          <SmartImage
             isBlurred // Applies a slight blur effect
             alt="Total Purple Lacco" // Alt text for accessibility
             className="item-center"
             src={totalPurpleLacco} // Imported image
             width={400}
-            loading="eager"
+            priority
             onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
           />
         </div>

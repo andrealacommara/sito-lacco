@@ -4,12 +4,47 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import svgr from "vite-plugin-svgr";
 import VitePluginSitemap from "vite-plugin-sitemap";
+import { imagetools } from "vite-imagetools";
+import { createHtmlPlugin } from "vite-plugin-html";
+import fs from "fs";
+import path from "path";
 
 export default defineConfig({
   plugins: [
     // React support with Fast Refresh
     react(),
-
+    // HTML preload CSS
+    createHtmlPlugin({
+      minify: true,
+      inject: {
+        data: (() => {
+          let entryCss = "/assets/index.css";
+          try {
+            const manifestPath = path.resolve(
+              __dirname,
+              "dist/.vite/manifest.json"
+            );
+            if (fs.existsSync(manifestPath)) {
+              const manifest = JSON.parse(
+                fs.readFileSync(manifestPath, "utf-8")
+              );
+              const main = manifest["src/main.tsx"];
+              if (main && main.css && main.css.length) {
+                entryCss = main.css[0];
+              }
+            }
+          } catch {
+            /* fallback */
+          }
+          return {
+            preloadCss: true,
+            preloadJs: true,
+            entryCss,
+            entryJs: "/src/main.tsx",
+          };
+        })(),
+      },
+    }),
     // Automatic sitemap generation for SEO
     VitePluginSitemap({
       hostname: "https://lacco.it",
@@ -24,6 +59,9 @@ export default defineConfig({
 
     // Import SVG files as React components
     svgr(),
+
+    // Creates optimized variants for each image
+    imagetools(),
   ],
   build: {
     rollupOptions: {

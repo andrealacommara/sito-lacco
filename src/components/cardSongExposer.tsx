@@ -14,11 +14,11 @@ import {
   Skeleton,
   useDisclosure,
 } from "@heroui/react";
-import { Image } from "@heroui/image"; // Optimized image component with automatic loading
 import { useState } from "react"; // React hook for local state management
 import { Link } from "@heroui/link"; // External link component
 import { useMediaQuery } from "@react-hook/media-query"; // Hook to detect viewport size
 import { SpotifyIcon } from "./icons"; // Custom Spotify icon component
+import SmartImage from "./smartImage"; // Optimized image component with automatic loading
 
 // ========================== INTERFACES ========================== //
 // Props definition for CardSongExposer component
@@ -88,12 +88,11 @@ export default function CardSongExposer({
               size={isSmallScreen ? "sm" : "md"} // Adjust badge size based on screen
             >
               {/* Song artwork image */}
-              <Image
+              <SmartImage
                 alt={artworkAlt}
                 className="rounded-lg"
                 src={artworkSrc}
                 width={300}
-                loading="eager"
                 onLoad={() => setIsLoaded(true)} // Hide skeleton once image is loaded
               />
             </Badge>
