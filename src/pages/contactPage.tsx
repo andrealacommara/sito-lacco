@@ -12,7 +12,7 @@ import { title } from "@/components/primitives"; // Predefined typography style 
 // ========================== CONTACT PAGE COMPONENT ========================== //
 // Manages the contact form, sending messages via EmailJS, and user feedback
 
-export default function ContactsPage() {
+export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",

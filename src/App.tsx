@@ -7,7 +7,7 @@ import { Route, Routes } from "react-router-dom"; // Client-side routing for pag
 import HomePage from "@/pages/homePage"; // "Home" page
 import MusicPage from "@/pages/musicPage"; // “La mia musica” page
 import AboutPage from "@/pages/aboutPage"; // “Su di me” page
-import ContactsPage from "@/pages/contactsPage"; // "Contatti" page
+import ContactPage from "@/pages/contactPage"; // "Contatti" page
 
 // ========================== MAIN COMPONENT: App ========================== //
 /**
@@ -30,7 +30,7 @@ function App() {
       <Route element={<AboutPage />} path="/su-di-me" />
 
       {/* "Contatti" page */}
-      <Route element={<ContactsPage />} path="/contatti" />
+      <Route element={<ContactPage />} path="/contatti" />
 
       {/* Fallback route: redirects undefined paths to Home */}
       {/* Useful to handle unknown URLs and avoid blank pages */}
