@@ -11,7 +11,7 @@ import { subtitle } from "./primitives"; // Predefined styling function for subt
 // Uses IntersectionObserver to trigger animations only when the element enters the screen.
 function useInView(
   ref: React.RefObject<HTMLDivElement | null>,
-  threshold = 0.2
+  threshold = 0.1
 ) {
   const [isInView, setIsInView] = useState(false); // Tracks visibility state
 
