@@ -52,42 +52,44 @@ export function AboutSection({
 
   return (
     // motion.div enables animation when the section appears on screen
-    <motion.div
-      ref={ref}
-      animate={inView ? { opacity: 1, x: 0 } : {}} // Animate only when visible
-      initial={{ opacity: 0, x: reversed ? 100 : -100 }} // Initial entrance direction based on layout
-      transition={{ duration: 0.8, ease: "easeOut" }} // Animation duration and easing
-    >
-      {/* Card containing text and image arranged in rows or columns */}
-      <Card
-        className={`flex flex-col-reverse md:flex-row ${
-          reversed ? "md:flex-row-reverse" : ""
-        } items-center md:items-center justify-center md:justify-center p-2 md:p-4 gap-2 md:gap-4 mx-auto  w-full max-w-5xl`}
+    <div className="overflow-x-hidden">
+      <motion.div
+        ref={ref}
+        animate={inView ? { opacity: 1, x: 0 } : {}} // Animate only when visible
+        initial={{ opacity: 0, x: reversed ? 100 : -100 }} // Initial entrance direction based on layout
+        transition={{ duration: 0.8, ease: "easeOut" }} // Animation duration and easing
       >
-        {/* Skeleton placeholder displayed until the image finishes loading */}
-        {!isLoaded && (
-          <Skeleton className="absolute inset-0 rounded-lg">
-            <div className="h-full w-full bg-default-300 rounded-lg" />
-          </Skeleton>
-        )}
+        {/* Card containing text and image arranged in rows or columns */}
+        <Card
+          className={`flex flex-col-reverse md:flex-row ${
+            reversed ? "md:flex-row-reverse" : ""
+          } items-center md:items-center justify-center md:justify-center p-2 md:p-4 gap-2 md:gap-4 mx-auto  w-full max-w-5xl`}
+        >
+          {/* Skeleton placeholder displayed until the image finishes loading */}
+          {!isLoaded && (
+            <Skeleton className="absolute inset-0 rounded-lg">
+              <div className="h-full w-full bg-default-300 rounded-lg" />
+            </Skeleton>
+          )}
 
-        {/* Section descriptive text */}
-        <div className="p-2 md:p-4">
-          <h1 className={subtitle()}>{text}</h1>
-        </div>
+          {/* Section descriptive text */}
+          <div className="p-2 md:p-4">
+            <h1 className={subtitle()}>{text}</h1>
+          </div>
 
-        {/* Section image with controlled loading and styling */}
-        <div className="p-4 md:p-4 w-fit md:w-full items-center">
-          <Image
-            alt="Lacco"
-            className="item-center"
-            src={image}
-            width={400}
-            loading="eager"
-            onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded
-          />
-        </div>
-      </Card>
-    </motion.div>
+          {/* Section image with controlled loading and styling */}
+          <div className="p-4 md:p-4 w-fit md:w-full items-center">
+            <Image
+              alt="Lacco"
+              className="item-center"
+              src={image}
+              width={400}
+              loading="eager"
+              onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded
+            />
+          </div>
+        </Card>
+      </motion.div>
+    </div>
   );
 }
