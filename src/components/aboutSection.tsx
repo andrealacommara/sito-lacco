@@ -52,7 +52,7 @@ export function AboutSection({
 
   return (
     // motion.div enables animation when the section appears on screen
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden p-4">
       <motion.div
         ref={ref}
         animate={inView ? { opacity: 1, x: 0 } : {}} // Animate only when visible

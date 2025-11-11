@@ -31,23 +31,23 @@ export default function AboutPage() {
           <h1 className={title()}>Su di me</h1>
         </section>
 
-        <div className="pb-6">
+        <div className="pb-2">
           <h2 className={subtitle()}>Raccontare l'invisibile</h2>
         </div>
 
         {/* SECTION 1 - Alternating layout */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col">
           {section1.map((s, i) => (
             <AboutSection key={i} {...s} reversed={i % 2 === 1} />
           ))}
         </div>
 
-        <div className="p-6">
+        <div className="pt-6 pb-2">
           <h2 className={subtitle()}>Radici</h2>
         </div>
 
         {/* SECTION 2 - Alternating layout */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col">
           {section2.map((s, i) => (
             <AboutSection key={i} {...s} reversed={(i + 1) % 2 === 1} />
           ))}
