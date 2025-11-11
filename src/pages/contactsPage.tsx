@@ -1,62 +1,45 @@
-// ========================== IMPORT DIPENDENZE PRINCIPALI ========================== //
-// Importa gli elementi essenziali per il form di contatto, la gestione dello stato e il layout generale.
+// ========================== MAIN IMPORTS ========================== //
+// Essential libraries and components for the contact form, state management, and layout
 
-import emailjs from "@emailjs/browser"; // Libreria per l'invio di email lato client
-import { Form, Input, Button, Textarea, addToast } from "@heroui/react"; // Componenti UI forniti da HeroUI
-import { useState } from "react"; // Hook per la gestione dello stato locale del componente
-import { Helmet } from "react-helmet-async"; // <--- Import di Helmet per SEO e meta tag
+import { useState } from "react"; // React hook for local state management
+import { Helmet } from "react-helmet-async"; // SEO and meta tags
+import emailjs from "@emailjs/browser"; // Client-side email sending via EmailJS
+import { Form, Input, Textarea, Button, addToast } from "@heroui/react"; // HeroUI form components
 
-import DefaultLayout from "@/layouts/default"; // Layout principale del sito (Navbar + Footer)
-import { title } from "@/components/primitives"; // Stile tipografico predefinito per i titoli
+import DefaultLayout from "@/layouts/default"; // Main site layout (Navbar + Footer)
+import { title } from "@/components/primitives"; // Predefined typography style for page titles
 
-// ========================== COMPONENTE PAGINA CONTATTI ========================== //
-// Gestisce il form di contatto, l'invio dei messaggi tramite EmailJS e il feedback all'utente.
+// ========================== CONTACT PAGE COMPONENT ========================== //
+// Manages the contact form, sending messages via EmailJS, and user feedback
 
-export default function DocsPage() {
-  // Stato del form — mantiene i valori dei campi inseriti dall'utente.
+export default function ContactsPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
 
-  // ========================== FUNZIONE DI RESET ========================== //
-  // Permette di svuotare uno o più campi del form, a seconda del parametro ricevuto.
-  const formReset = (data: string) => {
-    if (data === "name") {
-      setFormData({ ...formData, name: "" });
-      return;
-    }
-    if (data === "email") {
-      setFormData({ ...formData, email: "" });
-      return;
-    }
-    if (data === "message") {
-      setFormData({ ...formData, message: "" });
-      return;
-    }
-    if (data === "all") setFormData({ name: "", email: "", message: "" });
+  const [isLoading, setLoading] = useState(false);
+
+  // ========================== FORM RESET FUNCTION ========================== //
+  const formReset = (field: string) => {
+    if (field === "all")
+      return setFormData({ name: "", email: "", message: "" });
+    setFormData({ ...formData, [field]: "" });
   };
 
-  // ========================== CONFIGURAZIONE EMAILJS ========================== //
-  // Le chiavi vengono lette dalle variabili d’ambiente definite nel file `.env` (per il locale) o su GitHub Action.
+  // ========================== EMAILJS CONFIG ========================== //
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-  // ========================== INVIO EMAIL ========================== //
-  // Gestisce la chiamata asincrona a EmailJS e mostra notifiche di successo o errore.
-  const [isLoading, setLoading] = useState(false);
-
+  // ========================== SEND EMAIL FUNCTION ========================== //
   const sendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Previene il refresh della pagina
+    e.preventDefault();
     setLoading(true);
-
     try {
-      // Invio del messaggio tramite EmailJS
       await emailjs.send(serviceId, templateId, formData, publicKey);
 
-      // Notifica di successo
       addToast({
         title: "Messaggio inviato con successo!",
         description: "Riceverai una risposta al più presto.",
@@ -66,11 +49,9 @@ export default function DocsPage() {
         radius: "lg",
       });
 
-      // Pulizia dei campi dopo l’invio
       formReset("all");
-    } catch (e) {
-      console.error("error: ", e);
-      // Notifica di errore
+    } catch (error) {
+      console.error("error: ", error);
       addToast({
         title: "Errore durante l'invio del messaggio.",
         description:
@@ -85,12 +66,9 @@ export default function DocsPage() {
     }
   };
 
-  // ========================== RENDER COMPONENTE ========================== //
-  // Include layout generale, titolo, form e pulsanti di invio/reset.
-
+  // ========================== RENDER COMPONENT ========================== //
   return (
     <DefaultLayout>
-      {/* ========================== HELMET ========================== */}
       <Helmet>
         <title>Lacco | Contatti</title>
         <meta
@@ -101,17 +79,14 @@ export default function DocsPage() {
       </Helmet>
 
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 mx-auto w-full max-w-5xl">
-        {/* Contenitore centrale del form */}
         <div className="w-full max-w-3xl mx-auto text-center">
-          <h1 className={`${title()}`}>Contatti</h1>
+          <h1 className={title()}>Contatti</h1>
 
-          {/* FORM PRINCIPALE */}
           <Form
             className="w-full space-y-6 justify-around"
-            onReset={() => formReset("all")} // Reset completo
-            onSubmit={sendEmail} // Invio del form
+            onReset={() => formReset("all")}
+            onSubmit={sendEmail}
           >
-            {/* Campi nome ed email, affiancati su desktop */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
               <Input
                 isRequired
@@ -125,7 +100,6 @@ export default function DocsPage() {
                 }
                 onClear={() => formReset("name")}
               />
-
               <Input
                 isRequired
                 label="Email"
@@ -141,7 +115,6 @@ export default function DocsPage() {
               />
             </div>
 
-            {/* Campo testo per il messaggio */}
             <Textarea
               isRequired
               label="Messaggio"
@@ -154,7 +127,6 @@ export default function DocsPage() {
               onClear={() => formReset("message")}
             />
 
-            {/* Pulsanti di invio e reset */}
             <div className="flex flex-col md:flex-row gap-2 w-full md:justify-center">
               <Button
                 className="w-full sm:w-auto"
@@ -164,7 +136,6 @@ export default function DocsPage() {
               >
                 {isLoading ? "Invio..." : "Invia"}
               </Button>
-
               <Button
                 className="w-full sm:w-auto"
                 type="reset"

@@ -1,46 +1,45 @@
-import { useState } from "react";
-import { Card, Skeleton } from "@heroui/react";
-// Importa React e due componenti di HeroUI:
-// - `Card`: contenitore stilizzato per il player
-// - `Skeleton`: segnaposto visivo durante il caricamento dell’iframe
+// ========================== MAIN IMPORT ========================== //
+// Import React core, HeroUI components, e hook necessari
+import { useState } from "react"; // React useState for state handling
+import { Card, Skeleton } from "@heroui/react"; // Imports React and two HeroUI components
 
-// ========================== INTERFACCIA PROPS ========================== //
-// Definisce i parametri accettati dal componente `SpotifyPlayer`.
+// ========================== PROPS INTERFACE ========================== //
+// Defines the parameters accepted by the `SpotifyPlayer` component.
 interface SpotifyPlayerProps {
-  srcPlayer: string; // URL dell’iframe Spotify da incorporare
-  size?: "small" | "large"; // Dimensione opzionale del player
+  srcPlayer: string; // URL of the Spotify iframe to embed
+  size?: "small" | "large"; // Optional size of the player
 }
 
-// ========================== COMPONENTE PRINCIPALE ========================== //
+// ========================== MAIN COMPONENT ========================== //
 export default function SpotifyPlayer({ srcPlayer, size }: SpotifyPlayerProps) {
-  // Stato che indica se l’iframe è stato caricato
+  // State indicating if the iframe has finished loading
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    // Contenitore principale: una card centrata con overflow nascosto
+    // Main container: a centered card with hidden overflow
     <Card className="p-4 flex justify-center items-center relative overflow-hidden mx-auto w-full max-w-5xl">
-      {/* Mostra un segnaposto finché l’iframe non è pronto */}
+      {/* Shows a placeholder until the iframe is ready */}
       {!isLoaded && (
         <Skeleton className="absolute inset-0 rounded-lg">
           <div className="h-full w-full bg-default-300 rounded-lg" />
         </Skeleton>
       )}
 
-      {/* Iframe Spotify incorporato */}
+      {/* Embedded Spotify iframe */}
       <iframe
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        data-testid="embed-iframe" // Attributo utile per i test automatizzati
-        height={size === "small" ? "152" : "352"} // Cambia altezza in base alla prop
-        loading="lazy" // Caricamento ottimizzato per le performance
-        src={srcPlayer} // URL Spotify passato come prop
+        data-testid="embed-iframe" // Attribute useful for automated tests
+        height={size === "small" ? "152" : "352"} // Adjusts height based on prop
+        loading="lazy" // Optimized loading for performance
+        src={srcPlayer} // Spotify URL passed as a prop
         style={{
-          borderRadius: "12px", // Angoli arrotondati per coerenza visiva
-          opacity: isLoaded ? 1 : 0, // Rende visibile l’iframe solo dopo il caricamento
-          transition: "opacity 0.4s ease", // Applica una transizione morbida
+          borderRadius: "12px", // Rounded corners for visual consistency
+          opacity: isLoaded ? 1 : 0, // Makes iframe visible only after loading
+          transition: "opacity 0.4s ease", // Smooth transition effect
         }}
-        title="Spotify Player" // Descrizione accessibile per lo screen reader
-        width="100%" // Si adatta alla larghezza del contenitore
-        onLoad={() => setIsLoaded(true)} // Aggiorna lo stato una volta completato il caricamento
+        title="Spotify Player" // Accessible description for screen readers
+        width="100%" // Adapts to container width
+        onLoad={() => setIsLoaded(true)} // Updates state once loading is complete
       />
     </Card>
   );

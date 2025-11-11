@@ -1,23 +1,20 @@
-// ========================== TIPO DI CONFIGURAZIONE ========================== //
-
-// Definisce un tipo TypeScript che rappresenta la struttura dell’oggetto `siteConfig`.
-// Questo permette di utilizzare `SiteConfig` come tipo ovunque nel progetto,
-// garantendo coerenza e completamento automatico da parte dell’IDE.
+// ========================== SITE CONFIG TYPE ========================== //
+// Defines a TypeScript type representing the structure of the `siteConfig` object.
+// This allows `SiteConfig` to be used throughout the project for type safety and IDE autocompletion.
 export type SiteConfig = typeof siteConfig;
 
-// ========================== CONFIGURAZIONE DEL SITO ========================== //
-
-// Oggetto principale che contiene i metadati e le impostazioni globali del sito.
-// Include nome, descrizione, elementi di navigazione e link esterni.
+// ========================== SITE CONFIGURATION ========================== //
+// Main object containing metadata and global settings for the site.
+// Includes site name, description, navigation items, and external links.
 export const siteConfig = {
-  // Nome del progetto o del brand
+  // Project or brand name
   name: "Lacco",
 
-  // Breve descrizione del sito, utilizzata per SEO o condivisione social
+  // Short description for SEO or social sharing
   description: "Scopri Lacco, la sua musica e ciò che la ispira!",
 
-  // ========================== NAVBAR PRINCIPALE ========================== //
-  // Elementi visualizzati nella barra di navigazione desktop
+  // ========================== MAIN NAVBAR ========================== //
+  // Items shown in the desktop navigation bar
   navItems: [
     { label: "Home", href: "/" },
     { label: "La mia musica", href: "/la-mia-musica" },
@@ -25,8 +22,8 @@ export const siteConfig = {
     { label: "Contatti", href: "/contatti" },
   ],
 
-  // ========================== MENU MOBILE ========================== //
-  // Elementi visualizzati nel menu a tendina (mobile)
+  // ========================== MOBILE MENU ========================== //
+  // Items shown in the dropdown menu on mobile
   navMenuItems: [
     { label: "Home", href: "/" },
     { label: "La mia musica", href: "/la-mia-musica" },
@@ -34,8 +31,8 @@ export const siteConfig = {
     { label: "Contatti", href: "/contatti" },
   ],
 
-  // ========================== LINK ESTERNI ========================== //
-  // Collegamenti ufficiali alle piattaforme musicali e ai social di Lacco
+  // ========================== EXTERNAL LINKS ========================== //
+  // Official links to Lacco's music platforms and social profiles
   links: {
     spotify:
       "https://open.spotify.com/intl-it/artist/6viihrUFd4eGCfv9w61tL7?si=CDBCI2pYT2axereXjLHUJA",

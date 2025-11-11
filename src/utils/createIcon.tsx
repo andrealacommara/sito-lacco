@@ -1,22 +1,23 @@
-// ========================== IMPORT ========================== //
-// Tipizzazione condivisa per le icone SVG: include dimensioni, colore e props extra.
+// ========================== MAIN IMPORTS ========================== //
+// Shared typing for SVG icons: includes size, color, and additional props.
 import { IconSvgProps } from "@/types";
 
-// ========================== FUNZIONE: createIcon ========================== //
+// ========================== FUNCTION: createIcon ========================== //
 /**
- * Funzione di utilità per creare componenti React di icone SVG
- * a partire da una stringa `path` (comando SVG).
+ * Utility function to create reusable SVG icon components
+ * from a given SVG path string.
  *
- * @param path - La stringa `d` del tracciato SVG che definisce la forma dell’icona.
- * @param viewBox - L'area di visualizzazione dell'SVG (default: "0 0 512 512").
+ * @param path - The `d` attribute defining the shape of the icon.
+ * @param viewBox - The SVG viewBox area (default: "0 0 512 512").
  *
- * @returns Un componente React che rappresenta l’icona generata.
+ * @returns A React functional component representing the generated icon.
  *
- * Questa funzione consente di creare dinamicamente icone personalizzate
- * con dimensioni e stili configurabili tramite le props.
+ * This function allows you to dynamically create custom icons
+ * with configurable size and style through props.
  */
+
 export const createIcon = (path: string, viewBox = "0 0 512 512") => {
-  // Restituisce un componente funzionale React che rappresenta l’icona.
+  // Returns a React functional component representing the icon
   const IconComponent = ({
     size = 29,
     width,
@@ -24,16 +25,16 @@ export const createIcon = (path: string, viewBox = "0 0 512 512") => {
     ...props
   }: IconSvgProps) => (
     <svg
-      // Dimensione dell’icona: usa `size` come valore principale, o `height` se specificato
+      // Icon height — uses `size` by default, or `height` if provided
       height={size || height}
-      // Imposta il box di riferimento per il tracciato
+      // Defines the coordinate system for the icon path
       viewBox={viewBox}
-      // Dimensione dell’icona: usa `size` come valore principale, o `width` se specificato
+      // Icon width — uses `size` by default, or `width` if provided
       width={size || width}
-      // Permette di passare ulteriori proprietà (className, style, ecc.)
+      // Allows passing additional props (className, style, etc.)
       {...props}
     >
-      {/* Tracciato SVG: il cuore grafico dell’icona */}
+      {/* SVG path — the visual core of the icon */}
       <path d={path} fill="currentColor" />
     </svg>
   );

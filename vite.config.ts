@@ -7,42 +7,42 @@ import VitePluginSitemap from "vite-plugin-sitemap";
 
 export default defineConfig({
   plugins: [
-    // Supporto React con fast refresh
+    // React support with Fast Refresh
     react(),
 
-    // Generazione sitemap per SEO
+    // Automatic sitemap generation for SEO
     VitePluginSitemap({
       hostname: "https://lacco.it",
       dynamicRoutes: ["/la-mia-musica", "/su-di-me", "/contatti"],
     }),
 
-    // Risoluzione dei path definiti in tsconfig.json
+    // Resolves path aliases defined in tsconfig.json
     tsconfigPaths(),
 
-    // Integrazione TailwindCSS
+    // TailwindCSS integration
     tailwindcss(),
 
-    // Import SVG come componenti React
+    // Import SVG files as React components
     svgr(),
   ],
   build: {
     rollupOptions: {
       output: {
-        // Suddivisione dei bundle principali per caching ottimizzato
+        // Splits main bundles for better caching and performance
         manualChunks: {
           react: ["react", "react-dom"],
           ui: ["@heroui/react"],
         },
 
-        // Hash solo per JS e CSS, mantiene immagini e OG con nomi fissi
+        // Add hash only to JS and CSS files — keep images and OG assets with fixed names
         entryFileNames: `assets/[name]-[hash].js`,
         chunkFileNames: `assets/[name]-[hash].js`,
         assetFileNames: (assetInfo) => {
-          // File immagine (png, jpg, svg, avif, gif, webp) restano senza hash
+          // Keep image files (png, jpg, svg, avif, gif, webp) without hash for stable URLs
           if (/\.(png|jpe?g|svg|gif|avif|webp)$/i.test(assetInfo.name ?? "")) {
             return `assets/[name][extname]`;
           }
-          // Tutti gli altri asset (CSS ecc.) ricevono hash
+          // Apply hash to all other assets (e.g., CSS)
           return `assets/[name]-[hash][extname]`;
         },
       },

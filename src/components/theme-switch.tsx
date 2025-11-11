@@ -1,65 +1,61 @@
-import { FC, useState, useEffect } from "react";
-import { VisuallyHidden } from "@react-aria/visually-hidden";
-import { SwitchProps, useSwitch } from "@heroui/switch";
-import clsx from "clsx";
+// ========================== MAIN IMPORTS ========================== //
+import { FC, useState, useEffect } from "react"; // React functional component and hooks
+import { VisuallyHidden } from "@react-aria/visually-hidden"; // Hidden input for accessibility
+import { SwitchProps, useSwitch } from "@heroui/switch"; // HeroUI switch component and types
+import clsx from "clsx"; // Utility to combine class names conditionally
+import { SunFilledIcon, MoonFilledIcon } from "@/components/icons"; // Theme icons (sun and moon)
 
-import { SunFilledIcon, MoonFilledIcon } from "@/components/icons";
+// ========================== PROPS AND CONSTANTS ========================== //
 
-// ========================== PROPS E COSTANTI ========================== //
-
-// Definisce le proprietà accettate dal componente ThemeSwitch.
-// Permette di personalizzare le classi di stile esterne e interne.
+// Defines the props accepted by ThemeSwitch component
 export interface ThemeSwitchProps {
-  className?: string;
-  classNames?: SwitchProps["classNames"];
+  className?: string; // Optional external wrapper class
+  classNames?: SwitchProps["classNames"]; // Optional HeroUI switch classes
 }
 
-// Durata massima di validità del tema salvato (24 ore)
+// Maximum duration for saved theme (24 hours)
 const THEME_EXPIRATION_MS = 24 * 60 * 60 * 1000;
 
-// ========================== COMPONENTE PRINCIPALE ========================== //
+// ========================== MAIN COMPONENT ========================== //
 
 export const ThemeSwitch: FC<ThemeSwitchProps> = ({
   className,
   classNames,
 }) => {
-  // Stato che indica se il componente è montato (necessario per SSR/CSR)
+  // State to indicate if component has mounted (important for SSR/CSR)
   const [isMounted, setIsMounted] = useState(false);
 
-  // ========================== LOGICA TEMA ========================== //
+  // ========================== THEME LOGIC ========================== //
 
-  // Funzione che determina il tema iniziale da usare
+  // Determines initial theme
   const getInitialTheme = (): "light" | "dark" => {
     const saved = localStorage.getItem("user-theme");
     const timestamp = localStorage.getItem("user-theme-timestamp");
 
-    // Se esiste un tema salvato e non è scaduto → usalo
     if (saved && timestamp) {
       const expired = Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
       if (!expired) return saved as "light" | "dark";
     }
 
-    // Se non c'è tema valido → usa il tema di sistema
+    // Default to system preference if no valid theme saved
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
   };
 
-  // Gestione tema manuale
   const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
 
-  // Aggiorna classe del documento quando cambia il tema
+  // Apply theme class to document
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
-  // Controlla scadenza del tema salvato all’avvio
+  // Check if saved theme has expired
   useEffect(() => {
     const timestamp = localStorage.getItem("user-theme-timestamp");
     const expired =
       timestamp && Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
 
-    // Se il tema salvato è scaduto, resetta e applica la preferenza di sistema
     if (expired) {
       localStorage.removeItem("user-theme");
       localStorage.removeItem("user-theme-timestamp");
@@ -72,7 +68,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
     }
   }, []);
 
-  // Segui i cambiamenti del tema di sistema se l'utente non ha ancora fatto una scelta
+  // Follow system theme changes if user hasn't chosen manually
   useEffect(() => {
     const saved = localStorage.getItem("user-theme");
     if (!saved) {
@@ -80,48 +76,41 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
       const handleChange = (e: MediaQueryListEvent) =>
         setTheme(e.matches ? "dark" : "light");
 
-      // Applica subito il tema corrente del sistema
       setTheme(mediaQuery.matches ? "dark" : "light");
-
-      // Ascolta i cambiamenti futuri
       mediaQuery.addEventListener("change", handleChange);
-
-      // Pulisci listener quando il componente viene smontato
       return () => mediaQuery.removeEventListener("change", handleChange);
     }
   }, []);
 
-  // Funzione per alternare il tema
+  // Toggle theme manually
   const handleThemeChange = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    // Salva la scelta dell’utente con timestamp
     localStorage.setItem("user-theme", newTheme);
     localStorage.setItem("user-theme-timestamp", Date.now().toString());
   };
 
-  // ========================== HOOK HEROUI ========================== //
+  // ========================== HEROUI SWITCH HOOK ========================== //
 
-  // Hook di HeroUI che fornisce logica e accessibilità per lo switch
   const {
-    Component, // Componente wrapper dello switch
-    slots, // Classi di stile generate automaticamente
-    isSelected, // Stato selezionato (true = tema chiaro)
-    getBaseProps, // Props di base per lo switch
-    getInputProps, // Props per l'input nascosto
-    getWrapperProps, // Props per il wrapper visivo
+    Component, // Switch wrapper component
+    slots, // Auto-generated class slots
+    isSelected, // Selected state (true = light mode)
+    getBaseProps, // Base props for switch
+    getInputProps, // Props for hidden input
+    getWrapperProps, // Props for visual wrapper
   } = useSwitch({
     isSelected: theme === "light",
     onChange: handleThemeChange,
   });
 
-  // Imposta lo stato montato una volta che il componente è pronto
+  // Mark component as mounted
   useEffect(() => setIsMounted(true), []);
 
-  // Evita problemi di idratazione durante il rendering lato client
+  // Avoid hydration issues
   if (!isMounted) return <div className="w-6 h-6" />;
 
-  // ========================== RENDERING ========================== //
+  // ========================== RENDER ========================== //
 
   return (
     <Component
@@ -134,12 +123,12 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
         ),
       })}
     >
-      {/* Input nascosto per l’accessibilità */}
+      {/* Hidden input for accessibility */}
       <VisuallyHidden>
         <input {...getInputProps()} />
       </VisuallyHidden>
 
-      {/* Wrapper visivo del pulsante di switch */}
+      {/* Visual switch wrapper */}
       <div
         {...getWrapperProps()}
         className={slots.wrapper({
@@ -150,7 +139,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
           ),
         })}
       >
-        {/* Icona condizionale in base al tema corrente */}
+        {/* Conditional icon based on theme */}
         {isSelected ? (
           <MoonFilledIcon
             className="transition-colors duration-300 hover:text-danger dark:hover:text-danger"
