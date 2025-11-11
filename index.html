@@ -6,6 +6,11 @@
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     />
+    <% if (preloadCss) { %>
+    <link rel="preload" as="style" href="<%= entryCss %>" />
+    <% } %> <% if (preloadJs) { %>
+    <link rel="modulepreload" href="<%= entryJs %>" />
+    <% } %>
 
     <!-- ========================== BASIC SEO ========================== -->
     <!-- Core metadata for search engines and browser previews -->
