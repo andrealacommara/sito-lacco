@@ -32,7 +32,7 @@ export const Navbar = () => {
     // HeroUI Navbar: sticky at the top, with max width
     <HeroUINavbar
       className="bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70"
-      classNames={{ wrapper: "px-4 h-16" }}
+      classNames={{ wrapper: "px-6 h-16" }}
       maxWidth="full"
       position="static"
     >
@@ -50,7 +50,7 @@ export const Navbar = () => {
           </Link>
         </NavbarBrand>
 
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-4 md:hidden">
           <ThemeSwitch />
           <NavbarMenuToggle aria-label="Apri menu" />
         </div>
