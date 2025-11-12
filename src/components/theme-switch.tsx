@@ -3,6 +3,7 @@ import { FC, useState, useEffect } from "react"; // React functional component a
 import { VisuallyHidden } from "@react-aria/visually-hidden"; // Hidden input for accessibility
 import { SwitchProps, useSwitch } from "@heroui/switch"; // HeroUI switch component and types
 import clsx from "clsx"; // Utility to combine class names conditionally
+
 import { SunFilledIcon, MoonFilledIcon } from "@/components/icons"; // Theme icons (sun and moon)
 
 // ========================== PROPS AND CONSTANTS ========================== //
@@ -16,78 +17,75 @@ export interface ThemeSwitchProps {
 // Maximum duration for saved theme (24 hours)
 const THEME_EXPIRATION_MS = 24 * 60 * 60 * 1000;
 
+// ========================== UTILS ========================== //
+const getInitialTheme = (): "light" | "dark" => {
+  if (typeof window === "undefined") return "light";
+
+  const saved = localStorage.getItem("user-theme");
+  const timestamp = localStorage.getItem("user-theme-timestamp");
+
+  if (saved && timestamp) {
+    const expired = Date.now() - parseInt(timestamp, 10) > THEME_EXPIRATION_MS;
+
+    if (!expired) return saved as "light" | "dark";
+
+    localStorage.removeItem("user-theme");
+    localStorage.removeItem("user-theme-timestamp");
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+};
+
+const followsSystemByDefault = (): boolean => {
+  if (typeof window === "undefined") return true;
+
+  return !localStorage.getItem("user-theme");
+};
+
 // ========================== MAIN COMPONENT ========================== //
 
 export const ThemeSwitch: FC<ThemeSwitchProps> = ({
   className,
   classNames,
 }) => {
-  // State to indicate if component has mounted (important for SSR/CSR)
-  const [isMounted, setIsMounted] = useState(false);
-
-  // ========================== THEME LOGIC ========================== //
-
-  // Determines initial theme
-  const getInitialTheme = (): "light" | "dark" => {
-    const saved = localStorage.getItem("user-theme");
-    const timestamp = localStorage.getItem("user-theme-timestamp");
-
-    if (saved && timestamp) {
-      const expired = Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
-      if (!expired) return saved as "light" | "dark";
-    }
-
-    // Default to system preference if no valid theme saved
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  };
-
-  const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
+  const isBrowser = typeof window !== "undefined";
+  const [theme, setTheme] = useState<"light" | "dark">(() => getInitialTheme());
+  const [followsSystem, setFollowsSystem] = useState(() =>
+    followsSystemByDefault(),
+  );
 
   // Apply theme class to document
   useEffect(() => {
+    if (!isBrowser) return;
     document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+  }, [theme, isBrowser]);
 
-  // Check if saved theme has expired
+  // Follow system theme changes if no manual preference is stored
   useEffect(() => {
-    const timestamp = localStorage.getItem("user-theme-timestamp");
-    const expired =
-      timestamp && Date.now() - parseInt(timestamp) > THEME_EXPIRATION_MS;
+    if (!isBrowser || !followsSystem) return undefined;
 
-    if (expired) {
-      localStorage.removeItem("user-theme");
-      localStorage.removeItem("user-theme-timestamp");
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) =>
+      setTheme(e.matches ? "dark" : "light");
 
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
+    mediaQuery.addEventListener("change", handleChange);
 
-      setTheme(prefersDark ? "dark" : "light");
-    }
-  }, []);
-
-  // Follow system theme changes if user hasn't chosen manually
-  useEffect(() => {
-    const saved = localStorage.getItem("user-theme");
-    if (!saved) {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      const handleChange = (e: MediaQueryListEvent) =>
-        setTheme(e.matches ? "dark" : "light");
-
-      setTheme(mediaQuery.matches ? "dark" : "light");
-      mediaQuery.addEventListener("change", handleChange);
-      return () => mediaQuery.removeEventListener("change", handleChange);
-    }
-  }, []);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [followsSystem, isBrowser]);
 
   // Toggle theme manually
   const handleThemeChange = () => {
     const newTheme = theme === "light" ? "dark" : "light";
+
     setTheme(newTheme);
-    localStorage.setItem("user-theme", newTheme);
-    localStorage.setItem("user-theme-timestamp", Date.now().toString());
+    setFollowsSystem(false);
+
+    if (isBrowser) {
+      localStorage.setItem("user-theme", newTheme);
+      localStorage.setItem("user-theme-timestamp", Date.now().toString());
+    }
   };
 
   // ========================== HEROUI SWITCH HOOK ========================== //
@@ -104,11 +102,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
     onChange: handleThemeChange,
   });
 
-  // Mark component as mounted
-  useEffect(() => setIsMounted(true), []);
-
-  // Avoid hydration issues
-  if (!isMounted) return <div className="w-6 h-6" />;
+  if (!isBrowser) return <div className="w-6 h-6" />;
 
   // ========================== RENDER ========================== //
 
@@ -119,7 +113,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
         className: clsx(
           "px-px transition-opacity hover:opacity-80 cursor-pointer",
           className,
-          classNames?.base
+          classNames?.base,
         ),
       })}
     >
@@ -135,7 +129,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
           class: clsx(
             "w-auto h-auto bg-transparent rounded-lg flex items-center justify-center",
             "group-data-[selected=true]:bg-transparent text-default-500! pt-px px-0 mx-0",
-            classNames?.wrapper
+            classNames?.wrapper,
           ),
         })}
       >

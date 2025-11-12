@@ -2,14 +2,15 @@
 // Main libraries and page components for route management.
 
 import { Route, Routes } from "react-router-dom";
-import { lazy, Suspense } from "react"; // Import React.lazy + Suspense
+import { Suspense, useEffect } from "react";
 
-// ========================== LAZY IMPORTS ========================== //
-// Lazy loading for each main page: improves initial load time
-const HomePage = lazy(() => import("@/pages/homePage"));
-const MusicPage = lazy(() => import("@/pages/musicPage"));
-const AboutPage = lazy(() => import("@/pages/aboutPage"));
-const ContactPage = lazy(() => import("@/pages/contactPage"));
+import {
+  AboutPage,
+  ContactPage,
+  HomePage,
+  MusicPage,
+  warmupRoutes,
+} from "@/routes/pages";
 
 // ========================== MAIN COMPONENT: App ========================== //
 /**
@@ -22,6 +23,39 @@ const ContactPage = lazy(() => import("@/pages/contactPage"));
  * reducing the size of the initial bundle.
  */
 function App() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const pathsToWarm = ["/la-mia-musica", "/su-di-me", "/contatti"];
+    const warm = () => warmupRoutes(pathsToWarm);
+
+    const idleCallback = (
+      window as typeof window & {
+        requestIdleCallback?: (cb: () => void) => number;
+        cancelIdleCallback?: (handle: number) => void;
+      }
+    ).requestIdleCallback;
+    const cancelIdle = (
+      window as typeof window & {
+        requestIdleCallback?: (cb: () => void) => number;
+        cancelIdleCallback?: (handle: number) => void;
+      }
+    ).cancelIdleCallback;
+
+    if (
+      typeof idleCallback === "function" &&
+      typeof cancelIdle === "function"
+    ) {
+      const idleId = idleCallback(() => warm());
+
+      return () => cancelIdle(idleId);
+    }
+
+    const timeoutId = window.setTimeout(warm, 1500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
   return (
     <Suspense
       fallback={
@@ -32,19 +66,19 @@ function App() {
     >
       <Routes>
         {/* "Home" page */}
-        <Route path="/" element={<HomePage />} />
+        <Route element={<HomePage />} path="/" />
 
         {/* “La mia musica” page */}
-        <Route path="/la-mia-musica" element={<MusicPage />} />
+        <Route element={<MusicPage />} path="/la-mia-musica" />
 
         {/* “Su di me” page */}
-        <Route path="/su-di-me" element={<AboutPage />} />
+        <Route element={<AboutPage />} path="/su-di-me" />
 
         {/* "Contatti" page */}
-        <Route path="/contatti" element={<ContactPage />} />
+        <Route element={<ContactPage />} path="/contatti" />
 
         {/* Fallback route */}
-        <Route path="*" element={<HomePage />} />
+        <Route element={<HomePage />} path="*" />
       </Routes>
     </Suspense>
   );

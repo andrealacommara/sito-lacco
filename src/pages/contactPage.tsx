@@ -4,7 +4,10 @@
 import { useState } from "react"; // React hook for local state management
 import { Helmet } from "react-helmet-async"; // SEO and meta tags
 import emailjs from "@emailjs/browser"; // Client-side email sending via EmailJS
-import { Form, Input, Textarea, Button, addToast } from "@heroui/react"; // HeroUI form components
+import { Form } from "@heroui/form"; // HeroUI form component
+import { Input, Textarea } from "@heroui/input"; // Input + Textarea controls
+import { Button } from "@heroui/button"; // Button component
+import { addToast } from "@heroui/toast"; // Toast helper
 
 import DefaultLayout from "@/layouts/default"; // Main site layout (Navbar + Footer)
 import { title } from "@/components/primitives"; // Predefined typography style for page titles
@@ -20,6 +23,7 @@ export default function ContactPage() {
   });
 
   const [isLoading, setLoading] = useState(false);
+  const MIN_MESSAGE_LENGTH = 10;
 
   // ========================== FORM RESET FUNCTION ========================== //
   const formReset = (field: string) => {
@@ -32,10 +36,40 @@ export default function ContactPage() {
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+  const isEmailConfigured = Boolean(serviceId && templateId && publicKey);
 
   // ========================== SEND EMAIL FUNCTION ========================== //
   const sendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!isEmailConfigured) {
+      addToast({
+        title: "Servizio non disponibile.",
+        description:
+          "Il modulo non è configurato correttamente. Riprova più tardi.",
+        timeout: 5000,
+        color: "warning",
+        variant: "flat",
+        radius: "lg",
+      });
+
+      return;
+    }
+
+    const trimmedMessage = formData.message.trim();
+
+    if (trimmedMessage.length < MIN_MESSAGE_LENGTH) {
+      addToast({
+        title: "Messaggio troppo breve.",
+        description: "Scrivi almeno un paio di frasi prima di inviare.",
+        timeout: 5000,
+        color: "warning",
+        variant: "flat",
+        radius: "lg",
+      });
+
+      return;
+    }
     setLoading(true);
     try {
       await emailjs.send(serviceId, templateId, formData, publicKey);
@@ -51,7 +85,10 @@ export default function ContactPage() {
 
       formReset("all");
     } catch (error) {
-      console.error("error: ", error);
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console -- useful during local debugging only
+        console.error("error: ", error);
+      }
       addToast({
         title: "Errore durante l'invio del messaggio.",
         description:
@@ -72,10 +109,10 @@ export default function ContactPage() {
       <Helmet>
         <title>Lacco | Contatti</title>
         <meta
-          name="description"
           content="Contatta Lacco per collaborazioni, informazioni o semplicemente per lasciare un messaggio."
+          name="description"
         />
-        <meta name="robots" content="index, follow" />
+        <meta content="index, follow" name="robots" />
       </Helmet>
 
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 mx-auto w-full max-w-5xl">

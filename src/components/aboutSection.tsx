@@ -2,7 +2,9 @@
 // Import core libraries and components for animations, image handling, state management, and layout.
 import { motion } from "framer-motion"; // Provides scroll-based entrance animations
 import { useEffect, useRef, useState } from "react"; // React hooks for state, effects, and DOM references
-import { Card, Skeleton } from "@heroui/react"; // UI components for layout and loading placeholders
+import { Card } from "@heroui/card"; // UI component for layout
+import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
+
 import { subtitle } from "./primitives"; // Predefined styling function for subtitles
 import SmartImage from "./smartImage"; // Optimized image component with automatic loading
 
@@ -11,14 +13,14 @@ import SmartImage from "./smartImage"; // Optimized image component with automat
 // Uses IntersectionObserver to trigger animations only when the element enters the screen.
 function useInView(
   ref: React.RefObject<HTMLDivElement | null>,
-  threshold = 0.1
+  threshold = 0.1,
 ) {
   const [isInView, setIsInView] = useState(false); // Tracks visibility state
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting), // Update visibility state when intersection changes
-      { threshold } // Visibility threshold to consider the element "in view"
+      { threshold }, // Visibility threshold to consider the element "in view"
     );
 
     if (ref.current) observer.observe(ref.current); // Start observing the element
@@ -82,6 +84,7 @@ export function AboutSection({
             <SmartImage
               alt="Lacco"
               className="item-center"
+              sizes="400px"
               src={image}
               width={400}
               onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded

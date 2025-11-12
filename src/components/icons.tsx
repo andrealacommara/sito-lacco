@@ -22,6 +22,7 @@ import { IconSvgProps } from "@/types"; // TypeScript props definitions
  */
 const extractPath = (svg: string): string => {
   const match = svg.match(/<path[^>]*d="([^"]*)"/);
+
   return match ? match[1] : "";
 };
 
@@ -133,14 +134,14 @@ export const ChevronLeftIcon = ({
   ...props
 }: IconSvgProps) => (
   <svg
-    viewBox="0 0 24 24"
-    width={size || width}
-    height={size || height}
     fill="none"
+    height={size || height}
     stroke="currentColor"
-    strokeWidth="1.2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    strokeWidth="1.2"
+    viewBox="0 0 24 24"
+    width={size || width}
     {...props}
   >
     <polyline points="15 18 9 12 15 6" />
@@ -154,14 +155,14 @@ export const ChevronRightIcon = ({
   ...props
 }: IconSvgProps) => (
   <svg
-    viewBox="0 0 24 24"
-    width={size || width}
-    height={size || height}
     fill="none"
+    height={size || height}
     stroke="currentColor"
-    strokeWidth="1.2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    strokeWidth="1.2"
+    viewBox="0 0 24 24"
+    width={size || width}
     {...props}
   >
     <polyline points="9 6 15 12 9 18" />

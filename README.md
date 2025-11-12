@@ -50,12 +50,15 @@ src/
 │   ├── contactPage.tsx     # "Contatti" Page
 │   ├── homePage.tsx        # "Home" Page
 │   └── musicPage.tsx       # "La mia musica" Page
+├── routes/                 # Lazy routes + preload helpers
+│   └── pages.ts
 ├── styles/                 # Styles configuration
 │   └── global.css
 ├── types/                  # Shared TypeScript types
 │   └── index.ts
-├── utils/                  # Utility functions
-│   └── createIcon.tsx
+├── utils/                  # Utility helpers shared across the app
+│   ├── createIcon.tsx
+│   └── ensureMediaKeySystemRobustness.ts
 ├── App.tsx                 # Main component for routing
 ├── main.tsx                # App entry point
 └── provider.tsx            # Global HeroUI + Toast provider
@@ -65,11 +68,12 @@ src/
 
 ## ✨ Main Features
 
-- **Home:** Introduction to Lacco with embedded Spotify player.
+- **Home:** Introduction to Lacco with an on-demand Spotify player that loads only when needed on mobile.
 - **La mia musica:** Horizontal carousel of singles, with descriptions and direct links to platforms (Modal).
 - **Su di me:** Animated biography with progressive scroll effects (Framer Motion).
 - **Contatti:** Interactive form that sends messages via EmailJS.
 - **Footer:** Quick links to social and music platforms.
+- **Route preloading:** Navigation links prefetch their chunks on hover/touch for near-instant transitions.
 
 ---
 

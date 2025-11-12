@@ -1,8 +1,9 @@
 // ========================== MAIN IMPORTS ========================== //
 // Libraries and components used for layout, state management, images, and animations
 
-import { section1, section2 } from "@/config/sectionsAboutPage"; // Data for AboutPage sections
 import { Helmet } from "react-helmet-async"; // SEO and meta tags for the page
+
+import { section1, section2 } from "@/config/sectionsAboutPage"; // Data for AboutPage sections
 import DefaultLayout from "@/layouts/default"; // Base layout including navbar and footer
 import { subtitle, title } from "@/components/primitives"; // Dynamic text styles for headings and subtitles
 import { AboutSection } from "@/components/aboutSection"; // Component to render each section with text and image
@@ -19,10 +20,10 @@ export default function AboutPage() {
       <Helmet>
         <title>Lacco | Su di me</title>
         <meta
-          name="description"
           content="Scopri Lacco: la sua storia, il percorso musicale e la filosofia dietro la sua musica."
+          name="description"
         />
-        <meta name="robots" content="index, follow" />
+        <meta content="index, follow" name="robots" />
       </Helmet>
 
       <div>
@@ -32,7 +33,7 @@ export default function AboutPage() {
         </section>
 
         <div className="pb-2">
-          <h2 className={subtitle()}>Raccontare l'invisibile</h2>
+          <h2 className={subtitle()}>Raccontare l&apos;invisibile</h2>
         </div>
 
         {/* SECTION 1 - Alternating layout */}

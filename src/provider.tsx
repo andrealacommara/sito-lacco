@@ -2,7 +2,8 @@
 // Type definitions and core dependencies for global app providers.
 
 import type { NavigateOptions } from "react-router-dom"; // Navigation options type for router integration
-import { HeroUIProvider } from "@heroui/react"; // HeroUI global provider (component styling, theme context)
+
+import { HeroUIProvider } from "@heroui/system"; // HeroUI global provider (component styling, theme context)
 import { ToastProvider } from "@heroui/toast"; // Toast system provider for global notifications
 import { useHref, useNavigate } from "react-router-dom"; // React Router hooks for navigation and URL resolution
 

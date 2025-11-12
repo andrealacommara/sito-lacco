@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0"
     />
     <% if (preloadCss) { %>
     <link rel="preload" as="style" href="<%= entryCss %>" />
@@ -76,6 +76,12 @@
     <!-- Pinned site tile color and config for Windows browsers -->
     <meta name="msapplication-TileColor" content="#000000" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
+
+    <!-- ========================== RESOURCE HINTS ========================== -->
+    <!-- Speed up third-party embeds used across the site -->
+    <link rel="preconnect" href="https://open.spotify.com" crossorigin />
+    <link rel="preconnect" href="https://i.scdn.co" crossorigin />
+    <link rel="preconnect" href="https://api.emailjs.com" crossorigin />
 
     <!-- ========================== GOOGLE SEARCH CONSOLE ========================== -->
     <!-- Site ownership verification for Google indexing -->

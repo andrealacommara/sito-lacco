@@ -16,23 +16,17 @@ import {
 } from "@heroui/navbar"; // HeroUI Navbar components for desktop and mobile navigation
 import { link as linkStyles } from "@heroui/theme"; // Utility function for consistent link styling
 import clsx from "clsx"; // Utility to combine and conditionally apply CSS class names
-import { useEffect, useState } from "react"; // React hooks for state and side effects
 
 import { siteConfig } from "@/config/site"; // App configuration including navbar items
 import { ThemeSwitch } from "@/components/theme-switch"; // Toggle component for light/dark theme
 import { Logo } from "@/components/icons"; // SVG logo component for branding
+import { preloadRoute } from "@/routes/pages";
 
 // ========================== COMPONENT: Navbar ========================== //
 // Main application navigation bar (responsive)
 // Handles desktop and mobile layouts, includes theme switch
 export const Navbar = () => {
-  const location = useLocation(); // Hook to get the current route
-  const [pathname, setPathname] = useState(location.pathname); // State to track the active page
-
-  // Update pathname when the route changes
-  useEffect(() => {
-    setPathname(location.pathname);
-  }, [location]);
+  const pathname = useLocation().pathname; // Track active route directly from router
 
   return (
     // HeroUI Navbar: sticky at the top, with max width
@@ -55,25 +49,32 @@ export const Navbar = () => {
       {/* ================= MENU DESKTOP ================= */}
       <NavbarContent className="flex justify-center" justify="center">
         {/* Desktop menu visible from "md" breakpoint */}
-        <div className="hidden md:flex gap-4 justify-center ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              {/* Navigation link with active page highlight */}
-              <Link
-                className={clsx(
-                  linkStyles({
-                    color: pathname === item.href ? "danger" : "foreground",
-                  }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium"
-                )}
-                color={pathname === item.href ? "danger" : "foreground"}
-                href={item.href}
-              >
-                {item.label}
-              </Link>
-            </NavbarItem>
-          ))}
-        </div>
+        <ul className="hidden md:flex gap-4 justify-center ml-2">
+          {siteConfig.navItems.map((item) => {
+            const prefetch = () => preloadRoute(item.href);
+
+            return (
+              <NavbarItem key={item.href}>
+                {/* Navigation link with active page highlight */}
+                <Link
+                  className={clsx(
+                    linkStyles({
+                      color: pathname === item.href ? "danger" : "foreground",
+                    }),
+                    "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  )}
+                  color={pathname === item.href ? "danger" : "foreground"}
+                  href={item.href}
+                  onFocus={prefetch}
+                  onMouseEnter={prefetch}
+                  onTouchStart={prefetch}
+                >
+                  {item.label}
+                </Link>
+              </NavbarItem>
+            );
+          })}
+        </ul>
       </NavbarContent>
 
       {/* ================= ACTIONS / THEME SWITCH (DESKTOP) ================= */}
@@ -91,20 +92,27 @@ export const Navbar = () => {
 
       {/* ================= MOBILE MENU CONTENT ================= */}
       <NavbarMenu>
-        <div className="flex flex-col items-center justify-center min-h-[80vh] gap-4 p-6">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              {/* Each mobile menu item */}
-              <Link
-                className="text-xl"
-                color={pathname === item.href ? "danger" : "foreground"}
-                href={item.href}
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-        </div>
+        <ul className="flex flex-col items-center justify-center min-h-[80vh] gap-4 p-6">
+          {siteConfig.navMenuItems.map((item) => {
+            const prefetch = () => preloadRoute(item.href);
+
+            return (
+              <NavbarMenuItem key={item.href}>
+                {/* Each mobile menu item */}
+                <Link
+                  className="text-xl"
+                  color={pathname === item.href ? "danger" : "foreground"}
+                  href={item.href}
+                  onFocus={prefetch}
+                  onMouseEnter={prefetch}
+                  onTouchStart={prefetch}
+                >
+                  {item.label}
+                </Link>
+              </NavbarMenuItem>
+            );
+          })}
+        </ul>
       </NavbarMenu>
     </HeroUINavbar>
   );
