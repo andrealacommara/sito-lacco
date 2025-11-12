@@ -86,6 +86,7 @@ export function AboutSection({
               className="item-center"
               sizes="400px"
               src={image}
+              style={{ aspectRatio: "1 / 1" }}
               width={400}
               onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded
             />

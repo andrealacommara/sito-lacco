@@ -1,15 +1,18 @@
-# Enable rewrite engine
+# ====================== ENABLE REWRITE ENGINE ======================
 
 RewriteEngine On
 RewriteBase /
 
-# --- Permanent external redirects (301) ---
+# ====================== PERMANENT REDIRECTS (301) ======================
 
 Redirect 301 /spotify https://open.spotify.com/intl-it/artist/6viihrUFd4eGCfv9w61tL7?si=CDBCI2pYT2axereXjLHUJA
 Redirect 301 /instagram https://instagram.com/laccoverse
 Redirect 301 /tiktok https://tiktok.com/@laccoverse
 Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
 Redirect 301 /youtube https://www.youtube.com/@Laccoverse
+
+# Song redirects
+
 Redirect 301 /tempo-perso https://distrokid.com/hyperfollow/lacco/tempo-perso-intro
 Redirect 301 /mondo-dentro https://distrokid.com/hyperfollow/lacco/mondo-dentro
 Redirect 301 /tra-le-nuvole https://distrokid.com/hyperfollow/lacco/tra-le-nuvole
@@ -17,37 +20,41 @@ Redirect 301 /tra-le-nuvole-sv https://distrokid.com/hyperfollow/lacco/tra-le-nu
 Redirect 301 /cercami https://distrokid.com/hyperfollow/lacco/cercami-4
 Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-fondo
 
-# --- Serve existing static files ---
+# ====================== STATIC FILES & SPA FALLBACK ======================
+
+# Serve existing files normally
 
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# --- SPA fallback ---
+# Redirect all other routes to index.html (SPA fallback)
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.html [L]
 
-# --- Compression ---
+# ====================== COMPRESSION ======================
 
-<IfModule mod_brotli.c>
-  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
-  BrotliCompressionQuality 5
-</IfModule>
+# Brotli compression should be handled by the server configuration (Aruba blocks AllowOverride for it)
+
+# So we safely enable only DEFLATE here.
+
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
 </IfModule>
 
-# --- Cache control ---
+# ====================== CACHE CONTROL ======================
 
-<FilesMatch "\.(js|css)$">
+# Cache static assets for one year
+
+<FilesMatch "\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|woff2|ttf|eot)$">
 Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>
 
-<FilesMatch "\.(png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|woff2|ttf|eot)$">
-Header set Cache-Control "public, max-age=31536000, immutable"
-</FilesMatch>
+# Prevent caching of HTML (avoid blank page due to outdated index.html)
 
 <FilesMatch "\.(html)$">
-Header set Cache-Control "public, max-age=0, must-revalidate"
+Header set Cache-Control "no-cache, no-store, must-revalidate"
+Header set Pragma "no-cache"
+Header set Expires 0
 </FilesMatch>

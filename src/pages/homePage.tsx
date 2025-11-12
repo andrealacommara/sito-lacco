@@ -57,6 +57,7 @@ export default function HomePage() {
             className="item-center"
             sizes="400px"
             src={totalPurpleLacco} // Imported image
+            style={{ aspectRatio: "1 / 1" }}
             width={400}
             onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
           />
