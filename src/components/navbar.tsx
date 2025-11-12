@@ -37,7 +37,7 @@ export const Navbar = () => {
       position="static"
     >
       {/* ================= BRAND / LOGO ================= */}
-      <NavbarContent className="w-full items-center justify-between md:w-auto md:justify-start">
+      <NavbarContent className="items-center justify-start">
         <NavbarBrand className="flex items-center gap-2">
           {/* Logo link: clicking it navigates to home */}
           <Link
@@ -49,11 +49,6 @@ export const Navbar = () => {
             <Logo />
           </Link>
         </NavbarBrand>
-
-        <div className="flex items-center gap-4 md:hidden">
-          <ThemeSwitch />
-          <NavbarMenuToggle aria-label="Apri menu" />
-        </div>
       </NavbarContent>
 
       {/* ================= MENU DESKTOP ================= */}
@@ -95,6 +90,12 @@ export const Navbar = () => {
         <NavbarItem className="hidden md:flex gap-2">
           <ThemeSwitch />
         </NavbarItem>
+      </NavbarContent>
+
+      {/* ================= TOGGLE MOBILE ================= */}
+      <NavbarContent className="flex md:hidden" justify="end">
+        <ThemeSwitch />
+        <NavbarMenuToggle aria-label="Apri menu" />
       </NavbarContent>
 
       {/* ================= MOBILE MENU CONTENT ================= */}
