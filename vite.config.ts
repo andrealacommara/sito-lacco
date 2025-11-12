@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -6,8 +9,6 @@ import svgr from "vite-plugin-svgr";
 import VitePluginSitemap from "vite-plugin-sitemap";
 import { imagetools } from "vite-imagetools";
 import { createHtmlPlugin } from "vite-plugin-html";
-import fs from "fs";
-import path from "path";
 
 export default defineConfig({
   plugins: [
@@ -18,29 +19,42 @@ export default defineConfig({
       minify: true,
       inject: {
         data: (() => {
-          let entryCss = "/assets/index.css";
+          let entryCss = "";
+          let entryJs = "";
+          let preloadCss = false;
+          let preloadJs = false;
+
           try {
             const manifestPath = path.resolve(
               __dirname,
-              "dist/.vite/manifest.json"
+              "dist/.vite/manifest.json",
             );
+
             if (fs.existsSync(manifestPath)) {
               const manifest = JSON.parse(
-                fs.readFileSync(manifestPath, "utf-8")
+                fs.readFileSync(manifestPath, "utf-8"),
               );
               const main = manifest["src/main.tsx"];
+
               if (main && main.css && main.css.length) {
-                entryCss = main.css[0];
+                entryCss = `/${main.css[0].replace(/^\//, "")}`;
+                preloadCss = true;
+              }
+
+              if (main && main.file) {
+                entryJs = `/${main.file.replace(/^\//, "")}`;
+                preloadJs = true;
               }
             }
           } catch {
             /* fallback */
           }
+
           return {
-            preloadCss: true,
-            preloadJs: true,
+            preloadCss,
+            preloadJs,
             entryCss,
-            entryJs: "/src/main.tsx",
+            entryJs,
           };
         })(),
       },
@@ -69,7 +83,6 @@ export default defineConfig({
         // Splits main bundles for better caching and performance
         manualChunks: {
           react: ["react", "react-dom"],
-          ui: ["@heroui/react"],
         },
 
         // Add hash only to JS and CSS files — keep images and OG assets with fixed names
@@ -80,6 +93,7 @@ export default defineConfig({
           if (/\.(png|jpe?g|svg|gif|avif|webp)$/i.test(assetInfo.name ?? "")) {
             return `assets/[name][extname]`;
           }
+
           // Apply hash to all other assets (e.g., CSS)
           return `assets/[name]-[hash][extname]`;
         },

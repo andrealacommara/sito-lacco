@@ -1,14 +1,15 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import style functions, layout, and custom components for the “La mia musica” page.
 
+import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
+import { useRef, useState, useEffect } from "react"; // Hooks for scroll container reference and state
+import { Button } from "@heroui/button";
+
 import { subtitle, title } from "@/components/primitives"; // Style classes for main and secondary titles
 import DefaultLayout from "@/layouts/default"; // Base layout (includes navbar and footer)
 import CardSongExposer from "@/components/cardSongExposer"; // Custom component to display each song
 import { songList } from "@/config/songList"; // Static song data (title, description, artwork, link, etc.)
-import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons"; // Icons for carousel scroll
-import { useRef, useState, useEffect } from "react"; // Hooks for scroll container reference and state
-import { Button } from "@heroui/react";
 
 // ========================== MUSIC PAGE COMPONENT ========================== //
 // “La mia musica” page – displays all singles with descriptions and cover art.
@@ -25,9 +26,11 @@ export default function MusicPage() {
   // Scrolls one card at a time, left or right
   const scroll = (direction: "left" | "right") => {
     const container = scrollContainerRef.current;
+
     if (!container) return;
 
     const card = container.querySelector(".card-song");
+
     if (!card) return;
 
     const cardWidth = (card as HTMLElement).offsetWidth + 16; // 16px ≈ total horizontal margin (px-2)
@@ -42,12 +45,15 @@ export default function MusicPage() {
   // ========================== SCROLL EVENT HANDLER ========================== //
   useEffect(() => {
     const container = scrollContainerRef.current;
+
     if (!container) return;
 
     const card = container.querySelector(".card-song") as HTMLElement;
+
     if (!card) return;
 
     const cardWidth = card.offsetWidth;
+
     container.style.scrollPadding = `0px calc(50% - ${cardWidth / 2}px)`;
 
     // ========================== INITIAL SCROLL CENTERING ========================== //
@@ -63,6 +69,7 @@ export default function MusicPage() {
 
     handleScroll();
     container.addEventListener("scroll", handleScroll);
+
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -74,10 +81,10 @@ export default function MusicPage() {
       <Helmet>
         <title>Lacco | La mia musica</title>
         <meta
-          name="description"
           content="Scopri la musica di Lacco: la storia di ogni brano, l‘artwork e il link per ascoltarlo su Spotify."
+          name="description"
         />
-        <meta name="robots" content="index, follow" />
+        <meta content="index, follow" name="robots" />
       </Helmet>
 
       {/* ========================== TITLE SECTION ========================== */}
@@ -98,13 +105,13 @@ export default function MusicPage() {
             {/* Left arrow */}
             <Button
               isIconOnly
-              variant="flat"
-              radius="full"
-              onPress={() => scroll("left")}
+              aria-label="Scorri a sinistra"
               className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition hover:scale-110 ${
                 isAtStart ? "opacity-0 pointer-events-none" : "opacity-100"
               }`}
-              aria-label="Scorri a sinistra"
+              radius="full"
+              variant="flat"
+              onPress={() => scroll("left")}
             >
               <ChevronLeftIcon className="h-6 w-6 text-white" />
             </Button>
@@ -136,13 +143,13 @@ export default function MusicPage() {
             {/* Right arrow */}
             <Button
               isIconOnly
-              variant="flat"
-              radius="full"
-              onPress={() => scroll("right")}
+              aria-label="Scorri a destra"
               className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition hover:scale-110 ${
                 isAtEnd ? "opacity-0 pointer-events-none" : "opacity-100"
               }`}
-              aria-label="Scorri a destra"
+              radius="full"
+              variant="flat"
+              onPress={() => scroll("right")}
             >
               <ChevronRightIcon className="h-6 w-6 text-white" />
             </Button>

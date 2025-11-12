@@ -55,7 +55,6 @@ export default function HomePage() {
             priority
             alt="Total Purple Lacco" // Alt text for accessibility
             className="item-center"
-            height={400}
             sizes="400px"
             src={totalPurpleLacco} // Imported image
             width={400}

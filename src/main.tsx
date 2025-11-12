@@ -5,9 +5,12 @@ import React from "react"; // React core library
 import ReactDOM from "react-dom/client"; // ReactDOM for rendering the app into the DOM
 import { BrowserRouter } from "react-router-dom"; // Client-side routing
 import { HelmetProvider } from "react-helmet-async"; // SEO and dynamic meta tags manager
+
 import App from "./App.tsx"; // Main App component
 import { Provider } from "./provider.tsx"; // Global context provider (theme, state, etc.)
+
 import "@/styles/globals.css"; // Global stylesheet
+import { ensureMediaKeySystemRobustness } from "@/utils/ensureMediaKeySystemRobustness";
 
 // ========================== ENTRY POINT ========================== //
 /**
@@ -20,6 +23,8 @@ import "@/styles/globals.css"; // Global stylesheet
  * - HelmetProvider: manages SEO and meta tag updates.
  * - Provider: provides shared context and configuration across the app.
  */
+ensureMediaKeySystemRobustness();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* HelmetProvider wraps the app to enable dynamic SEO meta tags */}
@@ -32,5 +37,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </Provider>
       </BrowserRouter>
     </HelmetProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

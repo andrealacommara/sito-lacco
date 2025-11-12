@@ -2,21 +2,22 @@
 // Import core libraries and UI components for building the song card.
 // Includes HeroUI components for layout, badges, buttons, modals, skeletons, and links,
 // as well as React hooks for state management and media query detection.
+import { Badge } from "@heroui/badge";
+import { Button } from "@heroui/button";
+import { Card } from "@heroui/card";
 import {
-  Badge,
-  Button,
-  Card,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Skeleton,
-  useDisclosure,
-} from "@heroui/react";
+} from "@heroui/modal";
+import { Skeleton } from "@heroui/skeleton";
+import { useDisclosure } from "@heroui/use-disclosure";
 import { useState } from "react"; // React hook for local state management
 import { Link } from "@heroui/link"; // External link component
 import { useMediaQuery } from "@react-hook/media-query"; // Hook to detect viewport size
+
 import { SpotifyIcon } from "./icons"; // Custom Spotify icon component
 import SmartImage from "./smartImage"; // Optimized image component with automatic loading
 
@@ -91,6 +92,7 @@ export default function CardSongExposer({
               <SmartImage
                 alt={artworkAlt}
                 className="rounded-lg"
+                sizes="320px"
                 src={artworkSrc}
                 width={300}
                 onLoad={() => setIsLoaded(true)} // Hide skeleton once image is loaded
@@ -140,8 +142,8 @@ export default function CardSongExposer({
               <ModalFooter className="flex flex-col md:flex-row items-center justify-center">
                 <Link
                   isExternal
-                  href={songSpotifyLink}
                   aria-label="Vai al brano su Spotify" // Keep aria-label in Italian
+                  href={songSpotifyLink}
                 >
                   <Button color="success" onPress={onClose}>
                     {preSaveMode ? "Pre-Salva" : "Ascolta"} su Spotify
