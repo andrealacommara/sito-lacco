@@ -27,7 +27,10 @@ export default function DefaultLayout({
   return (
     <div className="relative flex flex-col justify-between min-h-screen">
       {/* NAVBAR - Top section */}
-      <header role="banner">
+      <header
+        className="sticky top-0 z-50 border-b border-default-100"
+        role="banner"
+      >
         <Navbar />
       </header>
 
