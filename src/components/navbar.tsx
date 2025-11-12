@@ -30,7 +30,11 @@ export const Navbar = () => {
 
   return (
     // HeroUI Navbar: sticky at the top, with max width
-    <HeroUINavbar maxWidth="xl" position="sticky">
+    <HeroUINavbar
+      className="bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+      maxWidth="xl"
+      position="static"
+    >
       {/* ================= BRAND / LOGO ================= */}
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand className="gap-3 max-w-fit">

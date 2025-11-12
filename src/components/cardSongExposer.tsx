@@ -61,7 +61,7 @@ export default function CardSongExposer({
       {/* Main clickable card */}
       <Card
         isPressable
-        className="group flex flex-col gap-4 pb-5 pt-5 px-5 bg-white transition-colors duration-300 hover:bg-danger w-full"
+        className="group flex flex-col gap-4 pb-5 pt-5 px-5 bg-white transition-colors duration-300 hover:bg-danger w-full shadow-lg rounded-3xl border border-default-100"
         radius="lg"
         shadow="md"
         onPress={() => handleOpen()}
