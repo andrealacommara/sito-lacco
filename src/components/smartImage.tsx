@@ -1,6 +1,6 @@
 // ========================== MAIN IMPORTS ========================== //
 import { useEffect } from "react";
-import { Image } from "@heroui/react";
+import { Image } from "@heroui/image";
 
 // ===================== SMART IMAGE COMPONENT ====================== //
 interface SmartImageProps {
@@ -10,7 +10,7 @@ interface SmartImageProps {
   isBlurred?: boolean;
   width?: number;
   height?: number;
-  size?: string;
+  sizes?: string;
   priority?: boolean;
   onLoad?: () => void;
 }
@@ -29,16 +29,18 @@ export default function SmartImage({
   width,
   height,
   priority = false,
+  sizes,
   onLoad,
 }: SmartImageProps) {
+  const responsiveSizes = sizes ?? "(max-width: 768px) 100vw, 50vw";
   // Responsive variants generated automatically
   const avifSet = new URL(
     `${src}?w=480;768;1200&format=avif&as=srcset`,
-    import.meta.url
+    import.meta.url,
   ).href;
   const webpSet = new URL(
     `${src}?w=480;768;1200&format=webp&as=srcset`,
-    import.meta.url
+    import.meta.url,
   ).href;
   const fallback = new URL(src, import.meta.url).href;
 
@@ -47,6 +49,7 @@ export default function SmartImage({
     if (!priority) return;
 
     const link = document.createElement("link");
+
     link.rel = "preload";
     link.as = "image";
     link.href = fallback;
@@ -55,11 +58,13 @@ export default function SmartImage({
       (link as any).fetchPriority = "high";
     } else {
       const img = new window.Image();
+
       img.src = fallback;
       img.decoding = "async";
     }
 
     document.head.appendChild(link);
+
     return () => {
       document.head.removeChild(link);
     };
@@ -68,21 +73,22 @@ export default function SmartImage({
   return (
     <picture>
       {/* Modern browsers: AVIF first */}
-      <source type="image/avif" srcSet={avifSet} sizes="(max-width: 768px) 100vw, 50vw" />
+      <source sizes={responsiveSizes} srcSet={avifSet} type="image/avif" />
       {/* Fallback for browsers without AVIF */}
-      <source type="image/webp" srcSet={webpSet} sizes="(max-width: 768px) 100vw, 50vw" />
+      <source sizes={responsiveSizes} srcSet={webpSet} type="image/webp" />
 
       {/* Final fallback: HeroUI Image component */}
       <Image
-        isBlurred={isBlurred}
         alt={alt}
         className={className}
-        width={width}
-        height={height}
-        src={fallback}
-        loading={priority ? "eager" : "lazy"}
         decoding="async"
         fetchPriority={priority ? "high" : "auto"}
+        height={height}
+        isBlurred={isBlurred}
+        loading={priority ? "eager" : "lazy"}
+        sizes={responsiveSizes}
+        src={fallback}
+        width={width}
         onLoad={onLoad}
       />
     </picture>

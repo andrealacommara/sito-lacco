@@ -1,9 +1,11 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import layout, UI components, and assets used to build the homepage.
 
-import { Card, Skeleton } from "@heroui/react"; // UI components for containers and loading placeholders
+import { Card } from "@heroui/card"; // UI component for container
+import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
 import { useState } from "react"; // React hook for local state management
 import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
+
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)
 import SpotifyPlayer from "@/components/spotifyPlayer"; // Custom component for Spotify player
 import { subtitle, title } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
@@ -25,10 +27,10 @@ export default function HomePage() {
       <Helmet>
         <title>Lacco | Home</title>
         <meta
-          name="description"
           content="Scopri Lacco: R&B e hip-hop in un viaggio introspettivo alla scoperta di sé."
+          name="description"
         />
-        <meta name="robots" content="index, follow" />
+        <meta content="index, follow" name="robots" />
       </Helmet>
 
       {/* ========================== INTRO SECTION ========================== */}
@@ -50,11 +52,13 @@ export default function HomePage() {
         <div className="p-4 md:p-4 w-fit md:w-full items-center">
           <SmartImage
             isBlurred // Applies a slight blur effect
+            priority
             alt="Total Purple Lacco" // Alt text for accessibility
             className="item-center"
+            height={400}
+            sizes="400px"
             src={totalPurpleLacco} // Imported image
             width={400}
-            priority
             onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
           />
         </div>
