@@ -31,16 +31,17 @@ export const Navbar = () => {
   return (
     // HeroUI Navbar: sticky at the top, with max width
     <HeroUINavbar
-      className="bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70"
-      maxWidth="xl"
+      className="bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70"
+      classNames={{ wrapper: "px-4 h-16" }}
+      maxWidth="full"
       position="static"
     >
       {/* ================= BRAND / LOGO ================= */}
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand className="gap-3 max-w-fit">
+      <NavbarContent className="w-full items-center justify-between md:w-auto md:justify-start">
+        <NavbarBrand className="flex items-center gap-2">
           {/* Logo link: clicking it navigates to home */}
           <Link
-            className="flex justify-start items-center gap-1 transition-colors duration-300 hover:text-danger dark:hover:text-danger"
+            className="flex items-center transition-colors duration-300 hover:text-danger dark:hover:text-danger"
             color="foreground"
             href="/"
             title="Home"
@@ -48,10 +49,18 @@ export const Navbar = () => {
             <Logo />
           </Link>
         </NavbarBrand>
+
+        <div className="flex items-center gap-3 md:hidden">
+          <ThemeSwitch />
+          <NavbarMenuToggle aria-label="Apri menu" />
+        </div>
       </NavbarContent>
 
       {/* ================= MENU DESKTOP ================= */}
-      <NavbarContent className="flex justify-center" justify="center">
+      <NavbarContent
+        className="hidden md:flex justify-center flex-1"
+        justify="center"
+      >
         {/* Desktop menu visible from "md" breakpoint */}
         <ul className="hidden md:flex gap-4 justify-center ml-2">
           {siteConfig.navItems.map((item) => {
@@ -84,14 +93,8 @@ export const Navbar = () => {
       {/* ================= ACTIONS / THEME SWITCH (DESKTOP) ================= */}
       <NavbarContent className="hidden md:flex" justify="end">
         <NavbarItem className="hidden md:flex gap-2">
-          <ThemeSwitch /> {/* Theme toggle only visible on desktop */}
+          <ThemeSwitch />
         </NavbarItem>
-      </NavbarContent>
-
-      {/* ================= MENU MOBILE ================= */}
-      <NavbarContent className="md:hidden gap-3" justify="end">
-        <ThemeSwitch /> {/* Theme toggle visible on mobile */}
-        <NavbarMenuToggle /> {/* Burger menu toggle button */}
       </NavbarContent>
 
       {/* ================= MOBILE MENU CONTENT ================= */}

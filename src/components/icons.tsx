@@ -42,12 +42,18 @@ const youtubePath = extractPath(logoYouTube);
  * Scalable SVG using the extracted path from the source file.
  * Color and size are controlled via props to match the current theme.
  */
-export const Logo = ({ size = 100, height, ...props }: IconSvgProps) => (
+export const Logo = ({
+  size,
+  width = 100,
+  height = 57,
+  ...props
+}: IconSvgProps) => (
   <svg
+    className="pr-4"
     fill="none"
     height={size || height}
-    viewBox="0 0 3000 3000"
-    width={size || height}
+    viewBox="0 0 3000 1700"
+    width={size || width}
     {...props}
   >
     <path
@@ -55,6 +61,7 @@ export const Logo = ({ size = 100, height, ...props }: IconSvgProps) => (
       d={logoPath}
       fill="currentColor"
       fillRule="evenodd"
+      transform="translate(-365,-1038) scale(1.25)"
     />
   </svg>
 );
