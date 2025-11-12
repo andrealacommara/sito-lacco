@@ -35,7 +35,7 @@ src/
 │   ├── cardSongExposer.tsx
 │   ├── icons.tsx
 │   ├── navbar.tsx
-│   ├── primitives.tsx
+│   ├── primitives.ts
 │   ├── smartImage.tsx
 │   ├── spotifyPlayer.tsx
 │   └── theme-switch.tsx
@@ -58,7 +58,8 @@ src/
 │   └── index.ts
 ├── utils/                  # Utility helpers shared across the app
 │   ├── createIcon.tsx
-│   └── ensureMediaKeySystemRobustness.ts
+│   ├── ensureMediaKeySystemRobustness.ts
+│   └── lazyWithPreload.ts
 ├── App.tsx                 # Main component for routing
 ├── main.tsx                # App entry point
 └── provider.tsx            # Global HeroUI + Toast provider
