@@ -1,5 +1,5 @@
 // ========================== MAIN IMPORTS ========================== //
-import { useEffect } from "react";
+import { useEffect, type CSSProperties } from "react";
 import { Image } from "@heroui/image";
 
 // ===================== SMART IMAGE COMPONENT ====================== //
@@ -12,6 +12,7 @@ interface SmartImageProps {
   height?: number;
   sizes?: string;
   priority?: boolean;
+  style?: CSSProperties;
   onLoad?: () => void;
 }
 
@@ -30,6 +31,7 @@ export default function SmartImage({
   height,
   priority = false,
   sizes,
+  style,
   onLoad,
 }: SmartImageProps) {
   const responsiveSizes = sizes ?? "(max-width: 768px) 100vw, 50vw";
@@ -88,6 +90,7 @@ export default function SmartImage({
         loading={priority ? "eager" : "lazy"}
         sizes={responsiveSizes}
         src={fallback}
+        style={style}
         width={width}
         onLoad={onLoad}
       />

@@ -94,6 +94,7 @@ export default function CardSongExposer({
                 className="rounded-lg"
                 sizes="320px"
                 src={artworkSrc}
+                style={{ aspectRatio: "1 / 1" }}
                 width={300}
                 onLoad={() => setIsLoaded(true)} // Hide skeleton once image is loaded
               />
