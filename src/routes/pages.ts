@@ -7,6 +7,7 @@ export const HomePage = lazyWithPreload(() => import("@/pages/homePage"));
 export const MusicPage = lazyWithPreload(() => import("@/pages/musicPage"));
 export const AboutPage = lazyWithPreload(() => import("@/pages/aboutPage"));
 export const ContactPage = lazyWithPreload(() => import("@/pages/contactPage"));
+export const PressKitPage = lazyWithPreload(() => import("@/pages/pressKitPage"));
 
 // ========================== PRELOAD MAP ========================== //
 // Maps route paths to the respective preload function for quick lookups.
@@ -15,6 +16,7 @@ const preloaders: Record<string, () => Promise<unknown>> = {
   "/la-mia-musica": MusicPage.preload,
   "/su-di-me": AboutPage.preload,
   "/contatti": ContactPage.preload,
+  "/presskit": PressKitPage.preload,
 };
 
 // ========================== HELPERS ========================== //

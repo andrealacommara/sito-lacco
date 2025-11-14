@@ -9,6 +9,7 @@ import {
   ContactPage,
   HomePage,
   MusicPage,
+  PressKitPage,
   warmupRoutes,
 } from "@/routes/pages";
 
@@ -26,7 +27,7 @@ function App() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const pathsToWarm = ["/la-mia-musica", "/su-di-me", "/contatti"];
+    const pathsToWarm = ["/la-mia-musica", "/su-di-me", "/contatti", "/presskit"];
     const warm = () => warmupRoutes(pathsToWarm);
 
     const idleCallback = (
@@ -76,6 +77,9 @@ function App() {
 
         {/* "Contatti" page */}
         <Route element={<ContactPage />} path="/contatti" />
+
+        {/* "PressKit" page */}
+        <Route element={<PressKitPage />} path="/presskit" />
 
         {/* Fallback route */}
         <Route element={<HomePage />} path="*" />
