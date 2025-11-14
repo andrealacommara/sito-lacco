@@ -24,8 +24,8 @@ export const songList = [
     alt: "Cover artwork di 'rumore di fondo'",
     description:
       "“rumore di fondo” è il suono che resta quando tutto il resto tace.\nÈ il pensiero che non smette mai di girare, la voce che continua a parlarti anche quando vorresti solo silenzio.\nRacconta una relazione che brucia ancora nelle vene, fatta di contrasti, di errori, di colpe condivise.\nÈ un viaggio nel caos interiore, tra nostalgia e consapevolezza, dove l’amore si confonde con il rumore e non sai più se ti tiene a galla o ti trascina giù.",
-    spotifyLink: "https://www.lacco.it/rumore-di-fondo",
-    preSaveMode: true,
+    spotifyLink: "https://open.spotify.com/track/3jAwmZHALqFWxy8pTMRmA6?si=s_2WH0IfTNO1E7UvEdbm7A&context=spotify%3Aalbum%3A1xO8LEQFfQSD0ZzJSQfDh8",
+    preSaveMode: false,
   },
   {
     title: "cercami",
