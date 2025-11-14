@@ -35,9 +35,7 @@ RewriteRule ^ index.html [L]
 
 # ====================== COMPRESSION ======================
 
-# Brotli compression should be handled by the server configuration (Aruba blocks AllowOverride for it)
-
-# So we safely enable only DEFLATE here.
+# Brotli is disabled by Aruba — enable DEFLATE safely
 
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
@@ -45,13 +43,23 @@ RewriteRule ^ index.html [L]
 
 # ====================== CACHE CONTROL ======================
 
-# Cache static assets for one year
+# --- 1) Soft-cache SEO critical assets (NO hash) ---
+
+# These must NOT be cached for a year or updates won't be visible (OG image, icons)
+
+<FilesMatch "^(og-image\.jpg|favicon\.ico|favicon\.svg|favicon-512\.png|apple-touch-icon\.png|android-chrome-192x192\.png|android-chrome-512x512\.png|mstile-150x150\.png)$">
+Header set Cache-Control "public, max-age=3600"
+</FilesMatch>
+
+# --- 2) Hard-cache hashed assets for 1 year (JS/CSS/images) ---
+
+# Safe because their names change on every update
 
 <FilesMatch "\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|woff2|ttf|eot)$">
 Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>
 
-# Prevent caching of HTML (avoid blank page due to outdated index.html)
+# --- 3) HTML should never be cached ---
 
 <FilesMatch "\.(html)$">
 Header set Cache-Control "no-cache, no-store, must-revalidate"
