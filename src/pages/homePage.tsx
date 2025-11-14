@@ -40,7 +40,7 @@ export default function HomePage() {
 
       {/* ========================== MAIN CARD ========================== */}
       {/* Contains the artist image and description */}
-      <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 gap-2 md:gap-4 mx-auto  w-full max-w-5xl">
+      <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 mx-auto  w-full max-w-5xl">
         {/* Visual placeholder while the image is loading */}
         {!isLoaded && (
           <Skeleton className="absolute inset-0 rounded-lg">
