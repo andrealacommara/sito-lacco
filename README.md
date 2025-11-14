@@ -49,7 +49,8 @@ src/
 │   ├── aboutPage.tsx       # "Su di me" Page
 │   ├── contactPage.tsx     # "Contatti" Page
 │   ├── homePage.tsx        # "Home" Page
-│   └── musicPage.tsx       # "La mia musica" Page
+│   |── musicPage.tsx       # "La mia musica" Page
+│   └── pressKitPage.tsx    # "PressKit" Page
 ├── routes/                 # Lazy routes + preload helpers
 │   └── pages.ts
 ├── styles/                 # Styles configuration
@@ -73,6 +74,7 @@ src/
 - **La mia musica:** Horizontal carousel of singles, with descriptions and direct links to platforms (Modal).
 - **Su di me:** Animated biography with progressive scroll effects (Framer Motion).
 - **Contatti:** Interactive form that sends messages via EmailJS.
+- **PressKit:** Dedicated private page (lazy-loaded and noindex) containing official media assets, extended bio, press photos, and professional contacts.
 - **Footer:** Quick links to social and music platforms.
 - **Route preloading:** Navigation links prefetch their chunks on hover/touch for near-instant transitions.
 
