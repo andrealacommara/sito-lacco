@@ -9,7 +9,7 @@ import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)
 import SpotifyPlayer from "@/components/spotifyPlayer"; // Custom component for Spotify player
 import { subtitle, title } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
-import totalPurpleLacco from "/images/totalPurpleLacco.avif"; // Main artist image
+import heroLacco from "/images/heroLacco.avif"; // Main artist image
 import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
 
 // ========================== HOME PAGE COMPONENT ========================== //
@@ -53,10 +53,10 @@ export default function HomePage() {
           <SmartImage
             isBlurred // Applies a slight blur effect
             priority
-            alt="Total Purple Lacco" // Alt text for accessibility
+            alt="Lacco" // Alt text for accessibility
             className="item-center"
             sizes="400px"
-            src={totalPurpleLacco} // Imported image
+            src={heroLacco} // Imported image
             style={{ aspectRatio: "1 / 1" }}
             width={400}
             onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
