@@ -27,12 +27,12 @@ export default defineConfig({
           try {
             const manifestPath = path.resolve(
               __dirname,
-              "dist/.vite/manifest.json",
+              "dist/.vite/manifest.json"
             );
 
             if (fs.existsSync(manifestPath)) {
               const manifest = JSON.parse(
-                fs.readFileSync(manifestPath, "utf-8"),
+                fs.readFileSync(manifestPath, "utf-8")
               );
               const main = manifest["src/main.tsx"];
 
@@ -89,12 +89,26 @@ export default defineConfig({
         entryFileNames: `assets/[name]-[hash].js`,
         chunkFileNames: `assets/[name]-[hash].js`,
         assetFileNames: (assetInfo) => {
-          // Keep image files (png, jpg, svg, avif, gif, webp) without hash for stable URLs
-          if (/\.(png|jpe?g|svg|gif|avif|webp)$/i.test(assetInfo.name ?? "")) {
-            return `assets/[name][extname]`;
+          const fileName = assetInfo.name ?? "";
+
+          // --- Files that MUST keep the same name (SEO / Social / Browser icons) ---
+          const fixedNames = [
+            "og-image.jpg",
+            "favicon.ico",
+            "favicon.svg",
+            "favicon-512.png",
+            "apple-touch-icon.png",
+            "android-chrome-192x192.png",
+            "android-chrome-512x512.png",
+            "mstile-150x150.png",
+          ];
+
+          // If the file is in the fixed list → keep exact name (no hash)
+          if (fixedNames.includes(fileName)) {
+            return `[name][extname]`;
           }
 
-          // Apply hash to all other assets (e.g., CSS)
+          // --- Everything else: images, assets → hashed for cache-busting ---
           return `assets/[name]-[hash][extname]`;
         },
       },
