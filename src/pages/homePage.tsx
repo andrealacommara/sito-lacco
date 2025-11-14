@@ -9,7 +9,7 @@ import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)
 import SpotifyPlayer from "@/components/spotifyPlayer"; // Custom component for Spotify player
 import { subtitle, title } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
-import heroLacco from "/images/heroLacco.avif"; // Main artist image
+import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
 import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
 
 // ========================== HOME PAGE COMPONENT ========================== //
