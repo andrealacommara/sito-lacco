@@ -1,3 +1,5 @@
+// ========================== TYPE DECLARATION ========================== //
+// Minimal Archiver typings required by the press-kit ZIP build script.
 declare module "archiver" {
   interface ArchiverOptions {
     zlib?: { level?: number };

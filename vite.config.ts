@@ -1,3 +1,5 @@
+// ========================== MAIN IMPORTS ========================== //
+// Node helpers plus the Vite plugins required to build the SPA.
 import fs from "fs";
 import path from "path";
 
@@ -65,7 +67,7 @@ export default defineConfig({
     VitePluginSitemap({
       hostname: "https://lacco.it",
       dynamicRoutes: ["/la-mia-musica", "/su-di-me", "/contatti"],
-      generateRobotsTxt: false, // ← FIX: impedisce al plugin di cercare robots.txt in dist
+      generateRobotsTxt: false, // Prevents the plugin from probing dist/ for robots.txt
     }),
 
     // Resolves path aliases defined in tsconfig.json
