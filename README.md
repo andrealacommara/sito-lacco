@@ -33,13 +33,18 @@ src/
 ├── components/             # Reusable UI components
 │   ├── aboutSection.tsx
 │   ├── cardSongExposer.tsx
+│   ├── countUp.tsx
 │   ├── icons.tsx
 │   ├── navbar.tsx
+│   ├── pressKitPhotoModal.tsx
+│   ├── pressKitSongCard.tsx
 │   ├── primitives.ts
 │   ├── smartImage.tsx
 │   ├── spotifyPlayer.tsx
 │   └── theme-switch.tsx
 ├── config/                 # Site and song configuration files
+│   ├── pressKitPhotos.ts
+│   ├── pressKitStats.ts
 │   ├── sectionsAboutPage.ts
 │   ├── site.ts
 │   └── songList.ts
@@ -56,6 +61,7 @@ src/
 ├── styles/                 # Styles configuration
 │   └── global.css
 ├── types/                  # Shared TypeScript types
+│   |── archiver.d.ts
 │   └── index.ts
 ├── utils/                  # Utility helpers shared across the app
 │   ├── createIcon.tsx
