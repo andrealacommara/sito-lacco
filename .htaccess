@@ -22,12 +22,12 @@ Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-
 
 # ====================== STATIC FILES & SPA FALLBACK ======================
 
-# Serve existing files normally
+# Serve static files if they exist
 
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# Redirect all other routes to index.html (SPA fallback)
+# SPA fallback → redirect everything else to index.html
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
@@ -35,7 +35,7 @@ RewriteRule ^ index.html [L]
 
 # ====================== COMPRESSION ======================
 
-# Brotli is disabled by Aruba — enable DEFLATE safely
+# Aruba: Brotli not allowed → enable DEFLATE safely
 
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
@@ -43,26 +43,28 @@ RewriteRule ^ index.html [L]
 
 # ====================== CACHE CONTROL ======================
 
-# --- 1) Soft-cache SEO critical assets (NO hash) ---
-
-# These must NOT be cached for a year or updates won't be visible (OG image, icons)
+# --- 1) Prevent long caching for fixed-name critical files (SEO + icons) ---
 
 <FilesMatch "^(og-image\.jpg|favicon\.ico|favicon\.svg|favicon-512\.png|apple-touch-icon\.png|android-chrome-192x192\.png|android-chrome-512x512\.png|mstile-150x150\.png)$">
 Header set Cache-Control "public, max-age=3600"
 </FilesMatch>
 
-# --- 2) Hard-cache hashed assets for 1 year (JS/CSS/images) ---
-
-# Safe because their names change on every update
+# --- 2) Hard-cache hashed assets for 1 year (safe because hash changes) ---
 
 <FilesMatch "\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|woff2|ttf|eot)$">
 Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>
 
-# --- 3) HTML should never be cached ---
+# --- 3) HTML must NEVER be cached ---
 
 <FilesMatch "\.(html)$">
 Header set Cache-Control "no-cache, no-store, must-revalidate"
 Header set Pragma "no-cache"
 Header set Expires 0
+</FilesMatch>
+
+# --- 4) ZIP (Press Kit) should never be cached ---
+
+<FilesMatch "photos\.zip$">
+Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
 </FilesMatch>

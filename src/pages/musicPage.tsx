@@ -134,6 +134,7 @@ export default function MusicPage() {
                     songDescription={song.description}
                     songSpotifyLink={song.spotifyLink}
                     songTitle={song.title}
+                    songAppleMusicLink={song.appleMusicLink}
                   />
                 </div>
               ))}
