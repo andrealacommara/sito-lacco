@@ -10,15 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Scarica il codice dal repository
+      # Checkout
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Installa le dipendenze
+      # Cache node_modules
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Install deps
       - name: Install dependencies
         run: npm install
 
-      # Build del progetto (React + Vite)
+      # Build
       - name: Build project
         run: npm run build
         env:
@@ -37,6 +46,6 @@ jobs:
           local-dir: ./dist/
           protocol: ftps
 
-      # Cache bust (opzionale ma utile)
+      # Cache bust (efficace su Aruba)
       - name: Bust cache
-        run: curl https://www.lacco.it/?cache_bust=${{ github.run_id }}
+        run: curl https://www.lacco.it/favicon.ico?cb=${{ github.run_id }}
