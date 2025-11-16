@@ -14,6 +14,7 @@ export default defineConfig({
   plugins: [
     // React support with Fast Refresh
     react(),
+
     // HTML preload CSS
     createHtmlPlugin({
       minify: true,
@@ -59,10 +60,12 @@ export default defineConfig({
         })(),
       },
     }),
+
     // Automatic sitemap generation for SEO
     VitePluginSitemap({
       hostname: "https://lacco.it",
       dynamicRoutes: ["/la-mia-musica", "/su-di-me", "/contatti"],
+      generateRobotsTxt: false, // ← FIX: impedisce al plugin di cercare robots.txt in dist
     }),
 
     // Resolves path aliases defined in tsconfig.json
@@ -77,6 +80,7 @@ export default defineConfig({
     // Creates optimized variants for each image
     imagetools(),
   ],
+
   build: {
     rollupOptions: {
       output: {
@@ -85,13 +89,13 @@ export default defineConfig({
           react: ["react", "react-dom"],
         },
 
-        // Add hash only to JS and CSS files — keep images and OG assets with fixed names
+        // Add hash only to JS and CSS — keep images and OG assets with fixed names
         entryFileNames: `assets/[name]-[hash].js`,
         chunkFileNames: `assets/[name]-[hash].js`,
         assetFileNames: (assetInfo) => {
           const fileName = assetInfo.name ?? "";
 
-          // --- Files that MUST keep the same name (SEO / Social / Browser icons) ---
+          // Files that must NOT be hashed
           const fixedNames = [
             "og-image.jpg",
             "favicon.ico",
@@ -103,12 +107,11 @@ export default defineConfig({
             "mstile-150x150.png",
           ];
 
-          // If the file is in the fixed list → keep exact name (no hash)
           if (fixedNames.includes(fileName)) {
             return `[name][extname]`;
           }
 
-          // --- Everything else: images, assets → hashed for cache-busting ---
+          // All other assets get hashed
           return `assets/[name]-[hash][extname]`;
         },
       },

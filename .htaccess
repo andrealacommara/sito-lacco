@@ -27,7 +27,7 @@ Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# SPA fallback → redirect everything else to index.html
+# SPA fallback → fall back to index.html
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
@@ -35,27 +35,13 @@ RewriteRule ^ index.html [L]
 
 # ====================== COMPRESSION ======================
 
-# Aruba: Brotli not allowed → enable DEFLATE safely
-
 <IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml application/xml
 </IfModule>
 
 # ====================== CACHE CONTROL ======================
 
-# --- 1) Prevent long caching for fixed-name critical files (SEO + icons) ---
-
-<FilesMatch "^(og-image\.jpg|favicon\.ico|favicon\.svg|favicon-512\.png|apple-touch-icon\.png|android-chrome-192x192\.png|android-chrome-512x512\.png|mstile-150x150\.png)$">
-Header set Cache-Control "public, max-age=3600"
-</FilesMatch>
-
-# --- 2) Hard-cache hashed assets for 1 year (safe because hash changes) ---
-
-<FilesMatch "\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|woff2|ttf|eot)$">
-Header set Cache-Control "public, max-age=31536000, immutable"
-</FilesMatch>
-
-# --- 3) HTML must NEVER be cached ---
+# --- 1) HTML must NEVER be cached ---
 
 <FilesMatch "\.(html)$">
 Header set Cache-Control "no-cache, no-store, must-revalidate"
@@ -63,8 +49,20 @@ Header set Pragma "no-cache"
 Header set Expires 0
 </FilesMatch>
 
-# --- 4) ZIP (Press Kit) should never be cached ---
+# --- 2) Press kit assets should NOT be cached ---
 
-<FilesMatch "photos\.zip$">
+<FilesMatch "(photos\.zip|artwork\.zip|logo\.zip)$">
 Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+</FilesMatch>
+
+# --- 3) Icon / SEO files need short caching ---
+
+<FilesMatch "^(og-image\.jpg|favicon\.ico|favicon\.svg|favicon-512\.png|apple-touch-icon\.png|android-chrome-192x192\.png|android-chrome-512x512\.png|mstile-150x150\.png)$">
+Header set Cache-Control "public, max-age=3600"
+</FilesMatch>
+
+# --- 4) All hashed assets (safe to cache for 1 year) ---
+
+<FilesMatch "\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|woff2|ttf|eot)$">
+Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>
