@@ -18,7 +18,7 @@ import { useState } from "react"; // React hook for local state management
 import { Link } from "@heroui/link"; // External link component
 import { useMediaQuery } from "@react-hook/media-query"; // Hook to detect viewport size
 
-import { SpotifyIcon } from "./icons"; // Custom Spotify icon component
+import { AppleMusicIcon, SpotifyIcon } from "./icons"; // Custom Spotify icon component
 import SmartImage from "./smartImage"; // Optimized image component with automatic loading
 
 // ========================== INTERFACES ========================== //
@@ -29,6 +29,7 @@ interface CardSongExposerProps {
   songTitle: string; // Song title
   songDescription: string; // Short description of the song
   songSpotifyLink: string; // External link to the song on Spotify
+  songAppleMusicLink: string; // External link to the song on Apple Music
   preSaveMode: boolean; // Flag indicating if "pre-save" mode is active
 }
 
@@ -45,6 +46,7 @@ export default function CardSongExposer({
   songTitle,
   songDescription,
   songSpotifyLink,
+  songAppleMusicLink,
   preSaveMode,
 }: CardSongExposerProps) {
   const [isLoaded, setIsLoaded] = useState(false); // Tracks artwork image loading state
@@ -140,17 +142,57 @@ export default function CardSongExposer({
               </ModalBody>
 
               {/* Modal footer with Spotify button */}
-              <ModalFooter className="flex flex-col md:flex-row items-center justify-center">
-                <Link
-                  isExternal
-                  aria-label="Vai al brano su Spotify" // Keep aria-label in Italian
-                  href={songSpotifyLink}
-                >
-                  <Button color="success" onPress={onClose}>
-                    {preSaveMode ? "Pre-Salva" : "Ascolta"} su Spotify
-                    <SpotifyIcon />
-                  </Button>
-                </Link>
+              <ModalFooter className="flex flex-col">
+                {!preSaveMode && (
+                  <div className="text-center">
+                    <text className="text-neutral-500 text-small">
+                      Ascolta ora il brano
+                    </text>
+                  </div>
+                )}
+                <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
+                  {/* Spotify */}
+                  <div className="flex-1 min-w-0">
+                    <Link
+                      isExternal
+                      href={songSpotifyLink}
+                      aria-label="Vai al brano su Spotify"
+                      className="block w-full min-w-0"
+                    >
+                      <Button
+                        fullWidth
+                        color="success"
+                        onPress={onClose}
+                        className="min-w-0"
+                      >
+                        {preSaveMode ? "Pre-Salva su Spotify" : "Spotify"}
+                        <SpotifyIcon />
+                      </Button>
+                    </Link>
+                  </div>
+
+                  {/* Apple Music */}
+                  {!preSaveMode && (
+                    <div className="flex-1 min-w-0">
+                      <Link
+                        isExternal
+                        href={songAppleMusicLink}
+                        aria-label="Vai al brano su Apple Music"
+                        className="block w-full min-w-0"
+                      >
+                        <Button
+                          fullWidth
+                          color="danger"
+                          onPress={onClose}
+                          className="min-w-0"
+                        >
+                          Apple Music
+                          <AppleMusicIcon />
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </ModalFooter>
             </>
           )}
