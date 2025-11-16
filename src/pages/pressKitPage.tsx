@@ -386,7 +386,7 @@ export default function PressKitPage() {
 
             {/* DOWNLOAD ZIP */}
             <div className="flex justify-center p-4">
-              <a href="/presskit/HQ/photos.zip" download>
+              <a href="/presskit-files/HQ/photos.zip" download>
                 <Button color="danger" variant="solid" className="px-6">
                   Scarica tutte le foto e gli artwork (.zip)
                 </Button>
