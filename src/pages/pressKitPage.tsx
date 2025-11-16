@@ -63,7 +63,7 @@ export default function PressKitPage() {
 
           <div className="flex flex-col items-center text-center md:text-left md:items-start p-2 md:p-4">
             <Logo
-              aria-label="Lacco official logo"
+              aria-label="Logo ufficiale di Lacco"
               className="item-center max-w-full"
               size={250}
             />
