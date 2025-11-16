@@ -3,7 +3,7 @@ import archiver from "archiver";
 import path from "path";
 
 // Output: public/presskit/HQ/photos.zip
-const outputPath = path.resolve("public/presskit/HQ/photos.zip");
+const outputPath = path.resolve("public/presskit-files/HQ/photos.zip");
 
 // Check if folder exists
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
