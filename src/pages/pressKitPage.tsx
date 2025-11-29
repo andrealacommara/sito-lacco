@@ -250,6 +250,15 @@ export default function PressKitPage() {
               </div>
             </div>
             <div className="flex flex-col gap-4 text-base leading-relaxed text-default-600">
+              <p className="text-center text-neutral-400 text-xs">
+                Artwork realizzati da Nicolò Piazza (in arte 
+                  <a
+                      href="https://www.instagram.com/torino_ink"
+                      target="_blank"
+                      className="text-primary px-1 hover:underline"
+                    >Torino Ink</a>
+                ), con la direzione artistica di Andrea La Commara (Lacco).
+              </p>
               <p>
                 <strong className="text-danger">
                   Il progetto artistico di Lacco si basa su una dicotomia
@@ -317,7 +326,7 @@ export default function PressKitPage() {
               <p>
                 Con
                 <em className="text-danger px-1">nokoru mono</em>(in uscita il{" "}
-                <em className="text-danger px-1">23/01/2026</em>) si apre il
+                <em className="text-danger px-1">30/01/2026</em>) si apre il
                 primo capitolo di un viaggio che continua, inevitabilmente, in{" "}
                 <em className="text-danger px-1">yuku mono</em>.<br />
                 Due prospettive, un’unica storia: quella dell’essere umano.
