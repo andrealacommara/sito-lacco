@@ -121,7 +121,7 @@ export default function HomePage() {
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <AppleMusicIcon />
-            Apple Music
+            Music
           </Card>
         </button>
         <button
