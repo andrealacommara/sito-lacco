@@ -11,6 +11,14 @@ import SpotifyPlayer from "@/components/spotifyPlayer"; // Custom component for 
 import { subtitle, title } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
 import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
 import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
+import {
+  AppleMusicIcon,
+  InstagramIcon,
+  SpotifyIcon,
+  TikTokIcon,
+  YouTubeIcon,
+} from "@/components/icons";
+import { siteConfig } from "@/config/site";
 
 // ========================== HOME PAGE COMPONENT ========================== //
 // Displays an introduction to the artist and includes a Spotify player.
@@ -74,6 +82,58 @@ export default function HomePage() {
           </h1>
         </div>
       </Card>
+
+      {/* ========================== LINKS SECTION ========================== */}
+      <div className="flex flex-row items-center justify-center py-4 md:py-4">
+        <h2 className={subtitle()}>Link</h2>
+      </div>
+      <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-5xl gap-4">
+        <button
+          className="w-full md:flex-1"
+          onClick={() => window.open(siteConfig.links.spotify, "_blank")}
+        >
+          <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+            <SpotifyIcon />
+            Spotify
+          </Card>
+        </button>
+        <button
+          className="w-full md:flex-1"
+          onClick={() => window.open(siteConfig.links.instagram, "_blank")}
+        >
+          <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+            <InstagramIcon />
+            Instagram
+          </Card>
+        </button>
+        <button
+          className="w-full md:flex-1"
+          onClick={() => window.open(siteConfig.links.tiktok, "_blank")}
+        >
+          <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+            <TikTokIcon />
+            TikTok
+          </Card>
+        </button>
+        <button
+          className="w-full md:flex-1"
+          onClick={() => window.open(siteConfig.links.appleMusic, "_blank")}
+        >
+          <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+            <AppleMusicIcon />
+            Apple Music
+          </Card>
+        </button>
+        <button
+          className="w-full md:flex-1"
+          onClick={() => window.open(siteConfig.links.youtube, "_blank")}
+        >
+          <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+            <YouTubeIcon />
+            YouTube
+          </Card>
+        </button>
+      </div>
 
       {/* ========================== SPOTIFY PLAYER SECTION ========================== */}
       <div className="flex flex-row items-center justify-center py-4 md:py-4">

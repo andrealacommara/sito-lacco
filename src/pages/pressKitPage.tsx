@@ -1,7 +1,14 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import style functions, layout, and custom components for the “PressKit” page.
 import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
-import { Logo } from "@/components/icons"; // Artist logo
+import {
+  AppleMusicIcon,
+  InstagramIcon,
+  Logo,
+  SpotifyIcon,
+  TikTokIcon,
+  YouTubeIcon,
+} from "@/components/icons"; // Artist logo
 import { title, subtitle } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
 import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)
@@ -251,12 +258,14 @@ export default function PressKitPage() {
             </div>
             <div className="flex flex-col gap-4 text-base leading-relaxed text-default-600">
               <p className="text-center text-neutral-400 text-xs">
-                Artwork realizzati da Nicolò Piazza (in arte 
-                  <a
-                      href="https://www.instagram.com/torino_ink"
-                      target="_blank"
-                      className="text-primary px-1 hover:underline"
-                    >Torino Ink</a>
+                Artwork realizzati da Nicolò Piazza (in arte
+                <a
+                  href="https://www.instagram.com/torino_ink"
+                  target="_blank"
+                  className="text-primary px-1 hover:underline"
+                >
+                  Torino Ink
+                </a>
                 ), con la direzione artistica di Andrea La Commara (Lacco).
               </p>
               <p>
@@ -462,18 +471,18 @@ export default function PressKitPage() {
             <div className="flex flex-col gap-8">
               {/* MANAGEMENT */}
               <div>
-                <h3 className="text-lg font-semibold text-danger">
+                <h3 className="text-lg font-semibold text-danger mb-3">
                   Management
                 </h3>
-                <p className="text-default-600 text-base mt-1 mb-3">
+                <p className="text-default-600 text-base">
                   Per richieste stampa, interviste, booking e collaborazioni:
+                  <a
+                    href="mailto:management@lacco.it"
+                    className="text-base font-medium text-default-800 hover:text-danger transition-colors ml-2"
+                  >
+                    management@lacco.it
+                  </a>
                 </p>
-                <a
-                  href="mailto:management@lacco.it"
-                  className="text-base font-medium text-default-800 hover:text-danger transition-colors"
-                >
-                  management@lacco.it
-                </a>
               </div>
 
               {/* SOCIAL LINKS */}
@@ -482,62 +491,63 @@ export default function PressKitPage() {
                   Social & Streaming
                 </h3>
 
-                <ul className="flex flex-col gap-2 text-default-600 text-base">
-                  <li className="flex items-center gap-2">
-                    <span className="text-danger">•</span>
-                    <a
-                      href={siteConfig.links.instagram}
-                      target="_blank"
-                      className="font-medium hover:text-danger transition-colors"
-                    >
-                      Instagram – @laccoverse
-                    </a>
-                  </li>
-
-                  <li className="flex items-center gap-2">
-                    <span className="text-danger">•</span>
-                    <a
-                      href={siteConfig.links.tiktok}
-                      target="_blank"
-                      className="font-medium hover:text-danger transition-colors"
-                    >
-                      TikTok – @laccoverse
-                    </a>
-                  </li>
-
-                  <li className="flex items-center gap-2">
-                    <span className="text-danger">•</span>
-                    <a
-                      href={siteConfig.links.spotify}
-                      target="_blank"
-                      className="font-medium hover:text-danger transition-colors"
-                    >
-                      Spotify – Lacco
-                    </a>
-                  </li>
-
-                  <li className="flex items-center gap-2">
-                    <span className="text-danger">•</span>
-                    <a
-                      href={siteConfig.links.appleMusic}
-                      target="_blank"
-                      className="font-medium hover:text-danger transition-colors"
-                    >
-                      Apple Music – Lacco
-                    </a>
-                  </li>
-
-                  <li className="flex items-center gap-2">
-                    <span className="text-danger">•</span>
-                    <a
-                      href={siteConfig.links.youtube}
-                      target="_blank"
-                      className="font-medium hover:text-danger transition-colors"
-                    >
-                      YouTube – Lacco
-                    </a>
-                  </li>
-                </ul>
+                <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-5xl gap-4">
+                  <button
+                    className="w-full md:flex-1"
+                    onClick={() =>
+                      window.open(siteConfig.links.spotify, "_blank")
+                    }
+                  >
+                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                      <SpotifyIcon />
+                      Spotify
+                    </Card>
+                  </button>
+                  <button
+                    className="w-full md:flex-1"
+                    onClick={() =>
+                      window.open(siteConfig.links.instagram, "_blank")
+                    }
+                  >
+                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                      <InstagramIcon />
+                      Instagram
+                    </Card>
+                  </button>
+                  <button
+                    className="w-full md:flex-1"
+                    onClick={() =>
+                      window.open(siteConfig.links.tiktok, "_blank")
+                    }
+                  >
+                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                      <TikTokIcon />
+                      TikTok
+                    </Card>
+                  </button>
+                  <button
+                    className="w-full md:flex-1"
+                    onClick={() =>
+                      window.open(siteConfig.links.appleMusic, "_blank")
+                    }
+                  >
+                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                      <AppleMusicIcon />
+                      Apple Music
+                    </Card>
+                  </button>
+                  <button
+                    className="w-full md:flex-1"
+                    onClick={() =>
+                      window.open(siteConfig.links.youtube, "_blank")
+                    }
+                  >
+                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                      <YouTubeIcon />
+                      YouTube
+                    </Card>
+                  </button>
+                </div>
               </div>
             </div>
           </Card>
