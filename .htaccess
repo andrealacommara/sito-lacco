@@ -19,6 +19,7 @@ Redirect 301 /tra-le-nuvole https://distrokid.com/hyperfollow/lacco/tra-le-nuvol
 Redirect 301 /tra-le-nuvole-sv https://distrokid.com/hyperfollow/lacco/tra-le-nuvole-sunset-version
 Redirect 301 /cercami https://distrokid.com/hyperfollow/lacco/cercami-4
 Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-fondo
+Redirect 301 /nokoru-mono https://distrokid.com/hyperfollow/lacco/nokoru-mono
 
 # ====================== STATIC FILES & SPA FALLBACK ======================
 
