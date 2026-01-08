@@ -180,7 +180,7 @@ export default function PressKitPage() {
 
               <div>
                 <div className="text-4xl font-semibold text-default-700">
-                  <CountUp end={songList.length} duration={1000} />
+                  <CountUp end={songList.filter((song) => song.preSaveMode === false).length} duration={1000} />
                 </div>
                 <p className="text-default-500">Brani pubblicati</p>
               </div>

@@ -8,6 +8,9 @@ import rumoreDiFondoArtwork from "@/assets/images/artworks/rumoreDiFondoArtwork.
 import tempoPersoArtwork from "@/assets/images/artworks/tempoPersoArtwork.avif";
 import traLeNuvoleArtwork from "@/assets/images/artworks/traLeNuvoleArtwork.avif";
 import traLeNuvoleSVArtwork from "@/assets/images/artworks/traLeNuvoleSunsetVersionArtwork.avif";
+import ricordoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
+import davveroArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
+import perGliAltriArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 
 // ========================== TYPE DEFINITION ========================== //
 // Export a TypeScript type based on the `songList` array structure.
@@ -19,6 +22,45 @@ export type songList = typeof songList;
 
 export const songList = [
   {
+    title: "per gli altri",
+    src: perGliAltriArtwork,
+    alt: "Cover artwork di 'per gli altri'",
+    description:
+      "“per gli altri” è il modo di vivere per chi sceglie di amare.\nMettere sempre le altre persone al primo posto, anche quando saremmo i primi ad aver bisogno di aiuto.\nUn inno all'amore per gli altri ed, allo stesso tempo, un promemoria.\nPerchè, a volte, serve ricordarsi che l'amore che diamo agli altri lo meritiamo anche noi stessi.",
+    spotifyLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    appleMusicLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    year: 2026,
+    pressKitDescription:
+      "Un brano intimo, che racconta l'amore per gli altri e, soprattutto, per noi stessi.",
+    preSaveMode: true,
+  },
+  {
+    title: "davvero",
+    src: davveroArtwork,
+    alt: "Cover artwork di 'davvero'",
+    description:
+      "“davvero” è una promessa a me stesso.\nDopo un'intera vita passata ad essere il più severo dei giudici con me stesso, finalmente, realizzo che posso essere indulgente.\nPrometto che ci proverò.\nNon serve essere perfetto se non riesci ad essere te stesso, difetti compresi.",
+    spotifyLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    appleMusicLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    year: 2026,
+    pressKitDescription:
+      "Un brano urban, che parla di accettazione di sè e crescita personale",
+    preSaveMode: true,
+  },
+  {
+    title: "ricordo",
+    src: ricordoArtwork,
+    alt: "Cover artwork di 'ricordo'",
+    description:
+      "“ricordo” è per mia nonna.\nUna raccolta di promesse, discorsi e frammenti di vita insieme.\nNon è una semplice dedica, ma una fotografia in musica di momenti passati che trovano l'eternità nella mia memoria.\nTe l'ho promesso, sai che le promesse le mantengo.\nNon ti preoccupare, ricordo.",
+    spotifyLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    appleMusicLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    year: 2026,
+    pressKitDescription:
+      "Un brano intimo e personale, dedicato alla memoria di una persona cara, arricchito da registrazioni reali per rendere l'ascolto ancora più vero.",
+    preSaveMode: true,
+  },
+  {
     title: "rumore di fondo",
     src: rumoreDiFondoArtwork,
     alt: "Cover artwork di 'rumore di fondo'",
@@ -29,7 +71,8 @@ export const songList = [
     appleMusicLink:
       "https://music.apple.com/it/album/rumore-di-fondo/1845625900?i=1845625902",
     year: 2025,
-    pressKitDescription: "Un brano R&B introspettivo che esplora il caos emotivo dopo una relazione irrisolta.",
+    pressKitDescription:
+      "Un brano R&B introspettivo che esplora il caos emotivo dopo una relazione irrisolta.",
     preSaveMode: false,
   },
   {
@@ -43,7 +86,8 @@ export const songList = [
     appleMusicLink:
       "https://music.apple.com/it/album/cercami/1836640192?i=1836640193",
     year: 2025,
-    pressKitDescription: "Un racconto emotivo tra attesa e smarrimento, con un sound sospeso tra pop e R&B.",
+    pressKitDescription:
+      "Un racconto emotivo tra attesa e smarrimento, con un sound sospeso tra pop e R&B.",
     preSaveMode: false,
   },
   {
@@ -57,7 +101,8 @@ export const songList = [
     appleMusicLink:
       "https://music.apple.com/it/album/tra-le-nuvole-sunset-version/1829063940?i=1829063941",
     year: 2025,
-    pressKitDescription: "Versione acustica e minimale che restituisce il brano alla sua forma più intima.",
+    pressKitDescription:
+      "Versione acustica e minimale che restituisce il brano alla sua forma più intima.",
     preSaveMode: false,
   },
   {
@@ -71,7 +116,8 @@ export const songList = [
     appleMusicLink:
       "https://music.apple.com/it/album/tra-le-nuvole/1815213555?i=1815213556",
     year: 2025,
-    pressKitDescription: "Un viaggio sognante tra nostalgia e desiderio, sospeso tra sonorità pop e atmosfere eteree.",
+    pressKitDescription:
+      "Un viaggio sognante tra nostalgia e desiderio, sospeso tra sonorità pop e atmosfere eteree.",
     preSaveMode: false,
   },
   {
@@ -85,7 +131,8 @@ export const songList = [
     appleMusicLink:
       "https://music.apple.com/it/album/mondo-dentro/1778959317?i=1778959318",
     year: 2024,
-    pressKitDescription: "Una ballad emotiva che parla di accettazione, distacco e amore che continua a esistere nel silenzio.",
+    pressKitDescription:
+      "Una ballad emotiva che parla di accettazione, distacco e amore che continua a esistere nel silenzio.",
     preSaveMode: false,
   },
   {
@@ -99,7 +146,8 @@ export const songList = [
     appleMusicLink:
       "https://music.apple.com/it/album/tempo-perso/1773232687?i=1773232688",
     year: 2024,
-    pressKitDescription: "Una riflessione sincera sulla ricerca di sé, tra vulnerabilità e resistenza personale.",
+    pressKitDescription:
+      "Una riflessione sincera sulla ricerca di sé, tra vulnerabilità e resistenza personale.",
     preSaveMode: false,
   },
 ];
