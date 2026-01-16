@@ -11,7 +11,7 @@ Redirect 301 /tiktok https://tiktok.com/@laccoverse
 Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
 Redirect 301 /youtube https://www.youtube.com/@Laccoverse
 
-# Song redirects
+# Song redirects and more
 
 Redirect 301 /tempo-perso https://distrokid.com/hyperfollow/lacco/tempo-perso-intro
 Redirect 301 /mondo-dentro https://distrokid.com/hyperfollow/lacco/mondo-dentro
@@ -21,6 +21,7 @@ Redirect 301 /cercami https://distrokid.com/hyperfollow/lacco/cercami-4
 Redirect 301 /rumore-di-fondo https://distrokid.com/hyperfollow/lacco/rumore-di-fondo
 Redirect 301 /nokoru-mono https://distrokid.com/hyperfollow/lacco/nokoru-mono
 Redirect 301 /tickets https://www.mailticket.it/evento/50837/lacco
+Redirect 301 /preview-nokoru-mono https://on.soundcloud.com/u3ZP1Y26moVlmrQSIO
 
 # ====================== STATIC FILES & SPA FALLBACK ======================
 
