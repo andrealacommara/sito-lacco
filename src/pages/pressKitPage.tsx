@@ -107,7 +107,7 @@ export default function PressKitPage() {
                 relazioni e fragilità condivise.
                 <br />
                 Nel 2026 presenta
-                <em className="text-danger px-1">nokoru mono</em>, il suo album
+                <em className="text-danger px-1">nokoru mono</em>, il suo EP
                 di debutto: un progetto che esplora ciò che resta dentro di noi,
                 il mondo interiore che si muove anche quando tutto sembra fermo.
                 Un disco introspettivo, vicino al contemporary R&amp;B,
@@ -131,7 +131,7 @@ export default function PressKitPage() {
                 Lacco (Torino, ’99) racconta ciò che si muove dentro e intorno
                 alle persone attraverso un R&amp;B introspettivo e narrativo.
                 Nel 2026 pubblica
-                <em className="text-danger px-1">nokoru mono</em>, un album che
+                <em className="text-danger px-1">nokoru mono</em>, un EP che
                 indaga ciò che resta nelle emozioni e nei pensieri. Il progetto
                 proseguirà con
                 <em className="text-danger px-1">yuku mono</em>, dedicato invece
