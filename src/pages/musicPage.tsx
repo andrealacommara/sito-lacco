@@ -9,7 +9,12 @@ import { subtitle, title } from "@/components/primitives"; // Style classes for 
 import DefaultLayout from "@/layouts/default"; // Base layout (includes navbar and footer)
 import CardSongExposer from "@/components/cardSongExposer"; // Custom component to display each song
 import { songList } from "@/config/songList"; // Static song data (title, description, artwork, link, etc.)
-import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons"; // Icons for carousel scroll
+import {
+  AppleMusicIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  SpotifyIcon,
+} from "@/components/icons"; // Icons for carousel scroll
 import { Card } from "@heroui/card"; // UI component for container
 import SmartImage from "@/components/smartImage";
 import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
@@ -168,16 +173,36 @@ export default function MusicPage() {
                 <br /> Un viaggio attraverso noi stessi e le altre persone.
               </p>
             </div>
-            <div className="flex items-justify-center justify-center">
-              <Link href="https://www.lacco.it/nokoru-mono/" target="_blank">
-                <Button
-                  variant="ghost"
-                  color="danger"
-                  className="max-w-full m-4"
+            <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
+              {/* Spotify */}
+              <div className="flex-1 min-w-0">
+                <Link
+                  isExternal
+                  href="https://open.spotify.com/intl-it/album/03t1vGNiDM9ORxsVWSnp8E?si=G7J5EBWJTNm3QMXpQytV1Q"
+                  aria-label="Vai al brano su Spotify"
+                  className="block w-full min-w-0"
                 >
-                  Pre-salva ora l'EP
-                </Button>
-              </Link>
+                  <Button fullWidth color="success" className="min-w-0">
+                    Ascolta su Spotify
+                    <SpotifyIcon />
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Apple Music */}
+              <div className="flex-1 min-w-0">
+                <Link
+                  isExternal
+                  href="https://music.apple.com/it/album/nokoru-mono/1863599627"
+                  aria-label="Vai al brano su Apple Music"
+                  className="block w-full min-w-0"
+                >
+                  <Button fullWidth color="danger" className="min-w-0">
+                    Ascolta su Apple Music
+                    <AppleMusicIcon />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </Card>
