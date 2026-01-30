@@ -19,7 +19,6 @@ import { Card } from "@heroui/card"; // UI component for container
 import SmartImage from "@/components/smartImage";
 import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
 import nokoruMonoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif"; // Main artist image
-import { Link } from "@heroui/link";
 
 // ========================== MUSIC PAGE COMPONENT ========================== //
 // “La mia musica” page – displays all singles with descriptions and cover art.
@@ -176,32 +175,40 @@ export default function MusicPage() {
             <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
               {/* Spotify */}
               <div className="flex-1 min-w-0">
-                <Link
-                  isExternal
-                  href="https://open.spotify.com/intl-it/album/03t1vGNiDM9ORxsVWSnp8E?si=G7J5EBWJTNm3QMXpQytV1Q"
+                <Button
+                  fullWidth
+                  color="success"
+                  className="min-w-0"
                   aria-label="Vai al brano su Spotify"
-                  className="block w-full min-w-0"
+                  onPress={() =>
+                    window.open(
+                      "https://open.spotify.com/intl-it/album/03t1vGNiDM9ORxsVWSnp8E?si=G7J5EBWJTNm3QMXpQytV1Q",
+                      "_blank",
+                    )
+                  }
                 >
-                  <Button fullWidth color="success" className="min-w-0">
-                    Ascolta su Spotify
-                    <SpotifyIcon />
-                  </Button>
-                </Link>
+                  Ascolta su Spotify
+                  <SpotifyIcon />
+                </Button>
               </div>
 
               {/* Apple Music */}
               <div className="flex-1 min-w-0">
-                <Link
-                  isExternal
-                  href="https://music.apple.com/it/album/nokoru-mono/1863599627"
+                <Button
+                  fullWidth
+                  color="danger"
+                  className="min-w-0"
                   aria-label="Vai al brano su Apple Music"
-                  className="block w-full min-w-0"
+                  onPress={() =>
+                    window.open(
+                      "https://music.apple.com/it/album/nokoru-mono/1863599627",
+                      "_blank",
+                    )
+                  }
                 >
-                  <Button fullWidth color="danger" className="min-w-0">
-                    Ascolta su Apple Music
-                    <AppleMusicIcon />
-                  </Button>
-                </Link>
+                  Ascolta su Apple Music
+                  <AppleMusicIcon />
+                </Button>
               </div>
             </div>
           </div>

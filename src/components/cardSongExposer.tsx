@@ -15,7 +15,6 @@ import {
 import { Skeleton } from "@heroui/skeleton";
 import { useDisclosure } from "@heroui/use-disclosure";
 import { useState } from "react"; // React hook for local state management
-import { Link } from "@heroui/link"; // External link component
 import { useMediaQuery } from "@react-hook/media-query"; // Hook to detect viewport size
 
 import { AppleMusicIcon, SpotifyIcon } from "./icons"; // Custom Spotify icon component
@@ -121,8 +120,8 @@ export default function CardSongExposer({
         placement="center"
         onClose={onClose}
       >
-        <ModalContent className="bg-white text-black dark:bg-white! dark:text-black! p-4 rounded-2xl shadow-xl max-w-[480px] mx-auto">
-          {(onClose) => (
+        <ModalContent className="bg-white text-black dark:bg-white! dark:text-black! p-4 rounded-2xl shadow-xl max-w-120 mx-auto">
+          {() => (
             <>
               {/* Modal header showing song title */}
               <ModalHeader className="items-center justify-center">
@@ -153,43 +152,33 @@ export default function CardSongExposer({
                 <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
                   {/* Spotify */}
                   <div className="flex-1 min-w-0">
-                    <Link
-                      isExternal
-                      href={songSpotifyLink}
+                    <Button
+                      fullWidth
+                      color="success"
+                      onPress={() => window.open(songSpotifyLink, "_blank")}
+                      className="min-w-0"
                       aria-label="Vai al brano su Spotify"
-                      className="block w-full min-w-0"
                     >
-                      <Button
-                        fullWidth
-                        color="success"
-                        onPress={onClose}
-                        className="min-w-0"
-                      >
-                        {preSaveMode ? "Pre-Salva su Spotify" : "Spotify"}
-                        <SpotifyIcon />
-                      </Button>
-                    </Link>
+                      {preSaveMode ? "Pre-Salva su Spotify" : "Spotify"}
+                      <SpotifyIcon />
+                    </Button>
                   </div>
 
                   {/* Apple Music */}
                   {!preSaveMode && (
                     <div className="flex-1 min-w-0">
-                      <Link
-                        isExternal
-                        href={songAppleMusicLink}
-                        aria-label="Vai al brano su Apple Music"
-                        className="block w-full min-w-0"
-                      >
                         <Button
                           fullWidth
                           color="danger"
-                          onPress={onClose}
+                          onPress={() =>
+                            window.open(songAppleMusicLink, "_blank")
+                          }
                           className="min-w-0"
+                          aria-label="Vai al brano su Apple Music"
                         >
                           Apple Music
                           <AppleMusicIcon />
                         </Button>
-                      </Link>
                     </div>
                   )}
                 </div>
