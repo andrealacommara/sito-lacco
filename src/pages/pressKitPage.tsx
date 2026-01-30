@@ -334,7 +334,7 @@ export default function PressKitPage() {
 
               <p>
                 Con
-                <em className="text-danger px-1">nokoru mono</em>(in uscita il{" "}
+                <em className="text-danger px-1">nokoru mono</em>(uscito il{" "}
                 <em className="text-danger px-1">30/01/2026</em>) si apre il
                 primo capitolo di un viaggio che continua, inevitabilmente, in{" "}
                 <em className="text-danger px-1">yuku mono</em>.<br />

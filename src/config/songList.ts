@@ -27,12 +27,12 @@ export const songList = [
     alt: "Cover artwork di 'per gli altri'",
     description:
       "“per gli altri” è il modo di vivere per chi sceglie di amare.\nMettere sempre le altre persone al primo posto, anche quando saremmo i primi ad aver bisogno di aiuto.\nUn inno all'amore per gli altri ed, allo stesso tempo, un promemoria.\nPerchè, a volte, serve ricordarsi che l'amore che diamo agli altri lo meritiamo anche noi stessi.",
-    spotifyLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
-    appleMusicLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    spotifyLink: "https://open.spotify.com/intl-it/track/5S0ApCxwF8aAGQlZCSTdLN?si=1611719cbb0c4efc",
+    appleMusicLink: "https://music.apple.com/it/album/per-gli-altri/1863599627?i=1863599635",
     year: 2026,
     pressKitDescription:
       "Un brano intimo, che racconta l'amore per gli altri e, soprattutto, per noi stessi.",
-    preSaveMode: true,
+    preSaveMode: false,
   },
   {
     title: "davvero",
@@ -40,12 +40,12 @@ export const songList = [
     alt: "Cover artwork di 'davvero'",
     description:
       "“davvero” è una promessa a me stesso.\nDopo un'intera vita passata ad essere il più severo dei giudici con me stesso, finalmente, realizzo che posso essere indulgente.\nPrometto che ci proverò.\nNon serve essere perfetto se non riesci ad essere te stesso, difetti compresi.",
-    spotifyLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
-    appleMusicLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    spotifyLink: "https://open.spotify.com/intl-it/track/5wU9L1yBhk6TZlv74ImyUB?si=fde0a6895f2040d7",
+    appleMusicLink: "https://music.apple.com/it/album/davvero/1863599627?i=1863599634",
     year: 2026,
     pressKitDescription:
       "Un brano urban, che parla di accettazione di sè e crescita personale",
-    preSaveMode: true,
+    preSaveMode: false,
   },
   {
     title: "ricordo",
@@ -53,12 +53,12 @@ export const songList = [
     alt: "Cover artwork di 'ricordo'",
     description:
       "“ricordo” è per mia nonna.\nUna raccolta di promesse, discorsi e frammenti di vita insieme.\nNon è una semplice dedica, ma una fotografia in musica di momenti passati che trovano l'eternità nella mia memoria.\nTe l'ho promesso, sai che le promesse le mantengo.\nNon ti preoccupare, ricordo.",
-    spotifyLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
-    appleMusicLink: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    spotifyLink: "https://open.spotify.com/intl-it/track/14pzWWmgbj8czymiOLGnPu?si=b7851a1ac18a4494",
+    appleMusicLink: "https://music.apple.com/it/album/ricordo/1863599627?i=1863599631",
     year: 2026,
     pressKitDescription:
       "Un brano intimo e personale, dedicato alla memoria di una persona cara, arricchito da registrazioni reali per rendere l'ascolto ancora più vero.",
-    preSaveMode: true,
+    preSaveMode: false,
   },
   {
     title: "rumore di fondo",
