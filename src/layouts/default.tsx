@@ -1,8 +1,6 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import core components and configurations needed for the main site layout.
 
-import { Link } from "@heroui/link"; // HeroUI Link component for navigation and anchors
-
 import { Navbar } from "@/components/navbar"; // Top navigation bar
 import {
   AppleMusicIcon,
@@ -44,47 +42,42 @@ export default function DefaultLayout({
         className="w-full flex items-center justify-center py-8 gap-2"
         role="contentinfo"
       >
-        {/* Each Link opens in a new tab (isExternal) */}
-        <Link
-          isExternal
+        {/* Each Link opens in a new tab */}
+        <button
           aria-label="Vai al profilo Spotify di Lacco"
-          href={siteConfig.links.spotify}
+          onClick={() => window.open(siteConfig.links.spotify, "_blank")}
           title="Spotify"
         >
           <SpotifyIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </Link>
-        <Link
-          isExternal
+        </button>
+        <button
           aria-label="Vai al profilo Instagram di Lacco"
-          href={siteConfig.links.instagram}
+          onClick={() => window.open(siteConfig.links.instagram, "_blank")}
           title="Instagram"
         >
           <InstagramIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </Link>
-        <Link
-          isExternal
+        </button>
+        <button
           aria-label="Vai al profilo TikTok di Lacco"
-          href={siteConfig.links.tiktok}
+          onClick={() => window.open(siteConfig.links.tiktok, "_blank")}
           title="TikTok"
         >
           <TikTokIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </Link>
-        <Link
-          isExternal
+        </button>
+        <button
           aria-label="Vai al profilo Apple Music di Lacco"
-          href={siteConfig.links.appleMusic}
+          onClick={() => window.open(siteConfig.links.appleMusic, "_blank")}
           title="Apple Music"
         >
           <AppleMusicIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </Link>
-        <Link
-          isExternal
+        </button>
+        <button
           aria-label="Vai al canale YouTube di Lacco"
-          href={siteConfig.links.youtube}
+          onClick={() => window.open(siteConfig.links.youtube, "_blank")}
           title="YouTube"
         >
           <YouTubeIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </Link>
+        </button>
       </footer>
     </div>
   );
