@@ -6,6 +6,8 @@ import pressKitPic3 from "@/assets/images/presskit/pressKitPic3.avif";
 import pressKitPic4 from "@/assets/images/presskit/pressKitPic4.avif";
 import pressKitPic5 from "@/assets/images/presskit/pressKitPic5.avif";
 import pressKitPic6 from "@/assets/images/presskit/pressKitPic6.avif";
+import pressKitPic7 from "@/assets/images/presskit/pressKitPic7.avif";
+import pressKitPic8 from "@/assets/images/presskit/pressKitPic8.avif";
 
 //Import of high quality press kit photos.
 import pressKitHQPic1 from "@/assets/images/presskit/HQ/pressKitPic1.jpg";
@@ -14,6 +16,8 @@ import pressKitHQPic3 from "@/assets/images/presskit/HQ/pressKitPic3.jpg";
 import pressKitHQPic4 from "@/assets/images/presskit/HQ/pressKitPic4.jpg";
 import pressKitHQPic5 from "@/assets/images/presskit/HQ/pressKitPic5.jpg";
 import pressKitHQPic6 from "@/assets/images/presskit/HQ/pressKitPic6.jpg";
+import pressKitHQPic7 from "@/assets/images/presskit/HQ/pressKitPic7.jpg";
+import pressKitHQPic8 from "@/assets/images/presskit/HQ/pressKitPic8.jpg";
 
 export const pressKitPhotos = [
   {
@@ -51,5 +55,17 @@ export const pressKitPhotos = [
     srcHQ: pressKitHQPic6,
     alt: "Lacco - Press Photo 6",
     full: pressKitHQPic6,
+  },
+  {
+    src: pressKitPic7,
+    srcHQ: pressKitHQPic7,
+    alt: "Lacco - Press Photo 7",
+    full: pressKitHQPic7,
+  },
+  {
+    src: pressKitPic8,
+    srcHQ: pressKitHQPic8,
+    alt: "Lacco - Press Photo 8",
+    full: pressKitHQPic8,
   }
 ];

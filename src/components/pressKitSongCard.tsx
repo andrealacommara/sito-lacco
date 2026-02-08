@@ -2,7 +2,6 @@
 // HeroUI card plus shared icon and image utilities.
 import { Card } from "@heroui/card";
 import { SpotifyIcon, AppleMusicIcon } from "@/components/icons"; // Platform icons
-import SmartImage from "@/components/smartImage"; // Responsive artwork component
 
 // ========================== PROPS ========================== //
 // Metadata printed inside each press-kit song card.
@@ -30,11 +29,12 @@ export default function PressKitSongCard({
 }: PressKitSongCardProps) {
   return (
     <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-6 gap-4 mx-auto  w-full max-w-5xl">
-      <SmartImage
+      <img
         alt={title}
         height={90}
         sizes="90px"
         src={artwork}
+        className="rounded-lg"
         style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
         width={90}
       />

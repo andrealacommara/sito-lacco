@@ -57,18 +57,19 @@ export default function HomePage() {
         )}
 
         {/* ========================== ARTIST IMAGE ========================== */}
-        <div className="p-4 md:p-4 w-fit md:w-full items-center">
-          <SmartImage
+        <div className="p-4 md:p-4 shrink-0 flex items-center justify-center">
+          <div className="w-80 h-80 md:w-96 md:h-96">
+            <SmartImage
             isBlurred // Applies a slight blur effect
             priority
             alt="Lacco" // Alt text for accessibility
-            className="item-center"
+            className="w-full h-full"
             sizes="400px"
             src={heroLacco} // Imported image
             style={{ aspectRatio: "1 / 1" }}
-            width={400}
             onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
-          />
+            />
+          </div>
         </div>
 
         {/* ========================== ARTIST DESCRIPTION ========================== */}

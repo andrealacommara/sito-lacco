@@ -375,7 +375,7 @@ export default function PressKitPage() {
           </div>
 
           <Card className="p-2 md:p-4 mx-auto w-full max-w-5xl">
-            <p className="text-default-500 text-sm p-4">
+            <p className="text-default-500 text-sm text-center pt-4">
               Foto ufficiali utilizzabili per articoli, playlist editoriali,
               social e materiale promozionale.
             </p>
@@ -456,6 +456,9 @@ export default function PressKitPage() {
                 </Button>
               </a>
             </div>
+            <p className="text-default-500 text-xs text-center pt-4">
+              "Lacco" è un marchio registrato.<br/>Tutti i diritti sono riservati.
+            </p>
           </Card>
         </div>
       </section>
