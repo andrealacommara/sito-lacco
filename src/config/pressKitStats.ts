@@ -1,7 +1,7 @@
 // ========================== PRESS KIT STATS ========================== //
 // Press Kit Page stats. To be updated monthly.
 export const pressKitStats = {
-  monthlyListeners: 474,
-  totalStreams: 31251,
-  spotifyFollowers: 146
+  monthlyListeners: 987,
+  totalStreams: 40932,
+  spotifyFollowers: 154
 };

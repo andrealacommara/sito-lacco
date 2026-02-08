@@ -73,7 +73,7 @@ export default function SmartImage({
   }, [priority, fallback]);
 
   return (
-    <picture>
+    <picture style={{ display: "block", width: "100%" }}>
       {/* Modern browsers: AVIF first */}
       <source sizes={responsiveSizes} srcSet={avifSet} type="image/avif" />
       {/* Fallback for browsers without AVIF */}
@@ -82,7 +82,7 @@ export default function SmartImage({
       {/* Final fallback: HeroUI Image component */}
       <Image
         alt={alt}
-        className={className}
+        className={`w-full h-auto ${className || ""}`}
         decoding="async"
         fetchPriority={priority ? "high" : "auto"}
         height={height}
@@ -90,7 +90,10 @@ export default function SmartImage({
         loading={priority ? "eager" : "lazy"}
         sizes={responsiveSizes}
         src={fallback}
-        style={style}
+        style={{
+          display: "block",
+          ...style,
+        }}
         width={width}
         onLoad={onLoad}
       />

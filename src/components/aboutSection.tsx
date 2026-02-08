@@ -80,16 +80,17 @@ export function AboutSection({
           </div>
 
           {/* Section image with controlled loading and styling */}
-          <div className="p-4 md:p-4 w-fit md:w-full items-center">
-            <SmartImage
-              alt="Lacco"
-              className="item-center"
-              sizes="400px"
-              src={image}
-              style={{ aspectRatio: "1 / 1" }}
-              width={400}
-              onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded
-            />
+          <div className="p-4 md:p-4 shrink-0 flex items-center justify-center">
+            <div className="w-80 h-80 md:w-96 md:h-96">
+              <SmartImage
+                alt="Lacco"
+                className="w-full h-full"
+                sizes="400px"
+                src={image}
+                style={{ aspectRatio: "1 / 1" }}
+                onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded
+              />
+            </div>
           </div>
         </Card>
       </motion.div>
