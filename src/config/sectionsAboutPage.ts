@@ -37,7 +37,7 @@ export const section2 = [
     image: aboutPic4,
   },
   {
-    text: "È con questo progetto che ho avviato le collaborazioni che oggi nutrono Lacco, grazie alle esperienze condivise con produttori, musicisti e tecnici come Giacomo Ruffa ed Emilio Orlandini. Insieme abbiamo costruito legami artistici solidi, tra Torino e Milano.",
+    text: "È con questo progetto che ho avviato le collaborazioni che oggi nutrono Lacco, grazie alle esperienze condivise con produttori, musicisti e tecnici come Emilio Orlandini e Giacomo Ruffa. Insieme abbiamo costruito legami artistici solidi, tra Torino e Milano.",
     image: aboutPic5,
   },
   {
