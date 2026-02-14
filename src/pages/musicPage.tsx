@@ -120,7 +120,7 @@ export default function MusicPage() {
             </Skeleton>
           )}
 
-          {/* ========================== ARTIST IMAGE ========================== */}
+          {/* ========================== ALBUM IMAGE ========================== */}
           <div className="p-4 md:p-4 w-fit md:w-full items-center">
             <SmartImage
               isBlurred // Applies a slight blur effect

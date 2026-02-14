@@ -81,13 +81,14 @@ export function AboutSection({
 
           {/* Section image with controlled loading and styling */}
           <div className="p-4 md:p-4 shrink-0 flex items-center justify-center">
-            <div className="w-80 h-80 md:w-96 md:h-96">
+            <div className="w-fit md:max-w-96 items-center">
               <SmartImage
                 alt="Lacco"
                 className="w-full h-full"
                 sizes="400px"
                 src={image}
                 style={{ aspectRatio: "1 / 1" }}
+                onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to load
                 onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded
               />
             </div>

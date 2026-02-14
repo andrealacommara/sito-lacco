@@ -14,6 +14,7 @@ interface SmartImageProps {
   priority?: boolean;
   style?: CSSProperties;
   onLoad?: () => void;
+  onError?: () => void;
 }
 
 /**
@@ -33,17 +34,9 @@ export default function SmartImage({
   sizes,
   style,
   onLoad,
+  onError,
 }: SmartImageProps) {
   const responsiveSizes = sizes ?? "(max-width: 768px) 100vw, 50vw";
-  // Responsive variants generated automatically
-  const avifSet = new URL(
-    `${src}?w=480;768;1200&format=avif&as=srcset`,
-    import.meta.url,
-  ).href;
-  const webpSet = new URL(
-    `${src}?w=480;768;1200&format=webp&as=srcset`,
-    import.meta.url,
-  ).href;
   const fallback = new URL(src, import.meta.url).href;
 
   // Preload logic with backward compatibility
@@ -73,30 +66,23 @@ export default function SmartImage({
   }, [priority, fallback]);
 
   return (
-    <picture style={{ display: "block", width: "100%" }}>
-      {/* Modern browsers: AVIF first */}
-      <source sizes={responsiveSizes} srcSet={avifSet} type="image/avif" />
-      {/* Fallback for browsers without AVIF */}
-      <source sizes={responsiveSizes} srcSet={webpSet} type="image/webp" />
-
-      {/* Final fallback: HeroUI Image component */}
-      <Image
-        alt={alt}
-        className={`w-full h-auto ${className || ""}`}
-        decoding="async"
-        fetchPriority={priority ? "high" : "auto"}
-        height={height}
-        isBlurred={isBlurred}
-        loading={priority ? "eager" : "lazy"}
-        sizes={responsiveSizes}
-        src={fallback}
-        style={{
-          display: "block",
-          ...style,
-        }}
-        width={width}
-        onLoad={onLoad}
-      />
-    </picture>
+    <Image
+      alt={alt}
+      className={`w-full h-auto ${className || ""}`}
+      decoding="async"
+      fetchPriority={priority ? "high" : "auto"}
+      height={height}
+      isBlurred={isBlurred}
+      loading={priority ? "eager" : "lazy"}
+      sizes={responsiveSizes}
+      src={fallback}
+      style={{
+        display: "block",
+        ...style,
+      }}
+      width={width}
+      onError={onError}
+      onLoad={onLoad}
+    />
   );
 }

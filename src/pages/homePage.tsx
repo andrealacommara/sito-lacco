@@ -58,7 +58,7 @@ export default function HomePage() {
 
         {/* ========================== ARTIST IMAGE ========================== */}
         <div className="p-4 md:p-4 shrink-0 flex items-center justify-center">
-          <div className="w-80 h-80 md:w-96 md:h-96">
+          <div className="w-fit md:w-full items-center">
             <SmartImage
             isBlurred // Applies a slight blur effect
             priority

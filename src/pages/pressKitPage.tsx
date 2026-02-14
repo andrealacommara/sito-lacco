@@ -64,6 +64,7 @@ export default function PressKitPage() {
               src={heroLacco} // Imported image
               style={{ aspectRatio: "1 / 1" }}
               width={500}
+              onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to load
               onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
             />
           </div>
@@ -238,6 +239,7 @@ export default function PressKitPage() {
                   src={nokoruMonoArtwork} // Imported image
                   style={{ aspectRatio: "1 / 1" }}
                   width={500}
+                  onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to load
                   onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
                 />
                 <em className="text-danger pt-2">nokoru mono</em>
@@ -251,6 +253,7 @@ export default function PressKitPage() {
                   src={yukuMonoArtwork} // Imported image
                   style={{ aspectRatio: "1 / 1" }}
                   width={500}
+                  onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to load
                   onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
                 />
                 <em className="text-danger pt-2">yuku mono</em>
