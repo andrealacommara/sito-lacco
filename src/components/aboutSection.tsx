@@ -52,6 +52,15 @@ export function AboutSection({
   const inView = useInView(ref); // Boolean indicating if the section is visible
   const [isLoaded, setIsLoaded] = useState(false); // Tracks image loading state
 
+  // Safety fallback: prevents an infinite skeleton on browsers that don't fire image events reliably.
+  useEffect(() => {
+    if (isLoaded) return;
+
+    const timeout = window.setTimeout(() => setIsLoaded(true), 6000);
+
+    return () => window.clearTimeout(timeout);
+  }, [isLoaded]);
+
   return (
     // motion.div enables animation when the section appears on screen
     <div className="overflow-x-hidden p-4">

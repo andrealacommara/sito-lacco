@@ -79,12 +79,15 @@ export default defineConfig({
     // Import SVG files as React components
     svgr(),
 
-    // Process images with imagetools only when explicitly requested
-    // via import query (e.g. image.jpg?imagetools&w=400;800&format=webp;jpeg).
-    // This avoids transforming every plain image import into complex objects.
+    // Process only AVIF imports through imagetools so we can generate
+    // compatible fallbacks (webp/jpeg) on older mobile browsers.
+    // PNG/JPG/SVG imports stay as plain URLs.
     imagetools({
-      include:
-        /.+\.(heif|avif|jpeg|jpg|png|tiff|webp|gif)\?.*imagetools(?:&.*)?$/,
+      include: /^[^?]+\.avif(\?.*)?$/,
+      defaultDirectives: () =>
+        new URLSearchParams({
+          format: "avif;webp;jpeg",
+        }),
     }),
   ],
 

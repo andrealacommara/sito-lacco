@@ -131,6 +131,7 @@ export default function MusicPage() {
               src={nokoruMonoArtwork} // Imported image
               style={{ aspectRatio: "1 / 1" }}
               width={400}
+              onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to decode
               onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
             />
           </div>
