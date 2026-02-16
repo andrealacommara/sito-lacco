@@ -79,8 +79,13 @@ export default defineConfig({
     // Import SVG files as React components
     svgr(),
 
-    // Creates optimized variants for each image
-    imagetools(),
+    // Process images with imagetools only when explicitly requested
+    // via import query (e.g. image.jpg?imagetools&w=400;800&format=webp;jpeg).
+    // This avoids transforming every plain image import into complex objects.
+    imagetools({
+      include:
+        /.+\.(heif|avif|jpeg|jpg|png|tiff|webp|gif)\?.*imagetools(?:&.*)?$/,
+    }),
   ],
 
   build: {

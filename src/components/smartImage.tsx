@@ -19,9 +19,8 @@ interface SmartImageProps {
 
 /**
  * SmartImage component
- * - Generates responsive AVIF + WebP variants via vite-imagetools
- * - Builds a <picture> for automatic format fallback
- * - Adds lazy/eager loading, async decoding, and automatic preload
+ * - Wraps HeroUI Image with lazy/eager loading and async decoding
+ * - Adds optional high-priority preloading for above-the-fold images
  */
 export default function SmartImage({
   src,
