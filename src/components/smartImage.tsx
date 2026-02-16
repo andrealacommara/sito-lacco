@@ -1,5 +1,5 @@
 // ========================== MAIN IMPORTS ========================== //
-import { useEffect, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { Image } from "@heroui/image";
 
 // ===================== SMART IMAGE COMPONENT ====================== //
@@ -27,6 +27,17 @@ interface SmartImageProps {
   onError?: () => void;
 }
 
+/**
+ * Canvas-based format support check.
+ *
+ * NOTE: this tests canvas ENCODING support, not image DECODING capability.
+ * On most mobile browsers canvas.toDataURL("image/avif") returns "image/png"
+ * even though the browser can perfectly decode AVIF files. The same applies
+ * to WebP on older iOS Safari versions.
+ *
+ * A false-negative here is safe — resolveImageSource always falls back to
+ * JPEG, which every browser supports.
+ */
 function supportsMime(mime: "image/avif" | "image/webp") {
   if (typeof document === "undefined") return false;
 
@@ -109,9 +120,31 @@ export function resolveImageSource(src: ImageLikeImport): string {
 
 /**
  * SmartImage component
- * - Wraps HeroUI Image with lazy/eager loading and async decoding
- * - Adds optional high-priority preloading for above-the-fold images
- * - Resolves image imports with format fallbacks (avif/webp/jpeg)
+ *
+ * Wraps HeroUI Image with lazy/eager loading and async decoding.
+ * Resolves image imports with format fallbacks (avif → webp → jpeg).
+ *
+ * === Mobile production fix ===
+ *
+ * ROOT CAUSE: HeroUI Image internally creates an off-DOM `new Image()`
+ * element to preload the image and track its loading status. When the
+ * native `loading` attribute is "lazy", mobile Safari / WebKit never
+ * starts loading that hidden Image because it's not in the DOM — the
+ * browser considers it "never near the viewport". Desktop Chrome is more
+ * lenient and loads it anyway.
+ *
+ * FIX: Passing `as="img"` sets HeroUI's internal flag
+ * `shouldBypassImageLoad = true`, which skips the off-DOM Image()
+ * preload entirely. The actual `<img>` in the DOM handles its own
+ * native lazy-loading correctly (browsers evaluate viewport distance
+ * for in-DOM elements).
+ *
+ * Because HeroUI's onLoad/onError callbacks are attached to the
+ * (now-skipped) preload Image, they never fire. We compensate with
+ * native event listeners attached directly to the DOM `<img>` via ref.
+ *
+ * The `new URL(src, import.meta.url)` wrapper was also removed — Vite
+ * already resolves imported assets to correct absolute paths.
  */
 export default function SmartImage({
   src,
@@ -128,25 +161,49 @@ export default function SmartImage({
 }: SmartImageProps) {
   const responsiveSizes = sizes ?? "(max-width: 768px) 100vw, 50vw";
   const resolvedSrc = resolveImageSource(src);
-  const fallback = resolvedSrc ? new URL(resolvedSrc, import.meta.url).href : "";
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  // Preload logic with backward compatibility
+  // ── Native load / error listeners ──────────────────────────────────
+  // HeroUI's onLoad/onError are NOT fired when as="img" is set
+  // (shouldBypassImageLoad = true skips the internal Image() preload).
+  // We attach listeners directly on the real DOM <img> via ref.
   useEffect(() => {
-    if (!priority || !fallback) return;
+    const img = imgRef.current;
+
+    if (!img || !resolvedSrc) return;
+
+    const handleLoad = () => onLoad?.();
+    const handleError = () => onError?.();
+
+    // The image may already be complete (browser cache, very fast load).
+    if (img.complete) {
+      if (img.naturalWidth > 0) handleLoad();
+      else handleError();
+
+      return;
+    }
+
+    img.addEventListener("load", handleLoad);
+    img.addEventListener("error", handleError);
+
+    return () => {
+      img.removeEventListener("load", handleLoad);
+      img.removeEventListener("error", handleError);
+    };
+  }, [resolvedSrc, onLoad, onError]);
+
+  // ── Preload for above-the-fold images ──────────────────────────────
+  useEffect(() => {
+    if (!priority || !resolvedSrc) return;
 
     const link = document.createElement("link");
 
     link.rel = "preload";
     link.as = "image";
-    link.href = fallback;
+    link.href = resolvedSrc;
 
     if ("fetchPriority" in link) {
       (link as any).fetchPriority = "high";
-    } else {
-      const img = new window.Image();
-
-      img.src = fallback;
-      img.decoding = "async";
     }
 
     document.head.appendChild(link);
@@ -154,11 +211,13 @@ export default function SmartImage({
     return () => {
       document.head.removeChild(link);
     };
-  }, [priority, fallback]);
+  }, [priority, resolvedSrc]);
 
   return (
     <Image
+      ref={imgRef}
       alt={alt}
+      as="img"
       className={`w-full h-auto ${className || ""}`}
       decoding="async"
       fetchPriority={priority ? "high" : "auto"}
@@ -166,14 +225,12 @@ export default function SmartImage({
       isBlurred={isBlurred}
       loading={priority ? "eager" : "lazy"}
       sizes={responsiveSizes}
-      src={fallback}
+      src={resolvedSrc}
       style={{
         display: "block",
         ...style,
       }}
       width={width}
-      onError={onError}
-      onLoad={onLoad}
     />
   );
 }
