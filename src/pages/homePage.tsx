@@ -67,6 +67,7 @@ export default function HomePage() {
             sizes="400px"
             src={heroLacco} // Imported image
             style={{ aspectRatio: "1 / 1" }}
+            onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to decode
             onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
             />
           </div>
