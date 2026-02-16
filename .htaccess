@@ -36,12 +36,33 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.html [L]
 
-# ====================== COMPRESSION ======================
+# ====================== MIME TYPES ======================
+# Register MIME types for modern image formats.
+# Essential for mobile browsers (especially Safari / WebKit) which
+# reject images served with incorrect Content-Type headers.
+# Desktop Chrome is lenient and sniffs content; mobile browsers are not.
 
 <IfModule mod_mime.c>
-  AddType image/avif .avif
-  AddType image/webp .webp
+  AddType image/avif  .avif
+  AddType image/webp  .webp
+  AddType image/jpeg  .jpeg .jpg
+  AddType font/woff2  .woff2
 </IfModule>
+
+# Fallback: explicit Content-Type headers for modern image formats.
+# Needed on some shared hosting (e.g., Aruba) where mod_mime may not
+# recognise .avif / .webp out of the box, or where the server's
+# mime.types file is outdated.
+<IfModule mod_headers.c>
+  <FilesMatch "\.avif$">
+    Header set Content-Type "image/avif"
+  </FilesMatch>
+  <FilesMatch "\.webp$">
+    Header set Content-Type "image/webp"
+  </FilesMatch>
+</IfModule>
+
+# ====================== COMPRESSION ======================
 
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml application/xml
