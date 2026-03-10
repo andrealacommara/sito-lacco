@@ -92,7 +92,7 @@ export default function HomePage() {
       <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-5xl gap-4">
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.spotify, "_blank")}
+          onClick={() => window.open(siteConfig.links.spotify, "_blank", "noopener,noreferrer")}
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <SpotifyIcon />
@@ -101,7 +101,7 @@ export default function HomePage() {
         </button>
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.instagram, "_blank")}
+          onClick={() => window.open(siteConfig.links.instagram, "_blank", "noopener,noreferrer")}
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <InstagramIcon />
@@ -110,7 +110,7 @@ export default function HomePage() {
         </button>
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.tiktok, "_blank")}
+          onClick={() => window.open(siteConfig.links.tiktok, "_blank", "noopener,noreferrer")}
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <TikTokIcon />
@@ -119,7 +119,7 @@ export default function HomePage() {
         </button>
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.appleMusic, "_blank")}
+          onClick={() => window.open(siteConfig.links.appleMusic, "_blank", "noopener,noreferrer")}
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <AppleMusicIcon />
@@ -128,7 +128,7 @@ export default function HomePage() {
         </button>
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.youtube, "_blank")}
+          onClick={() => window.open(siteConfig.links.youtube, "_blank", "noopener,noreferrer")}
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <YouTubeIcon />

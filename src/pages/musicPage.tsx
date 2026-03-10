@@ -2,7 +2,7 @@
 // Import style functions, layout, and custom components for the “La mia musica” page.
 
 import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
-import { useRef, useState, useEffect } from "react"; // Hooks for scroll container reference and state
+import { useRef, useState, useEffect, useCallback } from "react"; // Hooks for scroll container reference and state
 import { Button } from "@heroui/button";
 
 import { subtitle, title } from "@/components/primitives"; // Style classes for main and secondary titles
@@ -26,6 +26,8 @@ import nokoruMonoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 export default function MusicPage() {
   // Reference to the scrollable container
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const startSpacerRef = useRef<HTMLDivElement>(null);
+  const endSpacerRef = useRef<HTMLDivElement>(null);
 
   // States to handle arrow visibility (opacity)
   const [isAtStart, setIsAtStart] = useState(true);
@@ -45,7 +47,7 @@ export default function MusicPage() {
 
     if (!card) return;
 
-    const cardWidth = (card as HTMLElement).offsetWidth + 16; // 16px ≈ total horizontal margin (px-2)
+    const cardWidth = (card as HTMLElement).offsetWidth;
     const scrollAmount = direction === "left" ? -cardWidth : cardWidth;
 
     container.scrollBy({
@@ -54,36 +56,93 @@ export default function MusicPage() {
     });
   };
 
-  // ========================== SCROLL EVENT HANDLER ========================== //
-  useEffect(() => {
+  // ========================== CENTERED CARD DETECTION ========================== //
+  const detectCenteredCard = useCallback(() => {
     const container = scrollContainerRef.current;
 
     if (!container) return;
 
-    const card = container.querySelector(".card-song") as HTMLElement;
+    const cards = container.querySelectorAll(".card-song");
 
-    if (!card) return;
+    if (cards.length === 0) return;
 
-    const cardWidth = card.offsetWidth;
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.left + containerRect.width / 2;
 
-    container.style.scrollPadding = `0px calc(50% - ${cardWidth / 2}px)`;
+    let closestIndex = 0;
+    let closestDistance = Infinity;
 
-    // ========================== INITIAL SCROLL CENTERING ========================== //
-    // The first card starts centered within the viewport
-    container.scrollTo({ left: 0, behavior: "auto" });
+    cards.forEach((card, index) => {
+      const cardRect = card.getBoundingClientRect();
+      const cardCenter = cardRect.left + cardRect.width / 2;
+      const distance = Math.abs(cardCenter - containerCenter);
 
-    const handleScroll = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = container;
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
 
-      setIsAtStart(scrollLeft <= 2 * cardWidth);
-      setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 2 * cardWidth);
+    setIsAtStart(closestIndex === 0);
+    setIsAtEnd(closestIndex === cards.length - 1);
+  }, []);
+
+  // ========================== SCROLL EVENT HANDLER ========================== //
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const startSpacer = startSpacerRef.current;
+    const endSpacer = endSpacerRef.current;
+
+    if (!container || !startSpacer || !endSpacer) return;
+
+    let scrollRafId: number | null = null;
+
+    const updateLayout = () => {
+      const card = container.querySelector(".card-song") as HTMLElement;
+
+      if (!card) return;
+
+      const cardWidth = card.offsetWidth;
+      const containerWidth = container.getBoundingClientRect().width;
+      const padding = Math.max(0, (containerWidth - cardWidth) / 2);
+
+      startSpacer.style.minWidth = `${padding}px`;
+      endSpacer.style.minWidth = `${padding}px`;
     };
 
-    handleScroll();
-    container.addEventListener("scroll", handleScroll);
+    updateLayout();
 
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, []);
+    // Center on first card after layout is applied
+    requestAnimationFrame(() => {
+      container.scrollTo({ left: 0, behavior: "auto" });
+    });
+
+    // Debounced scroll handler using requestAnimationFrame
+    const handleScroll = () => {
+      if (scrollRafId !== null) cancelAnimationFrame(scrollRafId);
+      scrollRafId = requestAnimationFrame(() => {
+        detectCenteredCard();
+      });
+    };
+
+    // On resize: update spacers, re-center current card, and recheck chevrons
+    const handleResize = () => {
+      updateLayout();
+      detectCenteredCard();
+    };
+
+    detectCenteredCard();
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    container.addEventListener("scrollend", detectCenteredCard);
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      if (scrollRafId !== null) cancelAnimationFrame(scrollRafId);
+      container.removeEventListener("scroll", handleScroll);
+      container.removeEventListener("scrollend", detectCenteredCard);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [detectCenteredCard]);
 
   // ========================== RENDER ========================== //
   return (
@@ -159,6 +218,7 @@ export default function MusicPage() {
                 <a
                   href="https://www.instagram.com/torino_ink"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-primary px-1 hover:underline"
                 >
                   Torino Ink
@@ -185,6 +245,7 @@ export default function MusicPage() {
                     window.open(
                       "https://open.spotify.com/intl-it/album/03t1vGNiDM9ORxsVWSnp8E?si=G7J5EBWJTNm3QMXpQytV1Q",
                       "_blank",
+                      "noopener,noreferrer",
                     )
                   }
                 >
@@ -204,6 +265,7 @@ export default function MusicPage() {
                     window.open(
                       "https://music.apple.com/it/album/nokoru-mono/1863599627",
                       "_blank",
+                      "noopener,noreferrer",
                     )
                   }
                 >
@@ -227,8 +289,8 @@ export default function MusicPage() {
             <Button
               isIconOnly
               aria-label="Scorri a sinistra"
-              className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition hover:scale-110 ${
-                isAtStart ? "opacity-0 pointer-events-none" : "opacity-100"
+              className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
+                isAtStart ? "opacity-0 pointer-events-none scale-75" : "opacity-100"
               }`}
               radius="full"
               variant="flat"
@@ -240,9 +302,9 @@ export default function MusicPage() {
             {/* ========================== SONG CAROUSEL ========================== */}
             <div
               ref={scrollContainerRef}
-              className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full px-6 sm:px-12 md:px-0"
+              className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full"
             >
-              <div className="pl-200" /> {/* carousel offset */}
+              <div ref={startSpacerRef} className="shrink-0" />
               {songList.map((song) => (
                 <div
                   key={song.title}
@@ -259,15 +321,15 @@ export default function MusicPage() {
                   />
                 </div>
               ))}
-              <div className="pr-200" /> {/* carousel offset */}
+              <div ref={endSpacerRef} className="shrink-0" />
             </div>
 
             {/* Right arrow */}
             <Button
               isIconOnly
               aria-label="Scorri a destra"
-              className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition hover:scale-110 ${
-                isAtEnd ? "opacity-0 pointer-events-none" : "opacity-100"
+              className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
+                isAtEnd ? "opacity-0 pointer-events-none scale-75" : "opacity-100"
               }`}
               radius="full"
               variant="flat"

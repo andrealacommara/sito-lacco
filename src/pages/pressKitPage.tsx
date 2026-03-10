@@ -29,10 +29,12 @@ import yukuMonoArtwork from "@/assets/images/presskit/yukuMonoArtwork.avif";
 import logoLaccoSVG from "@/assets/images/presskit/logo/logo-lacco.svg";
 import logoLaccoPNG from "@/assets/images/presskit/logo/logo-lacco.png";
 
+type PressKitPhoto = (typeof pressKitPhotos)[number];
+
 export default function PressKitPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState<PressKitPhoto | null>(null);
 
   return (
     <DefaultLayout>
@@ -265,6 +267,7 @@ export default function PressKitPage() {
                 <a
                   href="https://www.instagram.com/torino_ink"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-primary px-1 hover:underline"
                 >
                   Torino Ink
@@ -501,7 +504,7 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.spotify, "_blank")
+                      window.open(siteConfig.links.spotify, "_blank", "noopener,noreferrer")
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
@@ -512,7 +515,7 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.instagram, "_blank")
+                      window.open(siteConfig.links.instagram, "_blank", "noopener,noreferrer")
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
@@ -523,7 +526,7 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.tiktok, "_blank")
+                      window.open(siteConfig.links.tiktok, "_blank", "noopener,noreferrer")
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
@@ -534,7 +537,7 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.appleMusic, "_blank")
+                      window.open(siteConfig.links.appleMusic, "_blank", "noopener,noreferrer")
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
@@ -545,7 +548,7 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.youtube, "_blank")
+                      window.open(siteConfig.links.youtube, "_blank", "noopener,noreferrer")
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">

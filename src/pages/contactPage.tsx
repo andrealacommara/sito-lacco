@@ -56,7 +56,35 @@ export default function ContactPage() {
       return;
     }
 
+    const trimmedName = formData.name.trim();
+    const trimmedEmail = formData.email.trim();
     const trimmedMessage = formData.message.trim();
+
+    if (!trimmedName) {
+      addToast({
+        title: "Nome obbligatorio.",
+        description: "Inserisci il tuo nome prima di inviare.",
+        timeout: 5000,
+        color: "warning",
+        variant: "flat",
+        radius: "lg",
+      });
+
+      return;
+    }
+
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      addToast({
+        title: "Email non valida.",
+        description: "Inserisci un indirizzo email valido.",
+        timeout: 5000,
+        color: "warning",
+        variant: "flat",
+        radius: "lg",
+      });
+
+      return;
+    }
 
     if (trimmedMessage.length < MIN_MESSAGE_LENGTH) {
       addToast({

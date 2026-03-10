@@ -18,15 +18,19 @@ function useInView(
   const [isInView, setIsInView] = useState(false); // Tracks visibility state
 
   useEffect(() => {
+    const element = ref.current;
+
+    if (!element) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting), // Update visibility state when intersection changes
       { threshold }, // Visibility threshold to consider the element "in view"
     );
 
-    if (ref.current) observer.observe(ref.current); // Start observing the element
+    observer.observe(element); // Start observing the element
 
     return () => {
-      if (ref.current) observer.unobserve(ref.current); // Cleanup observer on unmount
+      observer.unobserve(element); // Cleanup observer on unmount
     };
   }, [ref, threshold]);
 
