@@ -165,7 +165,7 @@ export default function CardSongExposer({
                     <Button
                       fullWidth
                       color="success"
-                      onPress={() => window.open(songSpotifyLink, "_blank")}
+                      onPress={() => window.open(songSpotifyLink, "_blank", "noopener,noreferrer")}
                       className="min-w-0"
                       aria-label="Vai al brano su Spotify"
                     >
@@ -181,7 +181,7 @@ export default function CardSongExposer({
                           fullWidth
                           color="danger"
                           onPress={() =>
-                            window.open(songAppleMusicLink, "_blank")
+                            window.open(songAppleMusicLink, "_blank", "noopener,noreferrer")
                           }
                           className="min-w-0"
                           aria-label="Vai al brano su Apple Music"
