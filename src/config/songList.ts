@@ -11,6 +11,7 @@ import traLeNuvoleSVArtwork from "@/assets/images/artworks/traLeNuvoleSunsetVers
 import ricordoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 import davveroArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 import perGliAltriArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
+import tuxtuArtwork from "@/assets/images/artworks/tuxtuArtwork.avif";
 
 // ========================== TYPE DEFINITION ========================== //
 // Export a TypeScript type based on the `songList` array structure.
@@ -21,6 +22,19 @@ export type songList = typeof songList;
 // Array of published songs, each object containing title, artwork, description, Spotify link (or pre-save link) and pre-save flag.
 
 export const songList = [
+  {
+    title: "tu x tu",
+    src: tuxtuArtwork,
+    alt: "Cover artwork di 'tu x tu'",
+    description:
+      "“tu x tu” è il filo che ci unisce.\nUn fil rouge che accomuna le nostre paure, i nostri pensieri, rendendoci uguali.\nSeguirlo permette di riconoscerci nelle altre persone e di avvicinarci a loro.",
+    spotifyLink: "https://www.lacco.it/tuxtu/",
+    appleMusicLink: "https://www.lacco.it/tuxtu/",
+    year: 2026,
+    pressKitDescription:
+      "Un brano urban pop che parla di connessione umana, empatia e riconoscimento reciproco.",
+    preSaveMode: true,
+  },
   {
     title: "per gli altri",
     src: perGliAltriArtwork,
