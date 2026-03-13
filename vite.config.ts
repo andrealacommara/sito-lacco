@@ -30,12 +30,12 @@ export default defineConfig({
           try {
             const manifestPath = path.resolve(
               __dirname,
-              "dist/.vite/manifest.json"
+              "dist/.vite/manifest.json",
             );
 
             if (fs.existsSync(manifestPath)) {
               const manifest = JSON.parse(
-                fs.readFileSync(manifestPath, "utf-8")
+                fs.readFileSync(manifestPath, "utf-8"),
               );
               const main = manifest["src/main.tsx"];
 

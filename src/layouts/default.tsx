@@ -45,36 +45,36 @@ export default function DefaultLayout({
         {/* Each Link opens in a new tab */}
         <button
           aria-label="Vai al profilo Spotify di Lacco"
-          onClick={() => window.open(siteConfig.links.spotify, "_blank")}
           title="Spotify"
+          onClick={() => window.open(siteConfig.links.spotify, "_blank")}
         >
           <SpotifyIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </button>
         <button
           aria-label="Vai al profilo Instagram di Lacco"
-          onClick={() => window.open(siteConfig.links.instagram, "_blank")}
           title="Instagram"
+          onClick={() => window.open(siteConfig.links.instagram, "_blank")}
         >
           <InstagramIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </button>
         <button
           aria-label="Vai al profilo TikTok di Lacco"
-          onClick={() => window.open(siteConfig.links.tiktok, "_blank")}
           title="TikTok"
+          onClick={() => window.open(siteConfig.links.tiktok, "_blank")}
         >
           <TikTokIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </button>
         <button
           aria-label="Vai al profilo Apple Music di Lacco"
-          onClick={() => window.open(siteConfig.links.appleMusic, "_blank")}
           title="Apple Music"
+          onClick={() => window.open(siteConfig.links.appleMusic, "_blank")}
         >
           <AppleMusicIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </button>
         <button
           aria-label="Vai al canale YouTube di Lacco"
-          onClick={() => window.open(siteConfig.links.youtube, "_blank")}
           title="YouTube"
+          onClick={() => window.open(siteConfig.links.youtube, "_blank")}
         >
           <YouTubeIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </button>

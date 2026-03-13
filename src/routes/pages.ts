@@ -7,7 +7,9 @@ export const HomePage = lazyWithPreload(() => import("@/pages/homePage"));
 export const MusicPage = lazyWithPreload(() => import("@/pages/musicPage"));
 export const AboutPage = lazyWithPreload(() => import("@/pages/aboutPage"));
 export const ContactPage = lazyWithPreload(() => import("@/pages/contactPage"));
-export const PressKitPage = lazyWithPreload(() => import("@/pages/pressKitPage"));
+export const PressKitPage = lazyWithPreload(
+  () => import("@/pages/pressKitPage"),
+);
 
 // ========================== PRELOAD MAP ========================== //
 // Maps route paths to the respective preload function for quick lookups.

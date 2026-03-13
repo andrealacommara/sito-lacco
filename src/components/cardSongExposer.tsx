@@ -164,10 +164,16 @@ export default function CardSongExposer({
                   <div className="flex-1 min-w-0">
                     <Button
                       fullWidth
-                      color="success"
-                      onPress={() => window.open(songSpotifyLink, "_blank", "noopener,noreferrer")}
-                      className="min-w-0"
                       aria-label="Vai al brano su Spotify"
+                      className="min-w-0"
+                      color="success"
+                      onPress={() =>
+                        window.open(
+                          songSpotifyLink,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
                     >
                       {preSaveMode ? "Pre-Salva su Spotify" : "Spotify"}
                       <SpotifyIcon />
@@ -177,18 +183,22 @@ export default function CardSongExposer({
                   {/* Apple Music */}
                   {!preSaveMode && (
                     <div className="flex-1 min-w-0">
-                        <Button
-                          fullWidth
-                          color="danger"
-                          onPress={() =>
-                            window.open(songAppleMusicLink, "_blank", "noopener,noreferrer")
-                          }
-                          className="min-w-0"
-                          aria-label="Vai al brano su Apple Music"
-                        >
-                          Apple Music
-                          <AppleMusicIcon />
-                        </Button>
+                      <Button
+                        fullWidth
+                        aria-label="Vai al brano su Apple Music"
+                        className="min-w-0"
+                        color="danger"
+                        onPress={() =>
+                          window.open(
+                            songAppleMusicLink,
+                            "_blank",
+                            "noopener,noreferrer",
+                          )
+                        }
+                      >
+                        Apple Music
+                        <AppleMusicIcon />
+                      </Button>
                     </div>
                   )}
                 </div>

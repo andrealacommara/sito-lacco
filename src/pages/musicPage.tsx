@@ -4,6 +4,8 @@
 import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
 import { useRef, useState, useEffect, useCallback } from "react"; // Hooks for scroll container reference and state
 import { Button } from "@heroui/button";
+import { Card } from "@heroui/card"; // UI component for container
+import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
 
 import { subtitle, title } from "@/components/primitives"; // Style classes for main and secondary titles
 import DefaultLayout from "@/layouts/default"; // Base layout (includes navbar and footer)
@@ -15,9 +17,7 @@ import {
   ChevronRightIcon,
   SpotifyIcon,
 } from "@/components/icons"; // Icons for carousel scroll
-import { Card } from "@heroui/card"; // UI component for container
 import SmartImage from "@/components/smartImage";
-import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
 import nokoruMonoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif"; // Main artist image
 
 // ========================== MUSIC PAGE COMPONENT ========================== //
@@ -216,10 +216,10 @@ export default function MusicPage() {
               <p>
                 L'artwork, realizzato da Nicolò Piazza ( in arte
                 <a
-                  href="https://www.instagram.com/torino_ink"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-primary px-1 hover:underline"
+                  href="https://www.instagram.com/torino_ink"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   Torino Ink
                 </a>
@@ -238,9 +238,9 @@ export default function MusicPage() {
               <div className="flex-1 min-w-0">
                 <Button
                   fullWidth
-                  color="success"
-                  className="min-w-0"
                   aria-label="Vai al brano su Spotify"
+                  className="min-w-0"
+                  color="success"
                   onPress={() =>
                     window.open(
                       "https://open.spotify.com/intl-it/album/03t1vGNiDM9ORxsVWSnp8E?si=G7J5EBWJTNm3QMXpQytV1Q",
@@ -258,9 +258,9 @@ export default function MusicPage() {
               <div className="flex-1 min-w-0">
                 <Button
                   fullWidth
-                  color="danger"
-                  className="min-w-0"
                   aria-label="Vai al brano su Apple Music"
+                  className="min-w-0"
+                  color="danger"
                   onPress={() =>
                     window.open(
                       "https://music.apple.com/it/album/nokoru-mono/1863599627",
@@ -290,7 +290,9 @@ export default function MusicPage() {
               isIconOnly
               aria-label="Scorri a sinistra"
               className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
-                isAtStart ? "opacity-0 pointer-events-none scale-75" : "opacity-100"
+                isAtStart
+                  ? "opacity-0 pointer-events-none scale-75"
+                  : "opacity-100"
               }`}
               radius="full"
               variant="flat"
@@ -314,10 +316,10 @@ export default function MusicPage() {
                     artworkAlt={song.alt}
                     artworkSrc={song.src}
                     preSaveMode={song.preSaveMode}
+                    songAppleMusicLink={song.appleMusicLink}
                     songDescription={song.description}
                     songSpotifyLink={song.spotifyLink}
                     songTitle={song.title}
-                    songAppleMusicLink={song.appleMusicLink}
                   />
                 </div>
               ))}
@@ -329,7 +331,9 @@ export default function MusicPage() {
               isIconOnly
               aria-label="Scorri a destra"
               className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
-                isAtEnd ? "opacity-0 pointer-events-none scale-75" : "opacity-100"
+                isAtEnd
+                  ? "opacity-0 pointer-events-none scale-75"
+                  : "opacity-100"
               }`}
               radius="full"
               variant="flat"

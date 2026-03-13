@@ -1,5 +1,11 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import style functions, layout, and custom components for the “PressKit” page.
+import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
+import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
+import { useState } from "react"; // React hook for local state management
+import { Card } from "@heroui/card"; // UI component for container
+import { Button } from "@heroui/button";
+
 import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
 import {
   AppleMusicIcon,
@@ -12,16 +18,11 @@ import {
 import { title, subtitle } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
 import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)
-import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
-import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
-import { useState } from "react"; // React hook for local state management
-import { Card } from "@heroui/card"; // UI component for container
 import CountUp from "@/components/countUp"; // Component for count up effect
 import { pressKitStats } from "@/config/pressKitStats"; // Stats
 import { songList } from "@/config/songList"; // Discography
 import PressKitSongCard from "@/components/pressKitSongCard"; //UI component for songs card
 import { pressKitPhotos } from "@/config/pressKitPhotos";
-import { Button } from "@heroui/button";
 import PressKitPhotoModal from "@/components/pressKitPhotoModal";
 import { siteConfig } from "@/config/site";
 import nokoruMonoArtwork from "@/assets/images/presskit/nokoruMonoArtwork.avif";
@@ -40,7 +41,7 @@ export default function PressKitPage() {
     <DefaultLayout>
       <Helmet>
         {/* Prevent indexing (private page) */}
-        <meta name="robots" content="noindex, nofollow" />
+        <meta content="noindex, nofollow" name="robots" />
         <title>Lacco | Press Kit</title>
       </Helmet>
       {/* ========================== INTRO SECTION ========================== */}
@@ -87,7 +88,7 @@ export default function PressKitPage() {
         </Card>
       </section>
       {/* ============================ BIO SECTION ============================= */}
-      <section id="presskit-bio" className="pt-8">
+      <section className="pt-8" id="presskit-bio">
         <div className="flex flex-col gap-4">
           <div className="pt-6">
             <h2 className={subtitle()}>Biografia</h2>
@@ -110,11 +111,11 @@ export default function PressKitPage() {
                 relazioni e fragilità condivise.
                 <br />
                 Nel 2026 presenta
-                <em className="text-danger px-1">nokoru mono</em>, il suo EP
-                di debutto: un progetto che esplora ciò che resta dentro di noi,
-                il mondo interiore che si muove anche quando tutto sembra fermo.
-                Un disco introspettivo, vicino al contemporary R&amp;B,
-                costruito su una ricerca emotiva sincera e mai estetizzata.
+                <em className="text-danger px-1">nokoru mono</em>, il suo EP di
+                debutto: un progetto che esplora ciò che resta dentro di noi, il
+                mondo interiore che si muove anche quando tutto sembra fermo. Un
+                disco introspettivo, vicino al contemporary R&amp;B, costruito
+                su una ricerca emotiva sincera e mai estetizzata.
                 <br />
                 Il progetto dialoga con il capitolo complementare
                 <em className="text-danger px-1">yuku mono</em>, previsto per il
@@ -147,7 +148,7 @@ export default function PressKitPage() {
         </div>
       </section>
       {/* ============================ HIGHLIGHTS ============================== */}
-      <section id="presskit-highlights" className="pt-8">
+      <section className="pt-8" id="presskit-highlights">
         <div className="flex flex-col gap-4">
           <div className="pt-6">
             <h2 className={subtitle()}>Highlights</h2>
@@ -157,8 +158,8 @@ export default function PressKitPage() {
               <div>
                 <div className="text-4xl font-semibold text-default-700">
                   <CountUp
-                    end={pressKitStats.monthlyListeners}
                     duration={1000}
+                    end={pressKitStats.monthlyListeners}
                   />
                 </div>
                 <p className="text-default-500">Ascoltatori mensili</p>
@@ -166,7 +167,7 @@ export default function PressKitPage() {
 
               <div>
                 <div className="text-4xl font-semibold text-default-700">
-                  <CountUp end={pressKitStats.totalStreams} duration={1000} />
+                  <CountUp duration={1000} end={pressKitStats.totalStreams} />
                 </div>
                 <p className="text-default-500">Stream totali</p>
               </div>
@@ -174,8 +175,8 @@ export default function PressKitPage() {
               <div>
                 <div className="text-4xl font-semibold text-default-700">
                   <CountUp
-                    end={pressKitStats.spotifyFollowers}
                     duration={1000}
+                    end={pressKitStats.spotifyFollowers}
                   />
                 </div>
                 <p className="text-default-500">Followers Spotify</p>
@@ -183,7 +184,13 @@ export default function PressKitPage() {
 
               <div>
                 <div className="text-4xl font-semibold text-default-700">
-                  <CountUp end={songList.filter((song) => song.preSaveMode === false).length} duration={1000} />
+                  <CountUp
+                    duration={1000}
+                    end={
+                      songList.filter((song) => song.preSaveMode === false)
+                        .length
+                    }
+                  />
                 </div>
                 <p className="text-default-500">Brani pubblicati</p>
               </div>
@@ -224,7 +231,7 @@ export default function PressKitPage() {
       </section>
 
       {/* ============================ PROJECT SECTION ============================ */}
-      <section id="presskit-project" className="pt-8">
+      <section className="pt-8" id="presskit-project">
         <div className="flex flex-col gap-4">
           <div className="pt-6">
             <h2 className={subtitle()}>Il progetto artistico</h2>
@@ -265,10 +272,10 @@ export default function PressKitPage() {
               <p className="text-center text-neutral-400 text-xs">
                 Artwork realizzati da Nicolò Piazza (in arte
                 <a
-                  href="https://www.instagram.com/torino_ink"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-primary px-1 hover:underline"
+                  href="https://www.instagram.com/torino_ink"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   Torino Ink
                 </a>
@@ -352,7 +359,7 @@ export default function PressKitPage() {
       </section>
 
       {/* ============================ DISCOGRAPHY ============================ */}
-      <section id="presskit-discography" className="pt-8">
+      <section className="pt-8" id="presskit-discography">
         <div className="pt-6 pb-4">
           <h2 className={subtitle()}>Discografia</h2>
         </div>
@@ -362,19 +369,19 @@ export default function PressKitPage() {
             .map((song) => (
               <PressKitSongCard
                 key={song.title}
+                appleMusic={song.appleMusicLink}
+                artwork={song.src}
+                description={song.pressKitDescription}
+                spotify={song.spotifyLink}
                 title={song.title}
                 year={song.year}
-                artwork={song.src}
-                spotify={song.spotifyLink}
-                appleMusic={song.appleMusicLink}
-                description={song.pressKitDescription}
               />
             ))}
         </div>
       </section>
 
       {/* ============================ PHOTOS ============================ */}
-      <section id="presskit-photos" className="pt-8">
+      <section className="pt-8" id="presskit-photos">
         <div className="flex flex-col gap-4">
           <div className="pt-6">
             <h2 className={subtitle()}>Book fotografico</h2>
@@ -391,17 +398,17 @@ export default function PressKitPage() {
               {pressKitPhotos.map((photo, i) => (
                 <button
                   key={i}
+                  className="block overflow-hidden rounded-lg"
                   onClick={() => {
                     setSelected(photo);
                     setModalOpen(true);
                   }}
-                  className="block overflow-hidden rounded-lg"
                 >
                   <SmartImage
-                    src={photo.src}
                     alt={photo.alt}
                     className="rounded-lg transition-transform hover:scale-105"
                     sizes="200px"
+                    src={photo.src}
                     style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
                   />
                 </button>
@@ -410,8 +417,8 @@ export default function PressKitPage() {
 
             {/* DOWNLOAD ZIP */}
             <div className="flex justify-center p-4">
-              <a href="/presskit-files/HQ/photos.zip" download>
-                <Button color="danger" variant="solid" className="px-6">
+              <a download href="/presskit-files/HQ/photos.zip">
+                <Button className="px-6" color="danger" variant="solid">
                   Scarica tutte le foto e gli artwork (.zip)
                 </Button>
               </a>
@@ -421,18 +428,18 @@ export default function PressKitPage() {
           {/* MODAL */}
           {selected && (
             <PressKitPhotoModal
-              isOpen={modalOpen}
-              onClose={() => setModalOpen(false)}
-              src={selected.srcHQ}
               alt={selected.alt}
               downloadUrl={selected.srcHQ}
+              isOpen={modalOpen}
+              src={selected.srcHQ}
+              onClose={() => setModalOpen(false)}
             />
           )}
         </div>
       </section>
 
       {/* ============================ LOGO ============================ */}
-      <section id="presskit-logo" className="pt-8">
+      <section className="pt-8" id="presskit-logo">
         <div className="flex flex-col gap-4">
           <div className="pt-6">
             <h2 className={subtitle()}>Logo ufficiale</h2>
@@ -446,31 +453,33 @@ export default function PressKitPage() {
 
             {/* PREVIEW */}
             <div className="w-full flex justify-center">
-              <Logo size={180} className="text-default-800" />
+              <Logo className="text-default-800" size={180} />
             </div>
 
             {/* DOWNLOAD BUTTONS */}
             <div className="flex flex-wrap gap-4 justify-center">
-              <a href={logoLaccoSVG} download>
-                <Button color="danger" className="px-6">
+              <a download href={logoLaccoSVG}>
+                <Button className="px-6" color="danger">
                   Scarica SVG
                 </Button>
               </a>
-              <a href={logoLaccoPNG} download>
-                <Button color="danger" className="px-6">
+              <a download href={logoLaccoPNG}>
+                <Button className="px-6" color="danger">
                   Scarica PNG
                 </Button>
               </a>
             </div>
             <p className="text-default-500 text-xs text-center pt-4">
-              "Lacco" è un marchio registrato.<br/>Tutti i diritti sono riservati.
+              "Lacco" è un marchio registrato.
+              <br />
+              Tutti i diritti sono riservati.
             </p>
           </Card>
         </div>
       </section>
 
       {/* ============================ CONTACTS =============================== */}
-      <section id="presskit-contacts" className="pt-8">
+      <section className="pt-8" id="presskit-contacts">
         <div className="flex flex-col gap-4">
           <div className="pt-6">
             <h2 className={subtitle()}>Contatti</h2>
@@ -486,8 +495,8 @@ export default function PressKitPage() {
                 <p className="text-default-600 text-base">
                   Per richieste stampa, interviste, booking e collaborazioni:
                   <a
-                    href="mailto:management@lacco.it"
                     className="text-base font-medium text-default-800 hover:text-danger transition-colors ml-2"
+                    href="mailto:management@lacco.it"
                   >
                     management@lacco.it
                   </a>
@@ -504,7 +513,11 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.spotify, "_blank", "noopener,noreferrer")
+                      window.open(
+                        siteConfig.links.spotify,
+                        "_blank",
+                        "noopener,noreferrer",
+                      )
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
@@ -515,7 +528,11 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.instagram, "_blank", "noopener,noreferrer")
+                      window.open(
+                        siteConfig.links.instagram,
+                        "_blank",
+                        "noopener,noreferrer",
+                      )
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
@@ -526,7 +543,11 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.tiktok, "_blank", "noopener,noreferrer")
+                      window.open(
+                        siteConfig.links.tiktok,
+                        "_blank",
+                        "noopener,noreferrer",
+                      )
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
@@ -537,7 +558,11 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.appleMusic, "_blank", "noopener,noreferrer")
+                      window.open(
+                        siteConfig.links.appleMusic,
+                        "_blank",
+                        "noopener,noreferrer",
+                      )
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
@@ -548,7 +573,11 @@ export default function PressKitPage() {
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
-                      window.open(siteConfig.links.youtube, "_blank", "noopener,noreferrer")
+                      window.open(
+                        siteConfig.links.youtube,
+                        "_blank",
+                        "noopener,noreferrer",
+                      )
                     }
                   >
                     <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">

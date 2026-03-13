@@ -11,7 +11,7 @@ The website features a modern, responsive, and high-performance structure, with 
 
 | Category               | Technologies                                                     |
 | ---------------------- | ---------------------------------------------------------------- |
-| **Frontend Framework** | [React 18+](https://react.dev/) with [Vite](https://vitejs.dev/) |
+| **Frontend Framework** | [React 19](https://react.dev/) with [Vite](https://vitejs.dev/) |
 | **Language**           | [TypeScript](https://www.typescriptlang.org/)                    |
 | **UI Library**         | [HeroUI](https://heroui.dev/) (based on NextUI and TailwindCSS)  |
 | **Styling**            | [TailwindCSS](https://tailwindcss.com/)                          |

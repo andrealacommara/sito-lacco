@@ -60,15 +60,15 @@ export default function HomePage() {
         <div className="p-4 md:p-4 shrink-0 flex items-center justify-center">
           <div className="w-fit md:w-full items-center">
             <SmartImage
-            isBlurred // Applies a slight blur effect
-            priority
-            alt="Lacco" // Alt text for accessibility
-            className="w-full h-full"
-            sizes="400px"
-            src={heroLacco} // Imported image
-            style={{ aspectRatio: "1 / 1" }}
-            onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to decode
-            onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
+              isBlurred // Applies a slight blur effect
+              priority
+              alt="Lacco" // Alt text for accessibility
+              className="w-full h-full"
+              sizes="400px"
+              src={heroLacco} // Imported image
+              style={{ aspectRatio: "1 / 1" }}
+              onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to decode
+              onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
             />
           </div>
         </div>
@@ -92,7 +92,13 @@ export default function HomePage() {
       <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-5xl gap-4">
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.spotify, "_blank", "noopener,noreferrer")}
+          onClick={() =>
+            window.open(
+              siteConfig.links.spotify,
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <SpotifyIcon />
@@ -101,7 +107,13 @@ export default function HomePage() {
         </button>
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.instagram, "_blank", "noopener,noreferrer")}
+          onClick={() =>
+            window.open(
+              siteConfig.links.instagram,
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <InstagramIcon />
@@ -110,7 +122,13 @@ export default function HomePage() {
         </button>
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.tiktok, "_blank", "noopener,noreferrer")}
+          onClick={() =>
+            window.open(
+              siteConfig.links.tiktok,
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <TikTokIcon />
@@ -119,7 +137,13 @@ export default function HomePage() {
         </button>
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.appleMusic, "_blank", "noopener,noreferrer")}
+          onClick={() =>
+            window.open(
+              siteConfig.links.appleMusic,
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <AppleMusicIcon />
@@ -128,7 +152,13 @@ export default function HomePage() {
         </button>
         <button
           className="w-full md:flex-1"
-          onClick={() => window.open(siteConfig.links.youtube, "_blank", "noopener,noreferrer")}
+          onClick={() =>
+            window.open(
+              siteConfig.links.youtube,
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
         >
           <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
             <YouTubeIcon />
