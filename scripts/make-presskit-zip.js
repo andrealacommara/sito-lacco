@@ -5,8 +5,8 @@ import { ZipFile } from "yazl";
 import path from "path";
 
 // ========================== OUTPUT TARGET ========================== //
-// Resulting ZIP file: public/presskit-files/HQ/photos.zip
-const outputPath = path.resolve("public/presskit-files/HQ/photos.zip");
+// Resulting ZIP file: dist/presskit-files/HQ/photos.zip
+const outputPath = path.resolve("dist/presskit-files/HQ/photos.zip");
 
 // Ensure the parent folder exists before streaming the archive.
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
