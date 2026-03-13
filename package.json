@@ -21,7 +21,7 @@
     "@react-aria/visually-hidden": "^3.8.28",
     "@react-hook/media-query": "^1.1.1",
     "@tailwindcss/vite": "^4.1.17",
-    "archiver": "^7.0.1",
+    "yazl": "^3.3.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
     "react": "^19.2.4",
@@ -35,7 +35,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.4",
     "@tailwindcss/postcss": "^4.1.17",
-    "@types/archiver": "^7.0.0",
+
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
