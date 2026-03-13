@@ -62,6 +62,6 @@
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-sitemap": "^0.8.2",
     "vite-plugin-svgr": "^4.5.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^6.1.1"
   }
 }
