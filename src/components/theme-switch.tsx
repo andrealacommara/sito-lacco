@@ -108,9 +108,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
 
   return (
     <Component
-      aria-label={
-        isSelected ? "Passa al tema scuro" : "Passa al tema chiaro"
-      }
+      aria-label={isSelected ? "Passa al tema scuro" : "Passa al tema chiaro"}
       {...getBaseProps({
         className: clsx(
           "px-px transition-opacity hover:opacity-80 cursor-pointer",

@@ -7,6 +7,7 @@ import {
   ModalFooter,
 } from "@heroui/modal";
 import { Button } from "@heroui/button";
+
 import SmartImage from "@/components/smartImage";
 
 // ========================== INTERFACE ========================== //
@@ -28,33 +29,32 @@ export default function PressKitPhotoModal({
 }: PressKitPhotoModalProps) {
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      scrollBehavior="inside"
-      size="xl"
-      placement="center"
       backdrop="blur"
       classNames={{
-          wrapper:
-            "flex items-center justify-center px-4 w-full max-w-none",
-        }}
+        wrapper: "flex items-center justify-center px-4 w-full max-w-none",
+      }}
+      isOpen={isOpen}
+      placement="center"
+      scrollBehavior="inside"
+      size="xl"
+      onClose={onClose}
     >
       <ModalContent>
         <ModalHeader className="text-lg font-semibold">{alt}</ModalHeader>
 
         <ModalBody>
           <SmartImage
-            src={src}
             alt={alt}
             className="rounded-lg"
-            sizes="600px"
-            style={{ width: "100%", height: "auto", objectFit: "contain" }}
             isBlurred={false}
+            sizes="600px"
+            src={src}
+            style={{ width: "100%", height: "auto", objectFit: "contain" }}
           />
         </ModalBody>
 
         <ModalFooter className="flex justify-center">
-          <a href={downloadUrl} download>
+          <a download href={downloadUrl}>
             <Button color="danger">Scarica in alta qualità</Button>
           </a>
         </ModalFooter>

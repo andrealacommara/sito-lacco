@@ -17,7 +17,6 @@ import pressKitPic14 from "@/assets/images/presskit/pressKitPic14.avif";
 import pressKitPic15 from "@/assets/images/presskit/pressKitPic15.avif";
 import pressKitPic16 from "@/assets/images/presskit/pressKitPic16.avif";
 
-
 //Import of high quality press kit photos.
 import pressKitHQPic1 from "@/assets/images/presskit/HQ/pressKitPic1.jpg";
 import pressKitHQPic2 from "@/assets/images/presskit/HQ/pressKitPic2.jpg";
@@ -84,8 +83,7 @@ export const pressKitPhotos = [
     srcHQ: pressKitHQPic8,
     alt: "Lacco - Press Photo 8",
     full: pressKitHQPic8,
-  }
-  ,
+  },
   {
     src: pressKitPic9,
     srcHQ: pressKitHQPic9,
@@ -133,5 +131,5 @@ export const pressKitPhotos = [
     srcHQ: pressKitHQPic16,
     alt: "Lacco - Press Photo 16",
     full: pressKitHQPic16,
-  }
+  },
 ];

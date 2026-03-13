@@ -3,5 +3,5 @@
 export const pressKitStats = {
   monthlyListeners: 987,
   totalStreams: 40932,
-  spotifyFollowers: 154
+  spotifyFollowers: 154,
 };

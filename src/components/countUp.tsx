@@ -15,6 +15,7 @@ export default function CountUp({ end, duration = 1500 }: CountUpProps) {
 
   useEffect(() => {
     const element = ref.current;
+
     if (!element || hasAnimatedRef.current) return;
 
     let counter: ReturnType<typeof setInterval> | undefined;
@@ -41,7 +42,7 @@ export default function CountUp({ end, duration = 1500 }: CountUpProps) {
           observer.disconnect();
         }
       },
-      { threshold: 0.3 } // 30% visibility required
+      { threshold: 0.3 }, // 30% visibility required
     );
 
     observer.observe(element);
