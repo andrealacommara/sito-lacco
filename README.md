@@ -20,6 +20,8 @@ The website features a modern, responsive, and high-performance structure, with 
 | **Image Handling**     | `@heroui/image`                                                  |
 | **Spotify Player**     | IFrame Embed API                                                 |
 | **Build Tools**        | Vite + TailwindCSS (PostCSS) + HeroUI Theme                      |
+| **CI/CD**              | [GitHub Actions](https://github.com/features/actions) + FTPS deploy to Aruba |
+| **Node.js**            | v22+ recommended                                                  |
 
 ---
 
@@ -91,8 +93,8 @@ src/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/andrealacommara/sito-lacco.git
+cd sito-lacco
 ```
 
 ### 2. Install dependencies
@@ -129,8 +131,35 @@ The website will be available at [http://localhost:5173](http://localhost:5173)
 npm run build
 ```
 
-Optimized files will be generated in the `/dist` folder.  
-The site is deployed automatically su **Aruba** via FTP tramite GitHub Actions (vedi `.github/workflows/deploy.yml`).
+Optimized files will be generated in the `/dist` folder.
+
+---
+
+## 🔄 CI/CD Pipeline
+
+The project uses **GitHub Actions** for continuous integration and deployment:
+
+| Workflow | Trigger | Purpose |
+| --- | --- | --- |
+| **CI** | Pull requests to `main` | Runs `npm install` + `npm run build` to validate changes |
+| **Build and Deploy** | Push to `main` | Builds and deploys to **Aruba** via FTPS |
+| **Auto-merge Dependabot** | Dependabot PRs | Merges dependency updates automatically after CI passes |
+
+Branch protection on `main` requires the CI check to pass before merging.
+
+---
+
+## 📦 Available Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start local development server |
+| `npm run build` | Build for production (+ generates presskit zip and copies `.htaccess`) |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Lint and auto-fix with ESLint |
+| `npm run format` | Format code with Prettier |
+| `npm run type-check` | Run TypeScript type checking |
+| `npm run test:full` | Run lint + type-check + build + env validation |
 
 ---
 
