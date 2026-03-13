@@ -63,7 +63,6 @@ src/
 ├── styles/                 # Styles configuration
 │   └── globals.css
 ├── types/                  # Shared TypeScript types
-│   ├── archiver.d.ts
 │   └── index.ts
 ├── utils/                  # Utility helpers shared across the app
 │   ├── createIcon.tsx

@@ -97,6 +97,8 @@ export default defineConfig({
         // Splits main bundles for better caching and performance
         manualChunks: {
           react: ["react", "react-dom"],
+          "heroui": ["@heroui/react"],
+          "framer-motion": ["framer-motion"],
         },
 
         // Add hash only to JS and CSS — keep images and OG assets with fixed names

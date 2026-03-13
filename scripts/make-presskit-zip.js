@@ -1,7 +1,7 @@
 // ========================== MAIN IMPORTS ========================== //
-// Node.js utilities and archiver used to build the press-kit ZIP package.
+// Node.js utilities and yazl used to build the press-kit ZIP package.
 import fs from "fs";
-import archiver from "archiver";
+import { ZipFile } from "yazl";
 import path from "path";
 
 // ========================== OUTPUT TARGET ========================== //
@@ -12,14 +12,21 @@ const outputPath = path.resolve("public/presskit-files/HQ/photos.zip");
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
 // ========================== ARCHIVE GENERATION ========================== //
-const output = fs.createWriteStream(outputPath);
-const archive = archiver("zip", { zlib: { level: 9 } }); // max compression
+const sourceDir = "src/assets/images/presskit/HQ/";
+const zipfile = new ZipFile();
+
+// Add every file in the source directory (flat, no sub-folders).
+const files = fs.readdirSync(sourceDir).filter((f) =>
+  fs.statSync(path.join(sourceDir, f)).isFile(),
+);
+
+for (const file of files) {
+  zipfile.addFile(path.join(sourceDir, file), file, { compress: true });
+}
 
 // Stream the archive contents to disk.
-archive.pipe(output);
+const output = fs.createWriteStream(outputPath);
+zipfile.outputStream.pipe(output);
 
-// Add the HQ photo directory contents, preserving root file names only.
-archive.directory("src/assets/images/presskit/HQ/", false);
-
-// Finalize the ZIP build (returns a promise).
-archive.finalize();
+// Finalize the ZIP build.
+zipfile.end();
