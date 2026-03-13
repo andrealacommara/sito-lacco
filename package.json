@@ -33,7 +33,7 @@
   "devDependencies": {
     "@eslint/compat": "^2.0.3",
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/archiver": "^7.0.0",
     "@types/node": "^25.5.0",
