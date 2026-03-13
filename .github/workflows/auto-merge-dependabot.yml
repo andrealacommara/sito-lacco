@@ -1,6 +1,9 @@
 name: Auto-merge Dependabot PRs
 
 on:
+  check_suite:
+    types:
+      - completed
   pull_request:
 
 permissions:
@@ -12,6 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
+      - name: Wait for CI to pass
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          check-name: "build"
+          wait-interval: 15
+          allowed-conclusions: success
+
       - name: Enable auto-merge
         run: gh pr merge --auto --merge "$PR_URL"
         env:
