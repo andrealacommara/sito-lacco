@@ -54,14 +54,14 @@ src/
 │   ├── aboutPage.tsx       # "Su di me" Page
 │   ├── contactPage.tsx     # "Contatti" Page
 │   ├── homePage.tsx        # "Home" Page
-│   |── musicPage.tsx       # "La mia musica" Page
+│   ├── musicPage.tsx       # "La mia musica" Page
 │   └── pressKitPage.tsx    # "PressKit" Page
 ├── routes/                 # Lazy routes + preload helpers
 │   └── pages.ts
 ├── styles/                 # Styles configuration
-│   └── global.css
+│   └── globals.css
 ├── types/                  # Shared TypeScript types
-│   |── archiver.d.ts
+│   ├── archiver.d.ts
 │   └── index.ts
 ├── utils/                  # Utility helpers shared across the app
 │   ├── createIcon.tsx
@@ -130,7 +130,7 @@ npm run build
 ```
 
 Optimized files will be generated in the `/dist` folder.  
-You can deploy them to any static hosting service (e.g., **Aruba**, Netlify, Vercel, GitHub Pages, Cloudflare Pages).
+The site is deployed automatically su **Aruba** via FTP tramite GitHub Actions (vedi `.github/workflows/deploy.yml`).
 
 ---
 
