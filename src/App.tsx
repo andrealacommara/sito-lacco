@@ -1,7 +1,7 @@
 // ========================== MAIN IMPORTS ========================== //
 // Main libraries and page components for route management.
 
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { Suspense, useEffect } from "react";
 
 import {
@@ -24,6 +24,12 @@ import {
  * reducing the size of the initial bundle.
  */
 function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
