@@ -28,12 +28,12 @@ export const songList = [
     alt: "Cover artwork di 'tu x tu'",
     description:
       "“tu x tu” è il filo che ci unisce.\nUn fil rouge che accomuna le nostre paure, i nostri pensieri, rendendoci uguali.\nSeguirlo permette di riconoscerci nelle altre persone e di avvicinarci a loro.",
-    spotifyLink: "https://www.lacco.it/tuxtu/",
-    appleMusicLink: "https://www.lacco.it/tuxtu/",
+    spotifyLink: "https://open.spotify.com/intl-it/track/6Mi4URZPZcXVi5YiI0mGdb?si=e37446cb3ee94378",
+    appleMusicLink: "https://music.apple.com/us/song/tu-x-tu/1879807616",
     year: 2026,
     pressKitDescription:
-      "Un brano urban pop che parla di connessione umana, empatia e riconoscimento reciproco.",
-    preSaveMode: true,
+      "Un brano pop/R&B che parla di connessione umana, empatia e riconoscimento reciproco.",
+    preSaveMode: false,
   },
   {
     title: "per gli altri",
