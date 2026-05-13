@@ -12,6 +12,7 @@ import ricordoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 import davveroArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 import perGliAltriArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 import tuxtuArtwork from "@/assets/images/artworks/tuxtuArtwork.avif";
+import bellaAlBuioArtwork from "@/assets/images/artworks/bellaAlBuioArtwork.avif";
 
 // ========================== TYPE DEFINITION ========================== //
 // Export a TypeScript type based on the `songList` array structure.
@@ -22,6 +23,19 @@ export type songList = typeof songList;
 // Array of published songs, each object containing title, artwork, description, Spotify link (or pre-save link) and pre-save flag.
 
 export const songList = [
+    {
+    title: "bella al buio",
+    src: bellaAlBuioArtwork,
+    alt: "Cover artwork di 'bella al buio'",
+    description:
+      "“bella al buio” racconta l’incontro tra due fragilità che si sfiorano nella notte, quando le difese cadono e restano solo le parole non dette.\nTra desiderio e distanza emotiva, il brano esplora il bisogno di connessione autentica, trasformando l’intimità in un dialogo sincero e disarmato.\nLe sonorità pop-punk moderne accompagnano un racconto emotivo fatto di dubbi, confessioni e attrazione silenziosa, trasformando la vulnerabilità in qualcosa di estremamente umano.",
+    spotifyLink: "https://distrokid.com/hyperfollow/lacco/bella-al-buio",
+    appleMusicLink: "https://distrokid.com/hyperfollow/lacco/bella-al-buio",
+    year: 2026,
+    pressKitDescription:
+      "Un brano che racconta un dialogo intimo fatto di dubbi, verità taciute e desiderio di connessione autentica, immerso in sonorità pop-punk moderne.",
+    preSaveMode: true,
+  },
   {
     title: "tu x tu",
     src: tuxtuArtwork,
