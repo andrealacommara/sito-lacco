@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@heroui/button";
 import { SpotifyIcon } from "@/components/icons";
 
@@ -17,19 +18,37 @@ function openCenteredPopup(url: string, fallbackUrl: string) {
     `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes`,
   );
   if (!popup || popup.closed || typeof popup.closed === "undefined") {
-    // Popup bloccato dal browser — fallback su nuova tab
     window.open(fallbackUrl, "_blank", "noopener,noreferrer");
   }
 }
 
 export default function PresaveButton({ presaveUrl, fallbackUrl }: Props) {
+  const [saved, setSaved] = useState(false);
+
+  if (saved) {
+    return (
+      <Button
+        isDisabled
+        className="font-semibold px-8"
+        color="success"
+        size="lg"
+      >
+        <SpotifyIcon />
+        Pre-salvato ✓
+      </Button>
+    );
+  }
+
   return (
     <Button
       aria-label="Pre-save su Spotify"
       className="font-semibold px-8"
       color="success"
       size="lg"
-      onPress={() => openCenteredPopup(presaveUrl, fallbackUrl)}
+      onPress={() => {
+        openCenteredPopup(presaveUrl, fallbackUrl);
+        setSaved(true);
+      }}
     >
       <SpotifyIcon />
       Pre-save su Spotify

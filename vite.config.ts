@@ -71,7 +71,17 @@ export default defineConfig({
         "/su-di-me",
         "/contatti",
         "/newsletter",
-        "/bella-al-buio", // aggiungere ogni nuovo slug release qui
+        "/bella-al-buio",
+        "/tu-x-tu",
+        "/per-gli-altri",
+        "/davvero",
+        "/ricordo",
+        "/rumore-di-fondo",
+        "/cercami",
+        "/tra-le-nuvole-sunset-version",
+        "/tra-le-nuvole",
+        "/mondo-dentro",
+        "/tempo-perso",
       ],
       generateRobotsTxt: false, // Prevents the plugin from probing dist/ for robots.txt
     }),

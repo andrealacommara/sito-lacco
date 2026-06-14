@@ -1,6 +1,7 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import core components and configurations needed for the main site layout.
 
+import { Link } from "react-router-dom";
 import { Navbar } from "@/components/navbar";
 import {
   AppleMusicIcon,
@@ -10,7 +11,6 @@ import {
   YouTubeIcon,
 } from "@/components/icons.tsx";
 import { siteConfig } from "@/config/site.ts";
-import SubscribeForm from "@/components/subscribeForm";
 
 // ========================== LAYOUT COMPONENT ========================== //
 // Defines the overall page structure:
@@ -38,17 +38,17 @@ export default function DefaultLayout({
         {children}
       </main>
 
-      {/* FOOTER - Bottom section with newsletter mini-form and social links */}
+      {/* FOOTER - Bottom section with newsletter link and social icons */}
       <footer
         className="w-full flex flex-col items-center justify-center py-8 gap-4"
         role="contentinfo"
       >
-        <div className="w-full max-w-xs px-4">
-          <p className="text-center text-xs text-default-400 mb-2 font-medium tracking-wide uppercase">
-            Aggiornamenti uscite
-          </p>
-          <SubscribeForm compact source="newsletter_form" />
-        </div>
+        <Link
+          className="text-xs text-default-400 hover:text-default-600 transition-colors underline underline-offset-2"
+          to="/newsletter"
+        >
+          Iscriviti alla newsletter
+        </Link>
         <div className="flex items-center gap-2">
         {/* Each Link opens in a new tab */}
         <button

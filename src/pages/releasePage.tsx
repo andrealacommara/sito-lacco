@@ -3,14 +3,14 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Button } from "@heroui/button";
 
-import { getReleaseBySlug } from "@/config/releases";
+import { getSongBySlug } from "@/config/catalog";
 import { resolveImageSource } from "@/components/smartImage";
 import SmartImage from "@/components/smartImage";
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
 import SongCarousel from "@/components/songCarousel";
 import SubscribeForm from "@/components/subscribeForm";
-import { AppleMusicIcon, SpotifyIcon } from "@/components/icons";
+import { AppleMusicIcon, Logo, SpotifyIcon } from "@/components/icons";
 import NotFoundPage from "@/pages/notFoundPage";
 
 const fadeUp = (delay: number) => ({
@@ -21,7 +21,7 @@ const fadeUp = (delay: number) => ({
 
 export default function ReleasePage() {
   const { slug } = useParams<{ slug: string }>();
-  const release = slug ? getReleaseBySlug(slug) : undefined;
+  const release = slug ? getSongBySlug(slug) : undefined;
 
   if (!release) return <NotFoundPage />;
 
@@ -63,17 +63,15 @@ export default function ReleasePage() {
 
       {/* Contenuto principale */}
       <div className="relative min-h-screen flex flex-col">
-        {/* Header: link back + logo */}
-        <header className="flex items-center justify-between px-5 pt-5 pb-2">
-          <Link
-            className="text-white/70 hover:text-white text-sm font-medium transition-colors"
-            to="/"
-          >
-            ← lacco.it
+        {/* Header: logo centrato cliccabile → home */}
+        <header className="flex items-center justify-center px-5 pt-6 pb-2">
+          <Link aria-label="Torna a lacco.it" to="/">
+            <Logo
+              className="text-white/80 transition-colors hover:text-white"
+              height={40}
+              width={70}
+            />
           </Link>
-          <span className="text-white/40 text-xs tracking-widest uppercase">
-            Lacco
-          </span>
         </header>
 
         {release.presaveMode ? (
@@ -89,7 +87,7 @@ export default function ReleasePage() {
 function PresaveSection({
   release,
 }: {
-  release: ReturnType<typeof getReleaseBySlug> & object;
+  release: ReturnType<typeof getSongBySlug> & object;
 }) {
   return (
     <>
@@ -159,7 +157,7 @@ function PresaveSection({
 function LiveSection({
   release,
 }: {
-  release: ReturnType<typeof getReleaseBySlug> & object;
+  release: ReturnType<typeof getSongBySlug> & object;
 }) {
   return (
     <div className="flex flex-col">
