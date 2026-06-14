@@ -1,28 +1,21 @@
-// ========================== MAIN IMPORTS ========================== //
-// Main libraries and page components for route management.
-
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Suspense, useEffect } from "react";
 
 import {
   AboutPage,
+  AdminPage,
+  ConfirmPage,
   ContactPage,
   HomePage,
   MusicPage,
+  NewsletterPage,
+  NotFoundPage,
   PressKitPage,
+  ReleasePage,
+  UnsubscribePage,
   warmupRoutes,
 } from "@/routes/pages";
 
-// ========================== MAIN COMPONENT: App ========================== //
-/**
- * Main application component.
- * Defines all routes and maps URLs to the corresponding pages.
- *
- * Each route uses React Router to render content dynamically
- * without reloading, ensuring a smooth SPA experience.
- * Lazy loading splits each page into a separate JS chunk,
- * reducing the size of the initial bundle.
- */
 function App() {
   const location = useLocation();
 
@@ -38,6 +31,7 @@ function App() {
       "/su-di-me",
       "/contatti",
       "/presskit",
+      "/newsletter",
     ];
     const warm = () => warmupRoutes(pathsToWarm);
 
@@ -77,23 +71,26 @@ function App() {
       }
     >
       <Routes>
-        {/* "Home" page */}
+        {/* Core pages */}
         <Route element={<HomePage />} path="/" />
-
-        {/* “La mia musica” page */}
         <Route element={<MusicPage />} path="/la-mia-musica" />
-
-        {/* “Su di me” page */}
         <Route element={<AboutPage />} path="/su-di-me" />
-
-        {/* "Contatti" page */}
         <Route element={<ContactPage />} path="/contatti" />
-
-        {/* "PressKit" page */}
         <Route element={<PressKitPage />} path="/presskit" />
 
-        {/* Fallback route */}
-        <Route element={<HomePage />} path="*" />
+        {/* Newsletter e subscription flow */}
+        <Route element={<NewsletterPage />} path="/newsletter" />
+        <Route element={<ConfirmPage />} path="/confirm" />
+        <Route element={<UnsubscribePage />} path="/unsubscribe" />
+
+        {/* Admin (protetto da Supabase Auth) */}
+        <Route element={<AdminPage />} path="/admin" />
+
+        {/* Release pages: /:slug deve stare DOPO tutte le route specifiche */}
+        <Route element={<ReleasePage />} path="/:slug" />
+
+        {/* 404 vero */}
+        <Route element={<NotFoundPage />} path="*" />
       </Routes>
     </Suspense>
   );
