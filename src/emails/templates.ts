@@ -1,9 +1,5 @@
-import { getResendApiKey } from "./clients.ts";
-
-const FROM = "Lacco <no-reply@lacco.it>";
-const REPLY_TO = "ciao@lacco.it";
-
-// ── HTML templates ──────────────────────────────────────────────────────────
+// Email HTML template functions — mirrors supabase/functions/_shared/email.ts
+// Used by the admin page to preview emails before sending.
 
 function baseTemplate(content: string): string {
   return `<!DOCTYPE html>
@@ -42,7 +38,7 @@ function baseTemplate(content: string): string {
 }
 
 export function confirmEmailHtml(firstName: string | undefined, confirmUrl: string): string {
-  const name = firstName ? firstName.trim() : undefined;
+  const name = firstName?.trim();
   const greeting = name ? `Hey ${name},` : "Hey,";
   return baseTemplate(`
     <p style="margin:0 0 16px;font-size:16px;color:#e0e0e0;line-height:1.6;">${greeting}</p>
@@ -100,43 +96,4 @@ export function announcementEmailHtml(opts: {
       </a>
     </p>
   `);
-}
-
-// ── Resend helpers ──────────────────────────────────────────────────────────
-
-export async function sendConfirmEmail(
-  to: string,
-  firstName: string | undefined,
-  confirmUrl: string,
-): Promise<void> {
-  await resendSend({
-    to,
-    subject: "Conferma la tua iscrizione",
-    html: confirmEmailHtml(firstName, confirmUrl),
-  });
-}
-
-export async function resendSend(opts: {
-  to: string;
-  subject: string;
-  html: string;
-}): Promise<void> {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${getResendApiKey()}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: FROM,
-      reply_to: REPLY_TO,
-      to: opts.to,
-      subject: opts.subject,
-      html: opts.html,
-    }),
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Resend error ${res.status}: ${err}`);
-  }
 }
