@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { Button } from "@heroui/button";
 import CardSongExposer from "@/components/cardSongExposer";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
-import { songList } from "@/config/songList";
+import { catalog } from "@/config/catalog";
 
 export default function SongCarousel() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -107,18 +107,18 @@ export default function SongCarousel() {
           className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full"
         >
           <div ref={startSpacerRef} className="shrink-0" />
-          {songList.map((song) => (
+          {catalog.map((song) => (
             <div
-              key={song.title}
+              key={song.slug}
               className="card-song shrink-0 snap-center px-2 max-w-full transition-transform hover:scale-105 active:scale-95"
             >
               <CardSongExposer
                 artworkAlt={song.alt}
-                artworkSrc={song.src}
-                preSaveMode={song.preSaveMode}
-                songAppleMusicLink={song.appleMusicLink}
+                artworkSrc={song.artwork}
+                preSaveMode={song.presaveMode}
+                songAppleMusicLink={song.streamingLinks?.appleMusic ?? ""}
                 songDescription={song.description}
-                songSpotifyLink={song.spotifyLink}
+                songSpotifyLink={song.streamingLinks?.spotify ?? ""}
                 songTitle={song.title}
               />
             </div>
