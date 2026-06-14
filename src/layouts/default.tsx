@@ -1,15 +1,16 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import core components and configurations needed for the main site layout.
 
-import { Navbar } from "@/components/navbar"; // Top navigation bar
+import { Navbar } from "@/components/navbar";
 import {
   AppleMusicIcon,
   InstagramIcon,
   SpotifyIcon,
   TikTokIcon,
   YouTubeIcon,
-} from "@/components/icons.tsx"; // Custom icons for social and music platforms
-import { siteConfig } from "@/config/site.ts"; // Global site configuration (links, menu, etc.)
+} from "@/components/icons.tsx";
+import { siteConfig } from "@/config/site.ts";
+import SubscribeForm from "@/components/subscribeForm";
 
 // ========================== LAYOUT COMPONENT ========================== //
 // Defines the overall page structure:
@@ -37,11 +38,18 @@ export default function DefaultLayout({
         {children}
       </main>
 
-      {/* FOOTER - Bottom section with social links */}
+      {/* FOOTER - Bottom section with newsletter mini-form and social links */}
       <footer
-        className="w-full flex items-center justify-center py-8 gap-2"
+        className="w-full flex flex-col items-center justify-center py-8 gap-4"
         role="contentinfo"
       >
+        <div className="w-full max-w-xs px-4">
+          <p className="text-center text-xs text-default-400 mb-2 font-medium tracking-wide uppercase">
+            Aggiornamenti uscite
+          </p>
+          <SubscribeForm compact source="newsletter_form" />
+        </div>
+        <div className="flex items-center gap-2">
         {/* Each Link opens in a new tab */}
         <button
           aria-label="Vai al profilo Spotify di Lacco"
@@ -78,6 +86,7 @@ export default function DefaultLayout({
         >
           <YouTubeIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </button>
+        </div>
       </footer>
     </div>
   );

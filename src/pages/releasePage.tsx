@@ -9,6 +9,7 @@ import SmartImage from "@/components/smartImage";
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
 import SongCarousel from "@/components/songCarousel";
+import SubscribeForm from "@/components/subscribeForm";
 import { AppleMusicIcon, SpotifyIcon } from "@/components/icons";
 import NotFoundPage from "@/pages/notFoundPage";
 
@@ -146,9 +147,8 @@ function PresaveSection({
             </span>
             <div className="flex-1 h-px bg-white/20" />
           </div>
-          {/* SubscribeForm placeholder — verrà collegato nella Fase 5 */}
-          <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white/40 text-sm text-center">
-            [Form iscrizione — Fase 5]
+          <div className="w-full">
+            <SubscribeForm releaseSlug={release.slug} source="presave_form" />
           </div>
         </motion.div>
       </main>
@@ -269,10 +269,7 @@ function LiveSection({
           <h2 className="text-white/80 font-semibold text-lg">
             Iscriviti per le prossime uscite
           </h2>
-          {/* SubscribeForm placeholder — verrà collegato nella Fase 5 */}
-          <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white/40 text-sm text-center">
-            [Form iscrizione — Fase 5]
-          </div>
+          <SubscribeForm source="newsletter_form" />
         </div>
       </section>
     </div>
