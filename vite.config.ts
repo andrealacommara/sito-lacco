@@ -66,7 +66,13 @@ export default defineConfig({
     // Automatic sitemap generation for SEO
     VitePluginSitemap({
       hostname: "https://lacco.it",
-      dynamicRoutes: ["/la-mia-musica", "/su-di-me", "/contatti"],
+      dynamicRoutes: [
+        "/la-mia-musica",
+        "/su-di-me",
+        "/contatti",
+        "/newsletter",
+        "/bella-al-buio", // aggiungere ogni nuovo slug release qui
+      ],
       generateRobotsTxt: false, // Prevents the plugin from probing dist/ for robots.txt
     }),
 
