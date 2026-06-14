@@ -53,15 +53,16 @@ export type AdminAddSubscriberBody = {
 };
 
 // POST /functions/v1/admin-broadcast (richiede Bearer JWT)
+// Il FE renderizza l'HTML via announcementEmailHtml() e lo passa come htmlBody
 export type BroadcastBody = {
-  template: "announcement";
   subject: string;
-  releaseTitle?: string;
-  dry?: boolean; // se true, non invia davvero
+  htmlBody: string;
+  dry?: boolean; // se true, restituisce solo recipientCount senza inviare
 };
 export type BroadcastResponse = {
   ok: boolean;
   broadcastId?: string;
   recipientCount?: number;
+  dry?: boolean;
   error?: string;
 };
