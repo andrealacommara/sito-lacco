@@ -39,11 +39,7 @@ function baseTemplate(
       <tr>
         <td style="padding:32px;">
           ${content}
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:0 32px 8px;text-align:left;">
-          <p style="margin:0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong>Lacco</strong></p>
+          <p style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong>Lacco</strong></p>
         </td>
       </tr>
       <tr>
