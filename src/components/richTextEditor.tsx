@@ -107,7 +107,12 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
   return (
     <>
       {/* Stile links nell'editor */}
-      <style>{`.rte-content a { color: #F31260; text-decoration: underline; cursor: pointer; }`}</style>
+      <style>{`
+        .rte-content a { color: #F31260; text-decoration: underline; cursor: pointer; }
+        .rte-content ul { list-style: disc; padding-left: 1.25rem; margin: 0.25rem 0; }
+        .rte-content ol { list-style: decimal; padding-left: 1.25rem; margin: 0.25rem 0; }
+        .rte-content li { margin-bottom: 2px; }
+      `}</style>
 
       <div className="flex flex-col gap-0">
         <label className="text-sm font-medium mb-1.5">Testo email</label>
