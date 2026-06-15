@@ -18,6 +18,7 @@ import { useEffect, useState } from "react"; // React hooks for local state and 
 import { useMediaQuery } from "@react-hook/media-query"; // Hook to detect viewport size
 
 import { AppleMusicIcon, SpotifyIcon } from "./icons"; // Custom Spotify icon component
+import PresaveButton from "./presaveButton";
 import SmartImage, { type ImageLikeImport } from "./smartImage"; // Optimized image component with automatic loading
 
 // ========================== INTERFACES ========================== //
@@ -30,6 +31,7 @@ interface CardSongExposerProps {
   songSpotifyLink: string; // External link to the song on Spotify
   songAppleMusicLink: string; // External link to the song on Apple Music
   preSaveMode: boolean; // Flag indicating if "pre-save" mode is active
+  hyperfollowUrl?: string; // DistroKid hyperfollow URL for pre-save mode
 }
 
 // ========================== COMPONENT: CardSongExposer ========================== //
@@ -47,6 +49,7 @@ export default function CardSongExposer({
   songSpotifyLink,
   songAppleMusicLink,
   preSaveMode,
+  hyperfollowUrl,
 }: CardSongExposerProps) {
   const [isLoaded, setIsLoaded] = useState(false); // Tracks artwork image loading state
   const { isOpen, onOpen, onClose } = useDisclosure(); // Manages modal open/close state
@@ -160,46 +163,52 @@ export default function CardSongExposer({
                   </div>
                 )}
                 <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
-                  {/* Spotify */}
-                  <div className="flex-1 min-w-0">
-                    <Button
-                      fullWidth
-                      aria-label="Vai al brano su Spotify"
-                      className="min-w-0"
-                      color="success"
-                      onPress={() =>
-                        window.open(
-                          songSpotifyLink,
-                          "_blank",
-                          "noopener,noreferrer",
-                        )
-                      }
-                    >
-                      {preSaveMode ? "Pre-Salva su Spotify" : "Spotify"}
-                      <SpotifyIcon />
-                    </Button>
-                  </div>
-
-                  {/* Apple Music */}
-                  {!preSaveMode && (
-                    <div className="flex-1 min-w-0">
-                      <Button
-                        fullWidth
-                        aria-label="Vai al brano su Apple Music"
-                        className="min-w-0"
-                        color="danger"
-                        onPress={() =>
-                          window.open(
-                            songAppleMusicLink,
-                            "_blank",
-                            "noopener,noreferrer",
-                          )
-                        }
-                      >
-                        Apple Music
-                        <AppleMusicIcon />
-                      </Button>
+                  {preSaveMode ? (
+                    <div className="flex-1 min-w-0 flex justify-center">
+                      <PresaveButton hyperfollowUrl={hyperfollowUrl ?? ""} />
                     </div>
+                  ) : (
+                    <>
+                      {/* Spotify */}
+                      <div className="flex-1 min-w-0">
+                        <Button
+                          fullWidth
+                          aria-label="Vai al brano su Spotify"
+                          className="min-w-0"
+                          color="success"
+                          onPress={() =>
+                            window.open(
+                              songSpotifyLink,
+                              "_blank",
+                              "noopener,noreferrer",
+                            )
+                          }
+                        >
+                          <SpotifyIcon />
+                          Spotify
+                        </Button>
+                      </div>
+
+                      {/* Apple Music */}
+                      <div className="flex-1 min-w-0">
+                        <Button
+                          fullWidth
+                          aria-label="Vai al brano su Apple Music"
+                          className="min-w-0"
+                          color="danger"
+                          onPress={() =>
+                            window.open(
+                              songAppleMusicLink,
+                              "_blank",
+                              "noopener,noreferrer",
+                            )
+                          }
+                        >                          
+                          <AppleMusicIcon />
+                          Apple Music
+                        </Button>
+                      </div>
+                    </>
                   )}
                 </div>
               </ModalFooter>

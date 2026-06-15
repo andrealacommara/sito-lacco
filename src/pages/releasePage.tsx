@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/card";
 
 import { getSongBySlug } from "@/config/catalog";
 import { resolveImageSource } from "@/components/smartImage";
@@ -16,7 +17,7 @@ import NotFoundPage from "@/pages/notFoundPage";
 const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 24 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: "easeOut", delay },
+  transition: { duration: 0.6, ease: "easeOut" as const, delay },
 });
 
 export default function ReleasePage() {
@@ -55,22 +56,22 @@ export default function ReleasePage() {
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             src={bgUrl}
-            style={{ filter: "blur(48px) brightness(0.18)", transform: "scale(1.15)" }}
+            style={{ filter: "blur(40px) brightness(0.35)", transform: "scale(1.15)" }}
           />
         )}
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
       {/* Contenuto principale */}
       <div className="relative min-h-screen flex flex-col">
         {/* Header: logo centrato cliccabile → home */}
         <header className="flex items-center justify-center px-5 pt-6 pb-2">
-          <Link aria-label="Torna a lacco.it" to="/">
-            <Logo
-              className="text-white/80 transition-colors hover:text-white"
-              height={40}
-              width={70}
-            />
+          <Link
+            aria-label="Torna a lacco.it"
+            className="flex items-center text-white transition-colors duration-300 hover:text-danger"
+            to="/"
+          >
+            <Logo />
           </Link>
         </header>
 
@@ -84,192 +85,181 @@ export default function ReleasePage() {
   );
 }
 
-function PresaveSection({
-  release,
-}: {
-  release: ReturnType<typeof getSongBySlug> & object;
-}) {
+type SectionProps = {
+  release: NonNullable<ReturnType<typeof getSongBySlug>>;
+};
+
+function PresaveSection({ release }: SectionProps) {
   return (
-    <>
-      {/* Hero centrato */}
-      <main className="flex flex-col items-center justify-center flex-1 px-5 py-8 gap-6 text-center">
-        {/* Cover */}
-        <motion.div
-          {...fadeUp(0)}
-          className="w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden shadow-2xl shadow-black/60"
-        >
-          <SmartImage
-            priority
-            alt={`Cover di ${release!.title}`}
-            sizes="256px"
-            src={release!.artwork}
-            style={{ aspectRatio: "1/1", objectFit: "cover" }}
-            width={256}
-          />
-        </motion.div>
+    <main className="flex flex-col items-center flex-1 px-6 py-8">
+      <Card className="bg-white shadow-2xl shadow-black/40 w-full max-w-md overflow-hidden">
+        <CardBody className="flex flex-col items-center gap-6 text-center p-8">
+          {/* Cover */}
+          <motion.div
+            {...fadeUp(0)}
+            className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden shadow-2xl shadow-black/60"
+          >
+            <SmartImage
+              priority
+              alt={`Cover di ${release.title}`}
+              sizes="320px"
+              src={release.artwork}
+              style={{ aspectRatio: "1/1", objectFit: "cover" }}
+              width={320}
+            />
+          </motion.div>
 
-        {/* Titolo + artista */}
-        <motion.div {...fadeUp(0.1)} className="flex flex-col gap-1">
-          <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
-            {release!.title}
-          </h1>
-          <p className="text-white/60 text-sm uppercase tracking-widest font-medium">
-            Lacco
-          </p>
-        </motion.div>
+          {/* Titolo + artista */}
+          <motion.div {...fadeUp(0.1)} className="flex flex-col gap-1">
+            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight">
+              {release.title}
+            </h1>
+            <p className="text-gray-500 text-sm tracking-widest font-medium">
+              {release.artist ?? "Lacco"}
+            </p>
+          </motion.div>
 
-        {/* Countdown */}
-        <motion.div {...fadeUp(0.2)}>
-          <Countdown releaseDate={release!.releaseDate} />
-        </motion.div>
+          {/* Countdown */}
+          <motion.div {...fadeUp(0.2)}>
+            <Countdown releaseDate={release.releaseDate} variant="light" />
+          </motion.div>
 
-        {/* CTA pre-save */}
-        <motion.div {...fadeUp(0.3)}>
-          <PresaveButton
-            fallbackUrl={
-              release!.streamingLinks?.hyperfollow ?? release!.distrokidHyperfollow
-            }
-            presaveUrl={release!.distrokidHyperfollow}
-          />
-        </motion.div>
+          {/* CTA pre-save */}
+          {release.streamingLinks?.hyperfollow && (
+            <motion.div {...fadeUp(0.3)}>
+              <PresaveButton hyperfollowUrl={release.streamingLinks.hyperfollow} />
+            </motion.div>
+          )}
 
-        {/* Divider + form iscrizione */}
-        <motion.div
-          {...fadeUp(0.4)}
-          className="flex flex-col items-center gap-4 w-full max-w-xs mt-2"
-        >
-          <div className="flex items-center gap-3 w-full">
-            <div className="flex-1 h-px bg-white/20" />
-            <span className="text-white/40 text-xs tracking-wide whitespace-nowrap">
-              o avvisami quando esce
-            </span>
-            <div className="flex-1 h-px bg-white/20" />
-          </div>
-          <div className="w-full">
-            <SubscribeForm releaseSlug={release.slug} source="presave_form" />
-          </div>
-        </motion.div>
-      </main>
-    </>
+          {/* Divider + form iscrizione */}
+          <motion.div
+            {...fadeUp(0.4)}
+            className="flex flex-col items-center gap-4 w-full mt-2"
+          >
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1 h-px bg-gray-200" />
+              <span className="text-gray-400 text-xs tracking-wide whitespace-nowrap">
+                o avvisami quando esce
+              </span>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+            <div className="w-full">
+              <SubscribeForm releaseSlug={release.slug} source="presave_form" />
+            </div>
+          </motion.div>
+        </CardBody>
+      </Card>
+    </main>
   );
 }
 
-function LiveSection({
-  release,
-}: {
-  release: ReturnType<typeof getSongBySlug> & object;
-}) {
+function LiveSection({ release }: SectionProps) {
   return (
-    <div className="flex flex-col">
-      {/* Hero live */}
-      <main className="flex flex-col items-center justify-center px-5 py-8 gap-6 text-center">
-        <motion.div
-          {...fadeUp(0)}
-          className="w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden shadow-2xl shadow-black/60"
-        >
-          <SmartImage
-            priority
-            alt={`Cover di ${release!.title}`}
-            sizes="256px"
-            src={release!.artwork}
-            style={{ aspectRatio: "1/1", objectFit: "cover" }}
-            width={256}
-          />
-        </motion.div>
+    <div className="flex flex-col gap-4 px-6 py-8">
+      {/* Hero card */}
+      <Card className="bg-white shadow-2xl shadow-black/40 mx-auto w-full max-w-md overflow-hidden">
+        <CardBody className="flex flex-col items-center gap-6 text-center p-8">
+          <motion.div
+            {...fadeUp(0)}
+            className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden shadow-2xl shadow-black/60"
+          >
+            <SmartImage
+              priority
+              alt={`Cover di ${release.title}`}
+              sizes="320px"
+              src={release.artwork}
+              style={{ aspectRatio: "1/1", objectFit: "cover" }}
+              width={320}
+            />
+          </motion.div>
 
-        <motion.div {...fadeUp(0.1)} className="flex flex-col gap-1">
-          <p className="text-danger font-semibold text-lg tracking-wide">
-            E fuori!
-          </p>
-          <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
-            {release!.title}
-          </h1>
-          <p className="text-white/60 text-sm uppercase tracking-widest font-medium">
-            Lacco
-          </p>
-        </motion.div>
+          <motion.div {...fadeUp(0.1)} className="flex flex-col gap-1">
+            <p className="text-danger font-semibold text-lg tracking-wide">
+              Ascoltalo ora
+            </p>
+            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight">
+              {release.title}
+            </h1>
+            <p className="text-gray-500 text-sm tracking-widest font-medium">
+              {release.artist ?? "Lacco"}
+            </p>
+          </motion.div>
 
-        {/* Streaming CTA */}
-        <motion.div
-          {...fadeUp(0.2)}
-          className="flex flex-col sm:flex-row gap-3"
-        >
-          {release!.streamingLinks?.spotify && (
-            <Button
-              aria-label={`Ascolta ${release!.title} su Spotify`}
-              className="font-semibold px-8"
-              color="success"
-              size="lg"
-              onPress={() =>
-                window.open(
-                  release!.streamingLinks?.spotify,
-                  "_blank",
-                  "noopener,noreferrer",
-                )
-              }
-            >
-              <SpotifyIcon />
-              {`Ascolta "${release!.title}"`}
-            </Button>
-          )}
-          {release!.streamingLinks?.appleMusic && (
-            <Button
-              aria-label={`Ascolta ${release!.title} su Apple Music`}
-              className="font-semibold"
-              color="danger"
-              size="lg"
-              variant="flat"
-              onPress={() =>
-                window.open(
-                  release!.streamingLinks?.appleMusic,
-                  "_blank",
-                  "noopener,noreferrer",
-                )
-              }
-            >
-              <AppleMusicIcon />
-              Apple Music
-            </Button>
-          )}
-          {!release!.streamingLinks?.spotify &&
-            release!.streamingLinks?.hyperfollow && (
+          {/* Streaming CTA — verticale, larghezza piena, nome store */}
+          <motion.div
+            {...fadeUp(0.2)}
+            className="flex flex-col gap-3 w-full"
+          >
+            {release.streamingLinks?.spotify && (
               <Button
-                aria-label="Ascolta ora"
-                className="font-semibold px-8"
+                fullWidth
+                aria-label={`Ascolta su Spotify`}
+                className="font-semibold"
                 color="success"
                 size="lg"
                 onPress={() =>
                   window.open(
-                    release!.streamingLinks?.hyperfollow,
+                    release.streamingLinks?.spotify,
                     "_blank",
                     "noopener,noreferrer",
                   )
                 }
               >
                 <SpotifyIcon />
-                {`Ascolta "${release!.title}"`}
+                Spotify
               </Button>
             )}
-        </motion.div>
-      </main>
+            {release.streamingLinks?.appleMusic && (
+              <Button
+                fullWidth
+                aria-label={`Ascolta su Apple Music`}
+                className="font-semibold"
+                color="danger"
+                size="lg"
+                variant="flat"
+                onPress={() =>
+                  window.open(
+                    release.streamingLinks?.appleMusic,
+                    "_blank",
+                    "noopener,noreferrer",
+                  )
+                }
+              >
+                <AppleMusicIcon />
+                Apple Music
+              </Button>
+            )}
+            {!release.streamingLinks?.spotify &&
+              release.streamingLinks?.hyperfollow && (
+                <Button
+                  fullWidth
+                  aria-label="Ascolta ora"
+                  className="font-semibold"
+                  color="success"
+                  size="lg"
+                  onPress={() =>
+                    window.open(
+                      release.streamingLinks?.hyperfollow,
+                      "_blank",
+                      "noopener,noreferrer",
+                    )
+                  }
+                >
+                  <SpotifyIcon />
+                  Spotify
+                </Button>
+              )}
+          </motion.div>
+        </CardBody>
+      </Card>
 
-      {/* Sezione catalogo */}
-      <section className="bg-background/80 backdrop-blur-md border-t border-white/10 py-10 px-4">
-        <h2 className="text-center text-white/80 font-semibold text-lg mb-2">
-          Intanto, ascolta i miei brani
+      {/* Carousel */}
+      <div className="py-6">
+        <h2 className="text-center text-white font-semibold text-lg mb-4">
+          Scopri gli altri miei brani
         </h2>
         <SongCarousel />
-      </section>
-
-      {/* Form newsletter */}
-      <section className="bg-background/80 backdrop-blur-md border-t border-white/10 py-10 px-4">
-        <div className="max-w-xs mx-auto text-center flex flex-col gap-4">
-          <h2 className="text-white/80 font-semibold text-lg">
-            Iscriviti per le prossime uscite
-          </h2>
-          <SubscribeForm source="newsletter_form" />
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

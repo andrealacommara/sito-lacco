@@ -149,7 +149,6 @@ export default function ContactPage() {
 
           <Form
             className="w-full space-y-6 justify-around"
-            onReset={() => formReset("all")}
             onSubmit={sendEmail}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
@@ -192,7 +191,7 @@ export default function ContactPage() {
               onClear={() => formReset("message")}
             />
 
-            <div className="flex flex-col md:flex-row gap-2 w-full md:justify-center">
+            <div className="flex w-full justify-center">
               <Button
                 className="w-full sm:w-auto"
                 color="primary"
@@ -200,13 +199,6 @@ export default function ContactPage() {
                 type="submit"
               >
                 {isLoading ? "Invio..." : "Invia"}
-              </Button>
-              <Button
-                className="w-full sm:w-auto"
-                type="reset"
-                variant="bordered"
-              >
-                Pulisci
               </Button>
             </div>
           </Form>

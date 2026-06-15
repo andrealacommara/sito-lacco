@@ -105,14 +105,12 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
 
           {!compact && (
             <Input
-              aria-label="Nome (opzionale)"
               autoComplete="given-name"
-              label="Nome (opzionale)"
+              label="Nome"
               labelPlacement="outside"
-              placeholder="Il tuo nome"
+              placeholder="Inserisci il tuo nome"
               type="text"
               value={firstName}
-              variant="bordered"
               onValueChange={setFirstName}
             />
           )}
@@ -120,11 +118,9 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
           {compact ? (
             <div className="flex gap-2">
               <Input
-                aria-label="Email"
                 autoComplete="email"
                 className="flex-1"
                 placeholder="La tua email"
-                required
                 type="email"
                 value={email}
                 variant="bordered"
@@ -141,15 +137,13 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
             </div>
           ) : (
             <Input
-              aria-label="Email"
+              isRequired
               autoComplete="email"
               label="Email"
               labelPlacement="outside"
-              placeholder="La tua email"
-              required
+              placeholder="Inserisci la tua email"
               type="email"
               value={email}
-              variant="bordered"
               onValueChange={setEmail}
             />
           )}
@@ -160,27 +154,31 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
             onValueChange={setConsent}
           >
             <span className="text-xs text-default-500">
-              Accetto di ricevere aggiornamenti sulle uscite di Lacco.{" "}
-              <a
-                className="text-primary hover:underline"
-                href="/privacy"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                Privacy policy
-              </a>
+              Accetto di ricevere aggiornamenti sulle uscite di Lacco.
             </span>
           </Checkbox>
 
           {!compact && (
-            <Button
-              color="danger"
-              fullWidth
-              isLoading={loading}
-              type="submit"
-            >
-              {loading ? "" : "Avvisami"}
-            </Button>
+            <>
+              <Button
+                color="danger"
+                fullWidth
+                isLoading={loading}
+                type="submit"
+              >
+                {loading ? "" : "Avvisami"}
+              </Button>
+              <p className="text-center text-xs text-default-400">
+                <a
+                  className="hover:underline"
+                  href="/privacy"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Leggi la Privacy policy
+                </a>
+              </p>
+            </>
           )}
         </motion.form>
       )}

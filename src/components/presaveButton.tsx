@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Button } from "@heroui/button";
 import { SpotifyIcon } from "@/components/icons";
+import { buildPresaveUrl } from "@/config/catalog";
 
 type Props = {
-  presaveUrl: string;
-  fallbackUrl: string;
+  hyperfollowUrl: string;
 };
 
 function openCenteredPopup(url: string, fallbackUrl: string) {
@@ -22,8 +22,9 @@ function openCenteredPopup(url: string, fallbackUrl: string) {
   }
 }
 
-export default function PresaveButton({ presaveUrl, fallbackUrl }: Props) {
+export default function PresaveButton({ hyperfollowUrl }: Props) {
   const [saved, setSaved] = useState(false);
+  const presaveUrl = buildPresaveUrl(hyperfollowUrl);
 
   if (saved) {
     return (
@@ -46,7 +47,7 @@ export default function PresaveButton({ presaveUrl, fallbackUrl }: Props) {
       color="success"
       size="lg"
       onPress={() => {
-        openCenteredPopup(presaveUrl, fallbackUrl);
+        openCenteredPopup(presaveUrl, hyperfollowUrl);
         setSaved(true);
       }}
     >

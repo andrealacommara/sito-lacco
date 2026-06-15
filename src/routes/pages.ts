@@ -22,6 +22,9 @@ export const ReleasePage = lazyWithPreload(() => import("@/pages/releasePage"));
 export const NotFoundPage = lazyWithPreload(
   () => import("@/pages/notFoundPage"),
 );
+export const PrivacyPage = lazyWithPreload(
+  () => import("@/pages/privacyPage"),
+);
 
 // ========================== PRELOAD MAP ========================== //
 // Maps route paths to the respective preload function for quick lookups.
@@ -32,6 +35,7 @@ const preloaders: Record<string, () => Promise<unknown>> = {
   "/contatti": ContactPage.preload,
   "/presskit": PressKitPage.preload,
   "/newsletter": NewsletterPage.preload,
+  "/privacy": PrivacyPage.preload,
 };
 
 // ========================== HELPERS ========================== //
