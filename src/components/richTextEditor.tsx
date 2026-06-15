@@ -124,7 +124,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
             <ToolbarButton
               active={editor.isActive("bold")}
               title="Grassetto"
-              onClick={() => editor.chain().focus().toggleBold().run()}
+              onClick={() => editor.chain().focus().extendMarkRange("bold").toggleBold().run()}
             >
               <strong>B</strong>
             </ToolbarButton>
