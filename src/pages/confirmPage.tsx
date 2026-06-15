@@ -30,7 +30,7 @@ export default function ConfirmPage() {
 
   const messages = {
     loading: "Conferma in corso…",
-    ok: "✓ Iscrizione confermata! Ti avviserò quando uscirà qualcosa di nuovo.",
+    ok: "✓ Iscrizione confermata! Sarai la prima persona a sapere delle novità",
     already: "✓ Sei già nella lista.",
     error: "Il link non è valido o è scaduto. Prova a iscriverti di nuovo.",
   };
