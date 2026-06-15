@@ -45,23 +45,6 @@ export type Song = {
   };
 };
 
-/**
- * Deriva l'URL di pre-save Spotify dall'URL hyperfollow di DistroKid.
- * https://distrokid.com/hyperfollow/lacco/bella-al-buio
- * → https://distrokid.com/spotify/auth/?action=hyperfollow&artistNameShortcut=lacco&albumIdShortcut=bella-al-buio
- */
-export function buildPresaveUrl(hyperfollowUrl: string): string {
-  try {
-    const url = new URL(hyperfollowUrl);
-    const parts = url.pathname.split("/").filter(Boolean);
-    const artist = parts[1];
-    const album = parts[2];
-    return `https://distrokid.com/spotify/auth/?action=hyperfollow&artistNameShortcut=${artist}&albumIdShortcut=${album}`;
-  } catch {
-    return hyperfollowUrl;
-  }
-}
-
 export const catalog: Song[] = [
   {
     slug: "bella-al-buio",

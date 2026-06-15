@@ -132,13 +132,12 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Invia welcome email
+  // Invia welcome email (non-critica: l'iscrizione è già avvenuta)
   const unsubscribeUrl = `${SITE_URL}/unsubscribe?token=${unsubscribeToken}`;
   try {
     await sendWelcomeEmail(normalizedEmail, normalizedFirstName, unsubscribeUrl);
   } catch (err) {
     console.error("Email send error:", err);
-    return jsonResponse({ ok: false, message: "Errore nell'invio dell'email" }, 500, origin);
   }
 
   return jsonResponse({ ok: true, message: "Benvenuto in famiglia!" }, 200, origin);
