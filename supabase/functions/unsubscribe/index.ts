@@ -39,16 +39,20 @@ Deno.serve(async (req) => {
     return jsonResponse({ ok: false, error: "Errore interno" }, 500, origin);
   }
 
-  // Rimuovi da Resend Audience
-  if (RESEND_AUDIENCE_ID && subscriber.resend_contact_id) {
+  // Marca come unsubscribed su Resend (upsert per email, funziona anche senza resend_contact_id)
+  if (RESEND_AUDIENCE_ID) {
     try {
       const apiKey = Deno.env.get("RESEND_API_KEY")!;
       await fetch(
-        `https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts/${subscriber.resend_contact_id}`,
-        { method: "DELETE", headers: { Authorization: `Bearer ${apiKey}` } },
+        `https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ email: subscriber.email, unsubscribed: true }),
+        },
       );
     } catch (err) {
-      console.error("Resend remove error:", err);
+      console.error("Resend unsubscribe error:", err);
     }
   }
 
