@@ -14,10 +14,8 @@ Redirect 301 /youtube https://www.youtube.com/@Laccoverse
 # Song redirects (slug diversi dalle pagine SPA — nessun conflitto)
 # /tuxtu → tu-x-tu è gestita dalla SPA
 # /tra-le-nuvole-sv → la SPA usa /tra-le-nuvole-sunset-version (slug diverso)
-Redirect 301 /tra-le-nuvole-sv https://distrokid.com/hyperfollow/lacco/tra-le-nuvole-sunset-version
 Redirect 301 /nokoru-mono https://distrokid.com/hyperfollow/lacco/nokoru-mono
 Redirect 301 /preview-nokoru-mono https://on.soundcloud.com/u3ZP1Y26moVlmrQSIO
-Redirect 301 /tuxtu https://distrokid.com/hyperfollow/lacco/tu-x-tu
 
 # Le seguenti slug sono gestite dalla SPA (SongPage/ReleasePage):
 # /bella-al-buio /tu-x-tu /per-gli-altri /davvero /ricordo
