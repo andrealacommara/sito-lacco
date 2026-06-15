@@ -187,7 +187,7 @@ export default function PressKitPage() {
                   <CountUp
                     duration={1000}
                     end={
-                      songList.filter((song) => song.preSaveMode === false)
+                      catalog.filter((song) => song.presaveMode === false)
                         .length
                     }
                   />

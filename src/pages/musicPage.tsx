@@ -106,8 +106,8 @@ export default function MusicPage() {
                     )
                   }
                 >
-                  Ascolta su Spotify
                   <SpotifyIcon />
+                  Ascolta su Spotify                  
                 </Button>
               </div>
               <div className="flex-1 min-w-0">
@@ -124,8 +124,8 @@ export default function MusicPage() {
                     )
                   }
                 >
-                  Ascolta su Apple Music
                   <AppleMusicIcon />
+                  Ascolta su Apple Music
                 </Button>
               </div>
             </div>

@@ -115,6 +115,7 @@ export default function SongCarousel() {
               <CardSongExposer
                 artworkAlt={song.alt}
                 artworkSrc={song.artwork}
+                hyperfollowUrl={song.streamingLinks?.hyperfollow}
                 preSaveMode={song.presaveMode}
                 songAppleMusicLink={song.streamingLinks?.appleMusic ?? ""}
                 songDescription={song.description}

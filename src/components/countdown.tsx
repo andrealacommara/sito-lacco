@@ -21,7 +21,13 @@ function getTimeLeft(target: Date): TimeLeft | null {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export default function Countdown({ releaseDate }: { releaseDate: Date }) {
+export default function Countdown({
+  releaseDate,
+  variant = "dark",
+}: {
+  releaseDate: Date;
+  variant?: "dark" | "light";
+}) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(() =>
     getTimeLeft(releaseDate),
   );
@@ -58,16 +64,16 @@ export default function Countdown({ releaseDate }: { releaseDate: Date }) {
     <div className="flex items-center gap-1 md:gap-3" role="timer" aria-live="off">
       {units.map((unit, i) => (
         <div key={unit.label} className="flex items-center gap-1 md:gap-3">
-          <div className="flex flex-col items-center min-w-[2.5rem] md:min-w-[3.5rem]">
-            <span className="text-3xl md:text-5xl font-bold text-white tabular-nums leading-none">
+          <div className="flex flex-col items-center min-w-10 md:min-w-14">
+            <span className={`text-3xl md:text-5xl font-bold tabular-nums leading-none ${variant === "light" ? "text-gray-900" : "text-white"}`}>
               {unit.value}
             </span>
-            <span className="text-[9px] md:text-[11px] text-white/50 font-medium tracking-widest mt-1 uppercase">
+            <span className={`text-[9px] md:text-[11px] font-medium tracking-widest mt-1 uppercase ${variant === "light" ? "text-gray-500" : "text-white/50"}`}>
               {unit.label}
             </span>
           </div>
           {i < units.length - 1 && (
-            <span className="text-2xl md:text-4xl font-bold text-white/40 pb-4 select-none">
+            <span className={`text-2xl md:text-4xl font-bold pb-4 select-none ${variant === "light" ? "text-gray-300" : "text-white/40"}`}>
               :
             </span>
           )}

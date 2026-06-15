@@ -14,15 +14,12 @@ export default function NewsletterPage() {
         />
         <meta content="index, follow" name="robots" />
       </Helmet>
-      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6 px-4">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className={title({ size: "md" })}>Rimani aggiornato</h1>
-          <p className="text-default-500 max-w-sm">
-            Iscriviti per essere il primo a sapere delle nuove uscite, date e
-            aggiornamenti di Lacco.
+      <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 mx-auto w-full max-w-5xl px-4">
+        <div className="w-full max-w-md mx-auto text-center">
+          <h1 className={title()}>Newsletter</h1>
+          <p className="text-default-500 mt-3 mb-8">
+            Iscriviti per essere il primo a sapere tutte le novità su Lacco.
           </p>
-        </div>
-        <div className="w-full max-w-sm">
           <SubscribeForm source="newsletter_form" />
         </div>
       </div>

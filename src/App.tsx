@@ -11,6 +11,7 @@ import {
   NewsletterPage,
   NotFoundPage,
   PressKitPage,
+  PrivacyPage,
   ReleasePage,
   UnsubscribePage,
   warmupRoutes,
@@ -85,6 +86,9 @@ function App() {
 
         {/* Admin (protetto da Supabase Auth) */}
         <Route element={<AdminPage />} path="/admin" />
+
+        {/* Privacy policy */}
+        <Route element={<PrivacyPage />} path="/privacy" />
 
         {/* Release pages: /:slug deve stare DOPO tutte le route specifiche */}
         <Route element={<ReleasePage />} path="/:slug" />

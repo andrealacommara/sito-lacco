@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import { Helmet } from "react-helmet-async";
-import { Input } from "@heroui/input";
+import { Input, Textarea } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { addToast } from "@heroui/toast";
 import type { Session } from "@supabase/supabase-js";
+import { Helmet } from "react-helmet-async";
 
 import DefaultLayout from "@/layouts/default";
 import { supabase, EF_BASE } from "@/lib/supabase";
-import { announcementEmailHtml } from "@/emails/templates";
+import { broadcastEmailHtml } from "@/emails/templates";
 import type {
   AdminSubscriber,
   AdminSubscribersResponse,
@@ -18,6 +18,8 @@ import type {
 type View = "login" | "check-email" | "dashboard";
 type Tab = "subscribers" | "broadcast";
 type FilterStatus = "" | "pending" | "confirmed" | "unsubscribed" | "bounced";
+
+const ADMIN_EMAIL = "management@lacco.it";
 
 const STATUS_LABEL: Record<string, string> = {
   confirmed: "confermato",
@@ -39,9 +41,6 @@ export default function AdminPage() {
   const [view, setView] = useState<View>("login");
   const [session, setSession] = useState<Session | null>(null);
   const [tab, setTab] = useState<Tab>("subscribers");
-
-  // Login
-  const [loginEmail, setLoginEmail] = useState("andrealacommara@icloud.com");
   const [loginLoading, setLoginLoading] = useState(false);
 
   // Subscribers list
@@ -61,8 +60,11 @@ export default function AdminPage() {
 
   // Broadcast
   const [subject, setSubject] = useState("");
-  const [releaseTitle, setReleaseTitle] = useState("");
-  const [releaseUrl, setReleaseUrl] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [imagePublicUrl, setImagePublicUrl] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
+  const [ctaText, setCtaText] = useState("");
+  const [ctaUrl, setCtaUrl] = useState("");
   const [dryCount, setDryCount] = useState<number | null>(null);
   const [broadcastLoading, setBroadcastLoading] = useState(false);
   const [confirmSend, setConfirmSend] = useState(false);
@@ -122,7 +124,7 @@ export default function AdminPage() {
     e.preventDefault();
     setLoginLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
-      email: loginEmail,
+      email: ADMIN_EMAIL,
       options: { emailRedirectTo: `${window.location.origin}/admin` },
     });
     setLoginLoading(false);
@@ -176,19 +178,44 @@ export default function AdminPage() {
     }
   };
 
-  const previewHtml = announcementEmailHtml({
-    releaseTitle: releaseTitle || "Titolo brano",
-    releaseUrl: releaseUrl || "#",
-    unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
-  });
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !session) return;
+    setImageUploading(true);
+    const ext = file.name.split(".").pop() ?? "jpg";
+    const path = `${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from("broadcast-images")
+      .upload(path, file, { upsert: false });
+    if (error) {
+      addToast({ title: "Errore upload immagine", color: "danger" });
+    } else {
+      const { data } = supabase.storage
+        .from("broadcast-images")
+        .getPublicUrl(path);
+      setImagePublicUrl(data.publicUrl);
+    }
+    setImageUploading(false);
+    e.target.value = "";
+  };
+
+  const buildBroadcastHtml = () =>
+    broadcastEmailHtml({
+      body: emailBody || "Corpo dell'email…",
+      imageUrl: imagePublicUrl || undefined,
+      ctaText: ctaText.trim() || undefined,
+      ctaUrl: ctaUrl.trim() || undefined,
+      unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
+      previewLogoUrl: `${window.location.origin}/logo-lacco.png`,
+    });
 
   const handleDryRun = async () => {
     if (!session) return;
     setBroadcastLoading(true);
     try {
-      const body: BroadcastBody = {
+      const payload: BroadcastBody = {
         subject: subject || "(bozza)",
-        htmlBody: previewHtml,
+        htmlBody: buildBroadcastHtml(),
         dry: true,
       };
       const res = await fetch(`${EF_BASE}/admin-broadcast`, {
@@ -197,7 +224,7 @@ export default function AdminPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       });
       const data = (await res.json()) as BroadcastResponse;
       setDryCount(data.recipientCount ?? 0);
@@ -209,8 +236,8 @@ export default function AdminPage() {
   };
 
   const handleSendBroadcast = async () => {
-    if (!subject.trim() || !releaseTitle.trim() || !releaseUrl.trim()) {
-      addToast({ title: "Compila oggetto, titolo brano e link", color: "danger" });
+    if (!subject.trim() || !emailBody.trim()) {
+      addToast({ title: "Compila oggetto e testo della mail", color: "danger" });
       return;
     }
     if (!confirmSend) {
@@ -221,19 +248,17 @@ export default function AdminPage() {
     setBroadcastLoading(true);
     setConfirmSend(false);
     try {
-      const html = announcementEmailHtml({
-        releaseTitle: releaseTitle.trim(),
-        releaseUrl: releaseUrl.trim(),
-        unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
-      });
-      const body: BroadcastBody = { subject: subject.trim(), htmlBody: html };
+      const payload: BroadcastBody = {
+        subject: subject.trim(),
+        htmlBody: buildBroadcastHtml(),
+      };
       const res = await fetch(`${EF_BASE}/admin-broadcast`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       });
       const data = (await res.json()) as BroadcastResponse;
       if (data.ok) {
@@ -242,8 +267,10 @@ export default function AdminPage() {
           color: "success",
         });
         setSubject("");
-        setReleaseTitle("");
-        setReleaseUrl("");
+        setEmailBody("");
+        setImagePublicUrl("");
+        setCtaText("");
+        setCtaUrl("");
         setDryCount(null);
       } else {
         addToast({ title: data.error ?? "Errore invio", color: "danger" });
@@ -266,26 +293,13 @@ export default function AdminPage() {
         </Helmet>
         <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6 px-4">
           <h1 className="text-xl font-semibold">Area admin</h1>
-          <form
-            className="flex flex-col gap-4 w-full max-w-xs"
-            onSubmit={handleLogin}
-          >
-            <Input
-              label="Email"
-              labelPlacement="outside"
-              placeholder="andrealacommara@icloud.com"
-              type="email"
-              value={loginEmail}
-              variant="bordered"
-              onValueChange={setLoginEmail}
-            />
+          <form onSubmit={handleLogin}>
             <Button
               color="danger"
-              fullWidth
               isLoading={loginLoading}
               type="submit"
             >
-              {loginLoading ? "" : "Invia magic link"}
+              {loginLoading ? "" : "Accedi"}
             </Button>
           </form>
         </div>
@@ -303,7 +317,7 @@ export default function AdminPage() {
         <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4 text-center px-4">
           <p className="text-lg font-medium">Controlla la tua email</p>
           <p className="text-default-500 text-sm">
-            Ti ho inviato un link di accesso a {loginEmail}.
+            Controlla la tua casella di posta.
           </p>
         </div>
       </DefaultLayout>
@@ -495,32 +509,85 @@ export default function AdminPage() {
         {/* ── BROADCAST TAB ───────────────────────────────────────────────── */}
         {tab === "broadcast" && (
           <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-3">
+
+            {/* Composer */}
+            <div className="flex flex-col gap-4">
               <Input
                 label="Oggetto email"
                 labelPlacement="outside"
-                placeholder="Es: Nuovo singolo di Lacco"
+                placeholder="Es: Nuovo singolo in arrivo"
                 value={subject}
                 variant="bordered"
                 onValueChange={setSubject}
               />
-              <Input
-                label="Titolo brano"
+              <Textarea
+                label="Testo email"
                 labelPlacement="outside"
-                placeholder="Es: Bella al buio"
-                value={releaseTitle}
+                minRows={4}
+                placeholder="Scrivi il corpo della mail…"
+                value={emailBody}
                 variant="bordered"
-                onValueChange={setReleaseTitle}
+                onValueChange={setEmailBody}
               />
-              <Input
-                label="Link streaming"
-                labelPlacement="outside"
-                placeholder="https://lacco.it/bella-al-buio"
-                type="url"
-                value={releaseUrl}
-                variant="bordered"
-                onValueChange={setReleaseUrl}
-              />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium">Immagine (opzionale)</label>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Button
+                    isLoading={imageUploading}
+                    size="sm"
+                    variant="bordered"
+                    onPress={() => document.getElementById("image-upload")?.click()}
+                  >
+                    {imagePublicUrl ? "Cambia immagine" : "Carica immagine"}
+                  </Button>
+                  <input
+                    accept="image/*"
+                    className="hidden"
+                    id="image-upload"
+                    type="file"
+                    onChange={handleImageUpload}
+                  />
+                  {imagePublicUrl && (
+                    <Button
+                      color="danger"
+                      size="sm"
+                      variant="light"
+                      onPress={() => setImagePublicUrl("")}
+                    >
+                      Rimuovi
+                    </Button>
+                  )}
+                </div>
+                {imagePublicUrl && (
+                  <img
+                    alt="Anteprima"
+                    className="mt-1 rounded-lg max-h-32 w-auto object-contain"
+                    src={imagePublicUrl}
+                  />
+                )}
+              </div>
+              <div className="flex gap-3 flex-wrap">
+                <Input
+                  className="flex-1 min-w-40"
+                  description="Lascia vuoto per non includere bottone"
+                  label="Testo bottone (opz.)"
+                  labelPlacement="outside"
+                  placeholder="Es: Ascolta ora"
+                  value={ctaText}
+                  variant="bordered"
+                  onValueChange={setCtaText}
+                />
+                <Input
+                  className="flex-1 min-w-48"
+                  label="Link bottone (opz.)"
+                  labelPlacement="outside"
+                  placeholder="https://lacco.it/…"
+                  type="url"
+                  value={ctaUrl}
+                  variant="bordered"
+                  onValueChange={setCtaUrl}
+                />
+              </div>
             </div>
 
             {/* Email preview */}
@@ -528,8 +595,8 @@ export default function AdminPage() {
               <p className="text-xs text-default-400 mb-2">Anteprima email</p>
               <iframe
                 className="w-full rounded-lg border border-default-200"
-                srcDoc={previewHtml}
-                style={{ height: 500 }}
+                srcDoc={buildBroadcastHtml()}
+                style={{ height: 520 }}
                 title="Anteprima email"
               />
             </div>
@@ -555,9 +622,7 @@ export default function AdminPage() {
             {!confirmSend ? (
               <Button
                 color="danger"
-                isDisabled={
-                  !subject.trim() || !releaseTitle.trim() || !releaseUrl.trim()
-                }
+                isDisabled={!subject.trim() || !emailBody.trim()}
                 isLoading={broadcastLoading}
                 onPress={handleSendBroadcast}
               >
