@@ -370,7 +370,7 @@ export default function AdminPage() {
           <div className="flex flex-col gap-6">
 
             {/* Status filter */}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap items-center">
               {(
                 [
                   ["", "Tutti"],
@@ -393,6 +393,14 @@ export default function AdminPage() {
                   {label}
                 </Button>
               ))}
+              <Button
+                isDisabled={subsLoading}
+                size="sm"
+                variant="light"
+                onPress={() => session && fetchSubscribers(session, page, filterStatus)}
+              >
+                ↺ Ricarica
+              </Button>
             </div>
 
             {/* List */}
