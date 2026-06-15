@@ -2,7 +2,10 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 
 type Props = {
   value: string;
@@ -47,7 +50,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
     content: value,
     editorProps: {
       attributes: {
-        class: "outline-none min-h-[100px] text-sm text-default-800 leading-relaxed",
+        class: "outline-none min-h-25 text-sm text-default-800 leading-relaxed",
       },
     },
     onUpdate({ editor }) {
@@ -61,21 +64,35 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
     }
   }, [editor, value]);
 
-  const handleAddLink = useCallback(() => {
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+
+  const openLinkModal = useCallback(() => {
     if (!editor) return;
-    const prev = editor.getAttributes("link").href ?? "";
-    const url = window.prompt("URL del link", prev);
-    if (url === null) return;
-    if (url === "") {
-      editor.chain().focus().unsetLink().run();
+    setLinkUrl(editor.getAttributes("link").href ?? "");
+    setLinkModalOpen(true);
+  }, [editor]);
+
+  const confirmLink = useCallback(() => {
+    if (!editor) return;
+    if (linkUrl.trim()) {
+      editor.chain().focus().setLink({ href: linkUrl.trim() }).run();
     } else {
-      editor.chain().focus().setLink({ href: url }).run();
+      editor.chain().focus().unsetLink().run();
     }
+    setLinkModalOpen(false);
+  }, [editor, linkUrl]);
+
+  const removeLink = useCallback(() => {
+    if (!editor) return;
+    editor.chain().focus().unsetLink().run();
+    setLinkModalOpen(false);
   }, [editor]);
 
   if (!editor) return null;
 
   return (
+    <>
     <div className="flex flex-col gap-0">
       <label className="text-sm font-medium mb-1.5">Testo email</label>
       <div className="rounded-xl border-2 border-default-200 hover:border-default-400 focus-within:border-default-foreground transition-colors">
@@ -114,19 +131,10 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
           <ToolbarButton
             active={editor.isActive("link")}
             title="Inserisci link"
-            onClick={handleAddLink}
+            onClick={openLinkModal}
           >
             <span className="text-xs">link</span>
           </ToolbarButton>
-          {editor.isActive("link") && (
-            <ToolbarButton
-              active={false}
-              title="Rimuovi link"
-              onClick={() => editor.chain().focus().unsetLink().run()}
-            >
-              <span className="text-xs text-danger">✕link</span>
-            </ToolbarButton>
-          )}
         </div>
 
         {/* Editor area */}
@@ -140,5 +148,41 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
         </div>
       </div>
     </div>
+
+    <Modal isOpen={linkModalOpen} placement="center" size="sm" onClose={() => setLinkModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader className="text-base font-semibold">Inserisci link</ModalHeader>
+          <ModalBody>
+            <Input
+              autoFocus
+              label="URL"
+              labelPlacement="outside"
+              placeholder="https://…"
+              type="url"
+              value={linkUrl}
+              onKeyDown={(e) => e.key === "Enter" && confirmLink()}
+              onValueChange={setLinkUrl}
+            />
+          </ModalBody>
+          <ModalFooter className="flex justify-between">
+            {editor.isActive("link") ? (
+              <Button color="danger" size="sm" variant="light" onPress={removeLink}>
+                Rimuovi link
+              </Button>
+            ) : (
+              <div />
+            )}
+            <div className="flex gap-2">
+              <Button size="sm" variant="light" onPress={() => setLinkModalOpen(false)}>
+                Annulla
+              </Button>
+              <Button color="primary" size="sm" onPress={confirmLink}>
+                Conferma
+              </Button>
+            </div>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
