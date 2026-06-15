@@ -200,7 +200,7 @@ export default function AdminPage() {
     e.target.value = "";
   };
 
-  const buildBroadcastHtml = () =>
+  const buildBroadcastHtml = (preview = false) =>
     broadcastEmailHtml({
       body: emailBody || "Corpo dell'email…",
       imageUrl: imagePublicUrl || undefined,
@@ -208,6 +208,7 @@ export default function AdminPage() {
       ctaUrl: ctaUrl.trim() || undefined,
       unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
       previewLogoUrl: `${window.location.origin}/logo-lacco.png`,
+      preview,
     });
 
   const handleDryRun = async () => {
@@ -592,7 +593,7 @@ export default function AdminPage() {
               <p className="text-xs text-default-400 mb-2">Anteprima email</p>
               <iframe
                 className="w-full rounded-lg border border-default-200"
-                srcDoc={buildBroadcastHtml()}
+                srcDoc={buildBroadcastHtml(true)}
                 style={{ height: 520 }}
                 title="Anteprima email"
               />
