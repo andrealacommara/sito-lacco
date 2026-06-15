@@ -20,9 +20,12 @@ function baseTemplate(content: string, unsubscribeUrl?: string): string {
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="light"/>
+<meta name="supported-color-schemes" content="light"/>
 <title>Lacco</title>
+<style>:root{color-scheme:light only;supported-color-schemes:light only;}</style>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;">
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;color:#333333;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
   <tr><td align="center">
     <table width="100%" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e7;">
@@ -54,9 +57,9 @@ function baseTemplate(content: string, unsubscribeUrl?: string): string {
 
 export function confirmEmailHtml(firstName: string | undefined, confirmUrl: string): string {
   const name = firstName ? firstName.trim() : undefined;
-  const greeting = name ? `Hey ${name},` : "Hey,";
+  const greeting = name ? `<p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">Ciao ${name}!</p>` : "";
   return baseTemplate(`
-    <p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">${greeting}</p>
+    ${greeting}
     <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
       Conferma la tua email per ricevere aggiornamenti sulle prossime uscite di Lacco.
     </p>
@@ -124,17 +127,19 @@ export function broadcastEmailHtml(opts: {
          </table>`
       : "";
 
+  const greeting = `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{first_name}},</p>`;
+
   return baseTemplate(
-    `${imageSection}<p style="margin:0;font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</p>${ctaSection}`,
+    `${greeting}${imageSection}<p style="margin:0;font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</p>${ctaSection}`,
     opts.unsubscribeUrl,
   );
 }
 
 export function welcomeEmailHtml(firstName: string | undefined, unsubscribeUrl: string): string {
   const name = firstName ? firstName.trim() : undefined;
-  const greeting = name ? `Hey ${name},` : "Hey,";
+  const greeting = name ? `<p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">Ciao ${name}!</p>` : "";
   return baseTemplate(`
-    <p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">${greeting}</p>
+    ${greeting}
     <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
       Benvenuto in famiglia!<br/>
       Sarai la prima persona a sapere delle novità di Lacco — nuove uscite, anteprime e aggiornamenti arriveranno direttamente qui.
