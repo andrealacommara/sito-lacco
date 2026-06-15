@@ -104,10 +104,6 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
 
   if (!editor) return null;
 
-  const { from, to } = editor.state.selection;
-  const hasSelection = from !== to;
-  const inList = editor.isActive("bulletList");
-
   return (
     <>
       {/* Stile links nell'editor */}
@@ -139,25 +135,6 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
             >
               <span style={{ textDecoration: "underline" }}>U</span>
             </ToolbarButton>
-            <div className="w-px h-4 bg-default-200 mx-1" />
-            <button
-              disabled={!hasSelection && !inList}
-              title={hasSelection || inList ? "Elenco puntato" : "Seleziona il testo da elencare"}
-              type="button"
-              className={`px-2 py-1 rounded text-sm font-medium transition-colors ${
-                inList
-                  ? "bg-default-200 text-default-900"
-                  : hasSelection
-                  ? "text-default-500 hover:bg-default-100 hover:text-default-800"
-                  : "text-default-300 cursor-not-allowed"
-              }`}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                if (hasSelection || inList) editor.chain().focus().toggleBulletList().run();
-              }}
-            >
-              ≡
-            </button>
             <div className="w-px h-4 bg-default-200 mx-1" />
             <ToolbarButton
               active={editor.isActive("link")}
