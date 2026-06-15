@@ -23,7 +23,7 @@ function baseTemplate(content: string, unsubscribeUrl?: string): string {
 <meta name="color-scheme" content="light"/>
 <meta name="supported-color-schemes" content="light"/>
 <title>Lacco</title>
-<style>:root{color-scheme:light only;supported-color-schemes:light only;}</style>
+<style>:root{color-scheme:light only;supported-color-schemes:light only;}.rte-body p{margin:0 0 16px;font-size:16px;color:#333;line-height:1.7;}.rte-body p:last-child{margin-bottom:0;}.rte-body ul,.rte-body ol{margin:0 0 16px;padding-left:24px;}.rte-body li{font-size:16px;color:#333;line-height:1.7;margin-bottom:4px;}</style>
 </head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;color:#333333;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
@@ -131,7 +131,7 @@ export function broadcastEmailHtml(opts: {
   const greeting = `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{first_name}},</p>`;
 
   return baseTemplate(
-    `${greeting}<p style="margin:0;font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</p>${imageSection}${ctaSection}`,
+    `${greeting}<div class="rte-body" style="font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</div>${imageSection}${ctaSection}`,
     opts.unsubscribeUrl,
   );
 }
