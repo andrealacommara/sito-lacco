@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Input, Textarea } from "@heroui/input";
+import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
+import RichTextEditor from "@/components/richTextEditor";
 import { addToast } from "@heroui/toast";
 import type { Session } from "@supabase/supabase-js";
 import { Helmet } from "react-helmet-async";
@@ -520,14 +521,10 @@ export default function AdminPage() {
                 variant="bordered"
                 onValueChange={setSubject}
               />
-              <Textarea
-                label="Testo email"
-                labelPlacement="outside"
-                minRows={4}
+              <RichTextEditor
                 placeholder="Scrivi il corpo della mail…"
                 value={emailBody}
-                variant="bordered"
-                onValueChange={setEmailBody}
+                onChange={setEmailBody}
               />
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium">Immagine (opzionale)</label>
@@ -622,7 +619,7 @@ export default function AdminPage() {
             {!confirmSend ? (
               <Button
                 color="danger"
-                isDisabled={!subject.trim() || !emailBody.trim()}
+                isDisabled={!subject.trim() || !emailBody.replace(/<[^>]*>/g, "").trim()}
                 isLoading={broadcastLoading}
                 onPress={handleSendBroadcast}
               >
