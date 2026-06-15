@@ -21,9 +21,12 @@ function baseTemplate(
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="light"/>
+<meta name="supported-color-schemes" content="light"/>
 <title>Lacco</title>
+<style>:root{color-scheme:light only;supported-color-schemes:light only;}.rte-body p{margin:0 0 16px;font-size:16px;color:#333;line-height:1.7;}.rte-body p:last-child{margin-bottom:0;}.rte-body ul,.rte-body ol{margin:0 0 16px;padding-left:24px;}.rte-body li{font-size:16px;color:#333;line-height:1.7;margin-bottom:4px;}</style>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;">
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;color:#333333;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
   <tr><td align="center">
     <table width="100%" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e7;">
@@ -36,6 +39,7 @@ function baseTemplate(
       <tr>
         <td style="padding:32px;">
           ${content}
+          <p style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong>Lacco</strong></p>
         </td>
       </tr>
       <tr>
@@ -55,9 +59,9 @@ function baseTemplate(
 
 export function confirmEmailHtml(firstName: string | undefined, confirmUrl: string): string {
   const name = firstName?.trim();
-  const greeting = name ? `Hey ${name},` : "Hey,";
+  const greeting = name ? `<p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">Ciao ${name}!</p>` : "";
   return baseTemplate(`
-    <p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">${greeting}</p>
+    ${greeting}
     <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
       Conferma la tua email per ricevere aggiornamenti sulle prossime uscite di Lacco.
     </p>
@@ -86,9 +90,9 @@ export function confirmEmailHtml(firstName: string | undefined, confirmUrl: stri
 
 export function welcomeEmailHtml(firstName: string | undefined, unsubscribeUrl: string): string {
   const name = firstName?.trim();
-  const greeting = name ? `Hey ${name},` : "Hey,";
+  const greeting = name ? `<p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">Ciao ${name}!</p>` : "";
   return baseTemplate(`
-    <p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">${greeting}</p>
+    ${greeting}
     <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
       Benvenuto in famiglia!<br/>
       Sarai la prima persona a sapere delle novità di Lacco — nuove uscite, anteprime e aggiornamenti arriveranno direttamente qui.
@@ -106,11 +110,12 @@ export function broadcastEmailHtml(opts: {
   ctaUrl?: string;
   unsubscribeUrl: string;
   previewLogoUrl?: string;
+  preview?: boolean;
 }): string {
-  const bodyHtml = opts.body.replace(/\n/g, "<br/>");
+  const bodyHtml = opts.body;
 
   const imageSection = opts.imageUrl
-    ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+    ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
         <tr>
           <td align="center">
             <img src="${opts.imageUrl}" alt=""
@@ -141,8 +146,12 @@ export function broadcastEmailHtml(opts: {
          </table>`
       : "";
 
+  const greeting = opts.preview
+    ? `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao <span style="color:#F31260;">[Nome destinatario]</span>,</p>`
+    : `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{{contact.first_name|}}},</p>`;
+
   return baseTemplate(
-    `${imageSection}<p style="margin:0;font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</p>${ctaSection}`,
+    `${greeting}<div class="rte-body" style="font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</div>${imageSection}${ctaSection}`,
     opts.unsubscribeUrl,
     opts.previewLogoUrl,
   );
