@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, getSupabaseAdmin, jsonResponse, RESEND_AUDIENCE_ID } from "../_shared/clients.ts";
 
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "";
-const FROM = "Lacco <no-reply@lacco.it>";
+const FROM = "Lacco <fan@lacco.it>";
 
 async function verifyAdmin(req: Request): Promise<boolean> {
   const authHeader = req.headers.get("authorization");
