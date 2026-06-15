@@ -1,5 +1,5 @@
-import { corsHeaders, getSupabaseAdmin, jsonResponse } from "../_shared/clients.ts";
-import { sendConfirmEmail } from "../_shared/email.ts";
+import { corsHeaders, getSupabaseAdmin, jsonResponse, RESEND_AUDIENCE_ID } from "../_shared/clients.ts";
+import { sendWelcomeEmail } from "../_shared/email.ts";
 import { isValidEmail } from "../_shared/validation.ts";
 
 const SITE_URL = Deno.env.get("SITE_URL") ?? "https://lacco.it";
@@ -41,54 +41,105 @@ Deno.serve(async (req) => {
   }
 
   const supabase = getSupabaseAdmin();
-  const confirmToken = crypto.randomUUID();
+  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedFirstName = typeof firstName === "string" && firstName.trim() ? firstName.trim() : undefined;
   const now = new Date().toISOString();
 
-  // Upsert: se esiste ed è pending, aggiorna il token e re-invia.
-  // Se è già confirmed, non toccare (risponde ok per non rivelare lo stato).
   const { data: existing } = await supabase
     .from("subscribers")
-    .select("id, status")
-    .eq("email", email.toLowerCase().trim())
+    .select("id, status, unsubscribe_token")
+    .eq("email", normalizedEmail)
     .maybeSingle();
 
   if (existing && existing.status === "confirmed") {
-    return jsonResponse({ ok: true, message: "Grazie! Controlla la tua email." }, 200, origin);
+    return jsonResponse({ ok: true, message: "Grazie!" }, 200, origin);
   }
 
+  let subscriberId: string;
+  let unsubscribeToken: string;
+
   if (existing) {
-    await supabase
+    // Aggiorna pending/unsubscribed a confirmed
+    const { data: updated, error } = await supabase
       .from("subscribers")
-      .update({ confirm_token: confirmToken, updated_at: now })
-      .eq("id", existing.id);
+      .update({
+        status: "confirmed",
+        double_optin_confirmed: true,
+        consent: true,
+        consent_timestamp: now,
+        confirm_token: null,
+        updated_at: now,
+      })
+      .eq("id", existing.id)
+      .select("id, unsubscribe_token")
+      .single();
+
+    if (error || !updated) {
+      console.error("Update error:", error);
+      return jsonResponse({ ok: false, message: "Errore interno" }, 500, origin);
+    }
+    subscriberId = updated.id as string;
+    unsubscribeToken = updated.unsubscribe_token as string;
   } else {
-    const { error } = await supabase.from("subscribers").insert({
-      email: email.toLowerCase().trim(),
-      first_name: typeof firstName === "string" && firstName.trim() ? firstName.trim() : null,
-      release_slug: typeof releaseSlug === "string" ? releaseSlug : null,
-      source,
-      consent: true,
-      consent_timestamp: now,
-      confirm_token: confirmToken,
-      status: "pending",
-    });
-    if (error) {
+    const { data: inserted, error } = await supabase
+      .from("subscribers")
+      .insert({
+        email: normalizedEmail,
+        first_name: normalizedFirstName ?? null,
+        release_slug: typeof releaseSlug === "string" ? releaseSlug : null,
+        source,
+        consent: true,
+        consent_timestamp: now,
+        double_optin_confirmed: true,
+        status: "confirmed",
+      })
+      .select("id, unsubscribe_token")
+      .single();
+
+    if (error || !inserted) {
       console.error("Insert error:", error);
       return jsonResponse({ ok: false, message: "Errore interno" }, 500, origin);
     }
+    subscriberId = inserted.id as string;
+    unsubscribeToken = inserted.unsubscribe_token as string;
   }
 
-  const confirmUrl = `${SITE_URL}/confirm?token=${confirmToken}`;
+  // Sync verso Resend Audience
+  if (RESEND_AUDIENCE_ID) {
+    try {
+      const apiKey = Deno.env.get("RESEND_API_KEY")!;
+      const res = await fetch(
+        `https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: normalizedEmail,
+            first_name: normalizedFirstName,
+            unsubscribed: false,
+          }),
+        },
+      );
+      if (res.ok) {
+        const { id: resendContactId } = await res.json() as { id: string };
+        await supabase
+          .from("subscribers")
+          .update({ resend_contact_id: resendContactId })
+          .eq("id", subscriberId);
+      }
+    } catch (err) {
+      console.error("Resend sync error:", err);
+    }
+  }
+
+  // Invia welcome email
+  const unsubscribeUrl = `${SITE_URL}/unsubscribe?token=${unsubscribeToken}`;
   try {
-    await sendConfirmEmail(
-      email.toLowerCase().trim(),
-      typeof firstName === "string" ? firstName.trim() || undefined : undefined,
-      confirmUrl,
-    );
+    await sendWelcomeEmail(normalizedEmail, normalizedFirstName, unsubscribeUrl);
   } catch (err) {
     console.error("Email send error:", err);
     return jsonResponse({ ok: false, message: "Errore nell'invio dell'email" }, 500, origin);
   }
 
-  return jsonResponse({ ok: true, message: "Controlla la tua email per confermare!" }, 200, origin);
+  return jsonResponse({ ok: true, message: "Benvenuto in famiglia!" }, 200, origin);
 });
