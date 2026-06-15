@@ -96,7 +96,7 @@ export function broadcastEmailHtml(opts: {
   const bodyHtml = opts.body.replace(/\n/g, "<br/>");
 
   const imageSection = opts.imageUrl
-    ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+    ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
         <tr>
           <td align="center">
             <img src="${opts.imageUrl}" alt=""
@@ -130,7 +130,7 @@ export function broadcastEmailHtml(opts: {
   const greeting = `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{first_name}},</p>`;
 
   return baseTemplate(
-    `${greeting}${imageSection}<p style="margin:0;font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</p>${ctaSection}`,
+    `${greeting}<p style="margin:0;font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</p>${imageSection}${ctaSection}`,
     opts.unsubscribeUrl,
   );
 }
