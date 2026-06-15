@@ -23,7 +23,7 @@ type FilterStatus = "" | "pending" | "confirmed" | "unsubscribed" | "bounced";
 const ADMIN_EMAIL = "management@lacco.it";
 
 const STATUS_LABEL: Record<string, string> = {
-  confirmed: "confermato",
+  confirmed: "iscritto",
   pending: "in attesa",
   unsubscribed: "disiscritto",
   bounced: "rimbalzato",
