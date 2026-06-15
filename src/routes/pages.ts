@@ -10,6 +10,21 @@ export const ContactPage = lazyWithPreload(() => import("@/pages/contactPage"));
 export const PressKitPage = lazyWithPreload(
   () => import("@/pages/pressKitPage"),
 );
+export const NewsletterPage = lazyWithPreload(
+  () => import("@/pages/newsletterPage"),
+);
+export const ConfirmPage = lazyWithPreload(() => import("@/pages/confirmPage"));
+export const UnsubscribePage = lazyWithPreload(
+  () => import("@/pages/unsubscribePage"),
+);
+export const AdminPage = lazyWithPreload(() => import("@/pages/adminPage"));
+export const ReleasePage = lazyWithPreload(() => import("@/pages/releasePage"));
+export const NotFoundPage = lazyWithPreload(
+  () => import("@/pages/notFoundPage"),
+);
+export const PrivacyPage = lazyWithPreload(
+  () => import("@/pages/privacyPage"),
+);
 
 // ========================== PRELOAD MAP ========================== //
 // Maps route paths to the respective preload function for quick lookups.
@@ -19,6 +34,8 @@ const preloaders: Record<string, () => Promise<unknown>> = {
   "/su-di-me": AboutPage.preload,
   "/contatti": ContactPage.preload,
   "/presskit": PressKitPage.preload,
+  "/newsletter": NewsletterPage.preload,
+  "/privacy": PrivacyPage.preload,
 };
 
 // ========================== HELPERS ========================== //

@@ -1,15 +1,16 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import core components and configurations needed for the main site layout.
 
-import { Navbar } from "@/components/navbar"; // Top navigation bar
+import { Link } from "react-router-dom";
+import { Navbar } from "@/components/navbar";
 import {
   AppleMusicIcon,
   InstagramIcon,
   SpotifyIcon,
   TikTokIcon,
   YouTubeIcon,
-} from "@/components/icons.tsx"; // Custom icons for social and music platforms
-import { siteConfig } from "@/config/site.ts"; // Global site configuration (links, menu, etc.)
+} from "@/components/icons.tsx";
+import { siteConfig } from "@/config/site.ts";
 
 // ========================== LAYOUT COMPONENT ========================== //
 // Defines the overall page structure:
@@ -37,11 +38,18 @@ export default function DefaultLayout({
         {children}
       </main>
 
-      {/* FOOTER - Bottom section with social links */}
+      {/* FOOTER - Bottom section with newsletter link and social icons */}
       <footer
-        className="w-full flex items-center justify-center py-8 gap-2"
+        className="w-full flex flex-col items-center justify-center py-8 gap-4"
         role="contentinfo"
       >
+        <Link
+          className="text-xs text-default-400 hover:text-default-600 transition-colors underline underline-offset-2"
+          to="/newsletter"
+        >
+          Iscriviti alla newsletter
+        </Link>
+        <div className="flex items-center gap-2">
         {/* Each Link opens in a new tab */}
         <button
           aria-label="Vai al profilo Spotify di Lacco"
@@ -78,6 +86,7 @@ export default function DefaultLayout({
         >
           <YouTubeIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
         </button>
+        </div>
       </footer>
     </div>
   );
