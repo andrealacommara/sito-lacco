@@ -30,10 +30,14 @@ Deno.serve(async (req) => {
     return jsonResponse({ ok: true }, 200, origin);
   }
 
-  await supabase
+  const { error: updateError } = await supabase
     .from("subscribers")
     .update({ status: "unsubscribed" })
     .eq("id", subscriber.id);
+
+  if (updateError) {
+    return jsonResponse({ ok: false, error: "Errore interno" }, 500, origin);
+  }
 
   // Rimuovi da Resend Audience
   if (RESEND_AUDIENCE_ID && subscriber.resend_contact_id) {
