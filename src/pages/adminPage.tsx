@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Input, Textarea } from "@heroui/input";
+import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
+import RichTextEditor from "@/components/richTextEditor";
 import { addToast } from "@heroui/toast";
 import type { Session } from "@supabase/supabase-js";
 import { Helmet } from "react-helmet-async";
@@ -199,7 +200,7 @@ export default function AdminPage() {
     e.target.value = "";
   };
 
-  const buildBroadcastHtml = () =>
+  const buildBroadcastHtml = (preview = false) =>
     broadcastEmailHtml({
       body: emailBody || "Corpo dell'email…",
       imageUrl: imagePublicUrl || undefined,
@@ -207,6 +208,7 @@ export default function AdminPage() {
       ctaUrl: ctaUrl.trim() || undefined,
       unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
       previewLogoUrl: `${window.location.origin}/logo-lacco.png`,
+      preview,
     });
 
   const handleDryRun = async () => {
@@ -520,14 +522,10 @@ export default function AdminPage() {
                 variant="bordered"
                 onValueChange={setSubject}
               />
-              <Textarea
-                label="Testo email"
-                labelPlacement="outside"
-                minRows={4}
+              <RichTextEditor
                 placeholder="Scrivi il corpo della mail…"
                 value={emailBody}
-                variant="bordered"
-                onValueChange={setEmailBody}
+                onChange={setEmailBody}
               />
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium">Immagine (opzionale)</label>
@@ -595,7 +593,7 @@ export default function AdminPage() {
               <p className="text-xs text-default-400 mb-2">Anteprima email</p>
               <iframe
                 className="w-full rounded-lg border border-default-200"
-                srcDoc={buildBroadcastHtml()}
+                srcDoc={buildBroadcastHtml(true)}
                 style={{ height: 520 }}
                 title="Anteprima email"
               />
@@ -622,7 +620,7 @@ export default function AdminPage() {
             {!confirmSend ? (
               <Button
                 color="danger"
-                isDisabled={!subject.trim() || !emailBody.trim()}
+                isDisabled={!subject.trim() || !emailBody.replace(/<[^>]*>/g, "").trim()}
                 isLoading={broadcastLoading}
                 onPress={handleSendBroadcast}
               >
