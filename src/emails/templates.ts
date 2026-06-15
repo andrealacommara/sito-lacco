@@ -110,6 +110,7 @@ export function broadcastEmailHtml(opts: {
   ctaUrl?: string;
   unsubscribeUrl: string;
   previewLogoUrl?: string;
+  preview?: boolean;
 }): string {
   const bodyHtml = opts.body;
 
@@ -145,7 +146,9 @@ export function broadcastEmailHtml(opts: {
          </table>`
       : "";
 
-  const greeting = `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao <span style="color:#F31260;">[Nome destinatario]</span>,</p>`;
+  const greeting = opts.preview
+    ? `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao <span style="color:#F31260;">[Nome destinatario]</span>,</p>`
+    : `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{first_name}},</p>`;
 
   return baseTemplate(
     `${greeting}<div class="rte-body" style="font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</div>${imageSection}${ctaSection}`,

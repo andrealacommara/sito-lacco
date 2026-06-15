@@ -89,7 +89,9 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
   const confirmLink = useCallback(() => {
     if (!editor) return;
     if (linkUrl.trim()) {
-      editor.chain().focus().setLink({ href: linkUrl.trim() }).run();
+      let href = linkUrl.trim();
+      if (!/^[a-z]+:\/\//i.test(href)) href = `https://${href}`;
+      editor.chain().focus().setLink({ href }).run();
     } else {
       editor.chain().focus().unsetLink().run();
     }
