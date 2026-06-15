@@ -42,6 +42,11 @@ function baseTemplate(
         </td>
       </tr>
       <tr>
+        <td style="padding:0 32px 8px;text-align:left;">
+          <p style="margin:0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong>Lacco</strong></p>
+        </td>
+      </tr>
+      <tr>
         <td style="padding:16px 32px 24px;border-top:1px solid #e4e4e7;text-align:center;">
           <p style="margin:0;font-size:12px;color:#999;line-height:1.5;">
             Hai ricevuto questa email perché iscritto alla newsletter di Lacco.
@@ -110,7 +115,7 @@ export function broadcastEmailHtml(opts: {
   unsubscribeUrl: string;
   previewLogoUrl?: string;
 }): string {
-  const bodyHtml = opts.body.replace(/\n/g, "<br/>");
+  const bodyHtml = opts.body;
 
   const imageSection = opts.imageUrl
     ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
@@ -144,7 +149,7 @@ export function broadcastEmailHtml(opts: {
          </table>`
       : "";
 
-  const greeting = `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{first_name}},</p>`;
+  const greeting = `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao <span style="color:#F31260;">[Nome destinatario]</span>,</p>`;
 
   return baseTemplate(
     `${greeting}<p style="margin:0;font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</p>${imageSection}${ctaSection}`,
