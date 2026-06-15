@@ -28,8 +28,8 @@ function baseTemplate(content: string, unsubscribeUrl?: string): string {
     <table width="100%" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e7;">
       <tr>
         <td style="padding:24px 32px;text-align:center;border-bottom:3px solid #F31260;">
-          <img src="${LOGO_URL}" alt="Lacco" height="36"
-               style="display:block;margin:0 auto;height:36px;width:auto;" />
+          <img src="${LOGO_URL}" alt="Lacco" height="130"
+               style="display:block;margin:0 auto;height:130px;width:auto;" />
         </td>
       </tr>
       <tr>
@@ -40,7 +40,7 @@ function baseTemplate(content: string, unsubscribeUrl?: string): string {
       <tr>
         <td style="padding:16px 32px 24px;border-top:1px solid #e4e4e7;text-align:center;">
           <p style="margin:0;font-size:12px;color:#999;line-height:1.5;">
-            Hai ricevuto questa email perché hai richiesto aggiornamenti sulle uscite di Lacco.
+            Hai ricevuto questa email perché sei iscritto alla newsletter di Lacco.
           </p>
           ${unsubFooter}
         </td>
@@ -130,7 +130,34 @@ export function broadcastEmailHtml(opts: {
   );
 }
 
+export function welcomeEmailHtml(firstName: string | undefined, unsubscribeUrl: string): string {
+  const name = firstName ? firstName.trim() : undefined;
+  const greeting = name ? `Hey ${name},` : "Hey,";
+  return baseTemplate(`
+    <p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">${greeting}</p>
+    <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
+      Benvenuto in famiglia!<br/>
+      Sarai la prima persona a sapere delle novità di Lacco — nuove uscite, anteprime e aggiornamenti arriveranno direttamente qui.
+    </p>
+    <p style="margin:0;font-size:13px;color:#888;">
+      Se non hai fatto tu questa richiesta, puoi ignorare questa email.
+    </p>
+  `, unsubscribeUrl);
+}
+
 // ── Resend helpers ──────────────────────────────────────────────────────────
+
+export async function sendWelcomeEmail(
+  to: string,
+  firstName: string | undefined,
+  unsubscribeUrl: string,
+): Promise<void> {
+  await resendSend({
+    to,
+    subject: "Benvenuto in famiglia",
+    html: welcomeEmailHtml(firstName, unsubscribeUrl),
+  });
+}
 
 export async function sendConfirmEmail(
   to: string,

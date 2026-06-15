@@ -84,6 +84,21 @@ export function confirmEmailHtml(firstName: string | undefined, confirmUrl: stri
   `);
 }
 
+export function welcomeEmailHtml(firstName: string | undefined, unsubscribeUrl: string): string {
+  const name = firstName?.trim();
+  const greeting = name ? `Hey ${name},` : "Hey,";
+  return baseTemplate(`
+    <p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">${greeting}</p>
+    <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
+      Benvenuto in famiglia!<br/>
+      Sarai la prima persona a sapere delle novità di Lacco — nuove uscite, anteprime e aggiornamenti arriveranno direttamente qui.
+    </p>
+    <p style="margin:0;font-size:13px;color:#888;">
+      Se non hai fatto tu questa richiesta, puoi ignorare questa email.
+    </p>
+  `, unsubscribeUrl);
+}
+
 export function broadcastEmailHtml(opts: {
   body: string;
   imageUrl?: string;

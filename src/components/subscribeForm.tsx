@@ -56,7 +56,7 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
       if (data.ok) {
         setDone(true);
         addToast({
-          title: "Controlla la tua email per confermare!",
+          title: "Ti abbiamo inviato un benvenuto!",
           color: "success",
         });
       } else {
@@ -80,7 +80,7 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
           initial={{ opacity: 0, y: 8 }}
           transition={{ duration: 0.4 }}
         >
-          Sei nella lista! Ti avviso presto.
+          Benvenuto in famiglia
         </motion.p>
       ) : (
         <motion.form
