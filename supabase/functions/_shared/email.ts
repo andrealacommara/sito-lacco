@@ -1,0 +1,170 @@
+import { getResendApiKey } from "./clients.ts";
+
+const FROM = "Lacco <fan@lacco.it>";
+const REPLY_TO = "ciao@lacco.it";
+const LOGO_URL = "https://lacco.it/logo-lacco.png";
+
+// ── HTML templates ──────────────────────────────────────────────────────────
+
+function baseTemplate(content: string, unsubscribeUrl?: string): string {
+  const unsubFooter = unsubscribeUrl
+    ? `<p style="margin:12px 0 0;font-size:11px;color:#bbb;">
+        <a href="${unsubscribeUrl}" style="color:#bbb;text-decoration:underline;">
+          Disiscriviti dalla newsletter
+        </a>
+       </p>`
+    : "";
+
+  return `<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lacco</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
+  <tr><td align="center">
+    <table width="100%" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e7;">
+      <tr>
+        <td style="padding:24px 32px;text-align:center;border-bottom:3px solid #F31260;">
+          <img src="${LOGO_URL}" alt="Lacco" height="36"
+               style="display:block;margin:0 auto;height:36px;width:auto;" />
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px;">
+          ${content}
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:16px 32px 24px;border-top:1px solid #e4e4e7;text-align:center;">
+          <p style="margin:0;font-size:12px;color:#999;line-height:1.5;">
+            Hai ricevuto questa email perché hai richiesto aggiornamenti sulle uscite di Lacco.
+          </p>
+          ${unsubFooter}
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+}
+
+export function confirmEmailHtml(firstName: string | undefined, confirmUrl: string): string {
+  const name = firstName ? firstName.trim() : undefined;
+  const greeting = name ? `Hey ${name},` : "Hey,";
+  return baseTemplate(`
+    <p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">${greeting}</p>
+    <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
+      Conferma la tua email per ricevere aggiornamenti sulle prossime uscite di Lacco.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td align="center">
+          <table cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="background:#F31260;border-radius:8px;">
+                <a href="${confirmUrl}"
+                   style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;
+                          color:#fff;text-decoration:none;letter-spacing:0.02em;">
+                  Conferma iscrizione
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:0;font-size:13px;color:#888;">
+      Se non hai fatto tu questa richiesta, puoi ignorare questa email.
+    </p>
+  `);
+}
+
+export function broadcastEmailHtml(opts: {
+  body: string;
+  imageUrl?: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  unsubscribeUrl: string;
+}): string {
+  const bodyHtml = opts.body.replace(/\n/g, "<br/>");
+
+  const imageSection = opts.imageUrl
+    ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+        <tr>
+          <td align="center">
+            <img src="${opts.imageUrl}" alt=""
+                 style="display:block;width:100%;max-width:456px;border-radius:8px;" />
+          </td>
+        </tr>
+       </table>`
+    : "";
+
+  const ctaSection =
+    opts.ctaText && opts.ctaUrl
+      ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+          <tr>
+            <td align="center">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#F31260;border-radius:8px;">
+                    <a href="${opts.ctaUrl}"
+                       style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;
+                              color:#fff;text-decoration:none;letter-spacing:0.02em;">
+                      ${opts.ctaText}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+         </table>`
+      : "";
+
+  return baseTemplate(
+    `${imageSection}<p style="margin:0;font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</p>${ctaSection}`,
+    opts.unsubscribeUrl,
+  );
+}
+
+// ── Resend helpers ──────────────────────────────────────────────────────────
+
+export async function sendConfirmEmail(
+  to: string,
+  firstName: string | undefined,
+  confirmUrl: string,
+): Promise<void> {
+  await resendSend({
+    to,
+    subject: "Conferma la tua iscrizione",
+    html: confirmEmailHtml(firstName, confirmUrl),
+  });
+}
+
+export async function resendSend(opts: {
+  to: string;
+  subject: string;
+  html: string;
+}): Promise<void> {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${getResendApiKey()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: FROM,
+      reply_to: REPLY_TO,
+      to: opts.to,
+      subject: opts.subject,
+      html: opts.html,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Resend error ${res.status}: ${err}`);
+  }
+}

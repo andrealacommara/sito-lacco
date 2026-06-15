@@ -1,206 +1,64 @@
-// ========================== MAIN IMPORTS ========================== //
-// Import style functions, layout, and custom components for the “La mia musica” page.
-
-import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
-import { useRef, useState, useEffect, useCallback } from "react"; // Hooks for scroll container reference and state
+import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@heroui/button";
-import { Card } from "@heroui/card"; // UI component for container
-import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
+import { Card } from "@heroui/card";
+import { Skeleton } from "@heroui/skeleton";
 
-import { subtitle, title } from "@/components/primitives"; // Style classes for main and secondary titles
-import DefaultLayout from "@/layouts/default"; // Base layout (includes navbar and footer)
-import CardSongExposer from "@/components/cardSongExposer"; // Custom component to display each song
-import { songList } from "@/config/songList"; // Static song data (title, description, artwork, link, etc.)
-import {
-  AppleMusicIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  SpotifyIcon,
-} from "@/components/icons"; // Icons for carousel scroll
+import { subtitle, title } from "@/components/primitives";
+import DefaultLayout from "@/layouts/default";
+import SongCarousel from "@/components/songCarousel";
+import { AppleMusicIcon, SpotifyIcon } from "@/components/icons";
 import SmartImage from "@/components/smartImage";
-import nokoruMonoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif"; // Main artist image
-
-// ========================== MUSIC PAGE COMPONENT ========================== //
-// “La mia musica” page – displays all singles with descriptions and cover art.
+import nokoruMonoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 
 export default function MusicPage() {
-  // Reference to the scrollable container
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const startSpacerRef = useRef<HTMLDivElement>(null);
-  const endSpacerRef = useRef<HTMLDivElement>(null);
-
-  // States to handle arrow visibility (opacity)
-  const [isAtStart, setIsAtStart] = useState(true);
-  const [isAtEnd, setIsAtEnd] = useState(false);
-
-  // Used to show a “skeleton” effect until the image is ready.
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // ========================== SCROLL FUNCTIONS ========================== //
-  // Scrolls one card at a time, left or right
-  const scroll = (direction: "left" | "right") => {
-    const container = scrollContainerRef.current;
-
-    if (!container) return;
-
-    const card = container.querySelector(".card-song");
-
-    if (!card) return;
-
-    const cardWidth = (card as HTMLElement).offsetWidth;
-    const scrollAmount = direction === "left" ? -cardWidth : cardWidth;
-
-    container.scrollBy({
-      left: scrollAmount,
-      behavior: "smooth",
-    });
-  };
-
-  // ========================== CENTERED CARD DETECTION ========================== //
-  const detectCenteredCard = useCallback(() => {
-    const container = scrollContainerRef.current;
-
-    if (!container) return;
-
-    const cards = container.querySelectorAll(".card-song");
-
-    if (cards.length === 0) return;
-
-    const containerRect = container.getBoundingClientRect();
-    const containerCenter = containerRect.left + containerRect.width / 2;
-
-    let closestIndex = 0;
-    let closestDistance = Infinity;
-
-    cards.forEach((card, index) => {
-      const cardRect = card.getBoundingClientRect();
-      const cardCenter = cardRect.left + cardRect.width / 2;
-      const distance = Math.abs(cardCenter - containerCenter);
-
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
-
-    setIsAtStart(closestIndex === 0);
-    setIsAtEnd(closestIndex === cards.length - 1);
-  }, []);
-
-  // ========================== SCROLL EVENT HANDLER ========================== //
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    const startSpacer = startSpacerRef.current;
-    const endSpacer = endSpacerRef.current;
-
-    if (!container || !startSpacer || !endSpacer) return;
-
-    let scrollRafId: number | null = null;
-
-    const updateLayout = () => {
-      const card = container.querySelector(".card-song") as HTMLElement;
-
-      if (!card) return;
-
-      const cardWidth = card.offsetWidth;
-      const containerWidth = container.getBoundingClientRect().width;
-      const padding = Math.max(0, (containerWidth - cardWidth) / 2);
-
-      startSpacer.style.minWidth = `${padding}px`;
-      endSpacer.style.minWidth = `${padding}px`;
-    };
-
-    updateLayout();
-
-    // Center on first card after layout is applied
-    requestAnimationFrame(() => {
-      container.scrollTo({ left: 0, behavior: "auto" });
-    });
-
-    // Debounced scroll handler using requestAnimationFrame
-    const handleScroll = () => {
-      if (scrollRafId !== null) cancelAnimationFrame(scrollRafId);
-      scrollRafId = requestAnimationFrame(() => {
-        detectCenteredCard();
-      });
-    };
-
-    // On resize: update spacers, re-center current card, and recheck chevrons
-    const handleResize = () => {
-      updateLayout();
-      detectCenteredCard();
-    };
-
-    detectCenteredCard();
-    container.addEventListener("scroll", handleScroll, { passive: true });
-    container.addEventListener("scrollend", detectCenteredCard);
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      if (scrollRafId !== null) cancelAnimationFrame(scrollRafId);
-      container.removeEventListener("scroll", handleScroll);
-      container.removeEventListener("scrollend", detectCenteredCard);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [detectCenteredCard]);
-
-  // ========================== RENDER ========================== //
   return (
     <DefaultLayout>
-      {/* ========================== HELMET ========================== */}
-      {/* Dynamic title and description for Google SEO */}
       <Helmet>
         <title>Lacco | La mia musica</title>
         <meta
-          content="Scopri la musica di Lacco: la storia di ogni brano, l‘artwork e il link per ascoltarlo su Spotify."
+          content="Scopri la musica di Lacco: la storia di ogni brano, l'artwork e il link per ascoltarlo su Spotify."
           name="description"
         />
         <meta content="index, follow" name="robots" />
       </Helmet>
 
-      {/* ========================== TITLE SECTION ========================== */}
-      {/* Main page title */}
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <h1 className={title()}>La mia musica</h1>
       </div>
 
-      {/* ========================== CONTENT SECTION ========================== */}
       <div className="flex flex-col justify-center min-h-fit md:min-h-fit">
-        {/* Intro subtitle */}
         <div className="pb-6">
-          <h2 className={subtitle()}>Scopri la storia dell'EP</h2>{" "}
+          <h2 className={subtitle()}>Scopri la storia dell'EP</h2>
         </div>
-        {/* Contains the artist image and description */}
-        <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 mx-auto  w-full max-w-5xl">
-          {/* Visual placeholder while the image is loading */}
+
+        <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 mx-auto w-full max-w-5xl">
           {!isLoaded && (
             <Skeleton className="absolute inset-0 rounded-lg">
               <div className="h-full w-full bg-default-300 rounded-lg" />
             </Skeleton>
           )}
-
-          {/* ========================== ALBUM IMAGE ========================== */}
           <div className="p-4 md:p-4 w-fit md:w-full items-center">
             <SmartImage
-              isBlurred // Applies a slight blur effect
+              isBlurred
               priority
-              alt="nokoru mono Artwork" // Alt text for accessibility
+              alt="nokoru mono Artwork"
               className="item-center"
               sizes="400px"
-              src={nokoruMonoArtwork} // Imported image
+              src={nokoruMonoArtwork}
               style={{ aspectRatio: "1 / 1" }}
               width={400}
-              onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to decode
-              onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
+              onError={() => setIsLoaded(true)}
+              onLoad={() => setIsLoaded(true)}
             />
           </div>
-
-          {/* ========================== ALBUM DESCRIPTION ========================== */}
           <div className="flex flex-col p-4">
             <div className="pb-4">
               <p>
-                <em className="text-danger pr-1">nokoru mono</em> (“quelli che
-                restano”) è il nome del primo progetto.
+                <em className="text-danger pr-1">nokoru mono</em> ("quelli che
+                restano") è il nome del primo progetto.
               </p>
               <p>
                 Racconta il mondo interiore, le emozioni che accompagnano la
@@ -234,7 +92,6 @@ export default function MusicPage() {
               </p>
             </div>
             <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
-              {/* Spotify */}
               <div className="flex-1 min-w-0">
                 <Button
                   fullWidth
@@ -249,12 +106,10 @@ export default function MusicPage() {
                     )
                   }
                 >
-                  Ascolta su Spotify
                   <SpotifyIcon />
+                  Ascolta su Spotify                  
                 </Button>
               </div>
-
-              {/* Apple Music */}
               <div className="flex-1 min-w-0">
                 <Button
                   fullWidth
@@ -269,83 +124,20 @@ export default function MusicPage() {
                     )
                   }
                 >
-                  Ascolta su Apple Music
                   <AppleMusicIcon />
+                  Ascolta su Apple Music
                 </Button>
               </div>
             </div>
           </div>
         </Card>
 
-        {/* Intro subtitle */}
         <div className="pt-10">
           <h2 className={subtitle()}>Scopri la storia di ogni singolo</h2>
         </div>
-        {/* ========================== FULL WRAPPER: CAROUSEL + ARROWS ========================== */}
-        {/* The arrows remain beside the carousel without overlapping cards */}
-        <div className="flex items-center justify-center gap-2 md:gap-4 w-full">
-          <div className="flex flex-row items-center gap-4 max-w-full max-h-fit">
-            {/* Left arrow */}
-            <Button
-              isIconOnly
-              aria-label="Scorri a sinistra"
-              className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
-                isAtStart
-                  ? "opacity-0 pointer-events-none scale-75"
-                  : "opacity-100"
-              }`}
-              radius="full"
-              variant="flat"
-              onPress={() => scroll("left")}
-            >
-              <ChevronLeftIcon className="h-6 w-6 text-white" />
-            </Button>
 
-            {/* ========================== SONG CAROUSEL ========================== */}
-            <div
-              ref={scrollContainerRef}
-              className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full"
-            >
-              <div ref={startSpacerRef} className="shrink-0" />
-              {songList.map((song) => (
-                <div
-                  key={song.title}
-                  className="card-song shrink-0 snap-center px-2 max-w-full transition-transform hover:scale-105 active:scale-95"
-                >
-                  <CardSongExposer
-                    artworkAlt={song.alt}
-                    artworkSrc={song.src}
-                    preSaveMode={song.preSaveMode}
-                    songAppleMusicLink={song.appleMusicLink}
-                    songDescription={song.description}
-                    songSpotifyLink={song.spotifyLink}
-                    songTitle={song.title}
-                  />
-                </div>
-              ))}
-              <div ref={endSpacerRef} className="shrink-0" />
-            </div>
+        <SongCarousel />
 
-            {/* Right arrow */}
-            <Button
-              isIconOnly
-              aria-label="Scorri a destra"
-              className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
-                isAtEnd
-                  ? "opacity-0 pointer-events-none scale-75"
-                  : "opacity-100"
-              }`}
-              radius="full"
-              variant="flat"
-              onPress={() => scroll("right")}
-            >
-              <ChevronRightIcon className="h-6 w-6 text-white" />
-            </Button>
-          </div>
-        </div>
-
-        {/* ========================== CLOSING SECTION ========================== */}
-        {/* Short closing message for the user */}
         <div className="flex justify-center">
           <h3 className="w-full md:w-1/2 my-2 text-default-400 block max-w-full text-center font-light text-small">
             Ogni brano è una parte di me, buon ascolto.
