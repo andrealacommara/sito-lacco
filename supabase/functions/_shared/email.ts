@@ -128,7 +128,7 @@ export function broadcastEmailHtml(opts: {
          </table>`
       : "";
 
-  const greeting = `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{first_name}},</p>`;
+  const greeting = `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{{contact.first_name|}}},</p>`;
 
   return baseTemplate(
     `${greeting}<div class="rte-body" style="font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</div>${imageSection}${ctaSection}`,

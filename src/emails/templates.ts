@@ -148,7 +148,7 @@ export function broadcastEmailHtml(opts: {
 
   const greeting = opts.preview
     ? `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao <span style="color:#F31260;">[Nome destinatario]</span>,</p>`
-    : `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{first_name}},</p>`;
+    : `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{{contact.first_name|}}},</p>`;
 
   return baseTemplate(
     `${greeting}<div class="rte-body" style="font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</div>${imageSection}${ctaSection}`,
