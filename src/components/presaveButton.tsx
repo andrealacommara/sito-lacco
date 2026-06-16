@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@heroui/button";
 
 import { SpotifyIcon } from "@/components/icons";
+import { hasReleased } from "@/components/countdown";
 
 type Props = {
   hyperfollowUrl: string;
+  releaseDate: Date;
 };
 
 function openCenteredPopup(url: string, fallbackUrl: string) {
@@ -23,8 +25,33 @@ function openCenteredPopup(url: string, fallbackUrl: string) {
   }
 }
 
-export default function PresaveButton({ hyperfollowUrl }: Props) {
+export default function PresaveButton({ hyperfollowUrl, releaseDate }: Props) {
   const [saved, setSaved] = useState(false);
+  const [isReleased, setIsReleased] = useState(() => hasReleased(releaseDate));
+
+  useEffect(() => {
+    if (isReleased) return;
+    const timer = setInterval(() => {
+      if (hasReleased(releaseDate)) setIsReleased(true);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [releaseDate, isReleased]);
+
+  if (isReleased) {
+    return (
+      <Button
+        aria-label="Ascoltala su Spotify"
+        className="font-semibold px-8"
+        color="success"
+        size="lg"
+        onPress={() => openCenteredPopup(hyperfollowUrl, hyperfollowUrl)}
+      >
+        <SpotifyIcon />
+        Ascoltala su Spotify
+      </Button>
+    );
+  }
 
   if (saved) {
     return (

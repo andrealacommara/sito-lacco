@@ -95,7 +95,7 @@ supabase/
 
 ## ✨ Main Features
 
-- **Home:** Introduction to Lacco with an on-demand Spotify player that loads only when needed on mobile.
+- **Home:** Introduction to Lacco with an on-demand Spotify player that loads only when needed on mobile, plus a presave card (blurred artwork backdrop, countdown, DistroKid presave button) for the next upcoming release.
 - **La mia musica:** Horizontal snap carousel of singles, with descriptions and streaming links (Spotify + Apple Music) in a modal. Supports presave mode with "COMING SOON" badge.
 - **Release pages (`/:slug`):** Full-screen landing pages driven by `catalog.ts`. Two modes:
   - **Presave mode** — artwork, countdown timer, DistroKid presave button, newsletter subscribe form.

@@ -126,6 +126,7 @@ function PresaveSection({ release }: SectionProps) {
             <motion.div {...fadeUp(0.3)}>
               <PresaveButton
                 hyperfollowUrl={release.streamingLinks.hyperfollow}
+                releaseDate={release.releaseDate}
               />
             </motion.div>
           )}
