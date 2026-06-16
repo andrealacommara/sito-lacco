@@ -23,6 +23,10 @@ function getTimeLeft(target: Date): TimeLeft | null {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+export function hasReleased(releaseDate: Date): boolean {
+  return getTimeLeft(releaseDate) === null;
+}
+
 export default function Countdown({
   releaseDate,
   variant = "dark",

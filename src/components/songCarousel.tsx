@@ -132,6 +132,7 @@ export default function SongCarousel() {
                 artworkSrc={song.artwork}
                 hyperfollowUrl={song.streamingLinks?.hyperfollow}
                 preSaveMode={song.presaveMode}
+                releaseDate={song.releaseDate}
                 songAppleMusicLink={song.streamingLinks?.appleMusic ?? ""}
                 songDescription={song.description}
                 songSpotifyLink={song.streamingLinks?.spotify ?? ""}

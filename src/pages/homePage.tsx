@@ -10,7 +10,7 @@ import DefaultLayout from "@/layouts/default"; // General site layout (navbar + 
 import SpotifyPlayer from "@/components/spotifyPlayer"; // Custom component for Spotify player
 import { subtitle, title } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
 import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
-import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
+import SmartImage, { resolveImageSource } from "@/components/smartImage"; // Optimized image component with automatic loading
 import {
   AppleMusicIcon,
   InstagramIcon,
@@ -19,6 +19,9 @@ import {
   YouTubeIcon,
 } from "@/components/icons";
 import { siteConfig } from "@/config/site";
+import { catalog } from "@/config/catalog";
+import Countdown from "@/components/countdown";
+import PresaveButton from "@/components/presaveButton";
 
 // ========================== HOME PAGE COMPONENT ========================== //
 // Displays an introduction to the artist and includes a Spotify player.
@@ -84,6 +87,55 @@ export default function HomePage() {
           </h1>
         </div>
       </Card>
+
+      {/* ========================== SPOTIFY PRE-SAVE SECTION ========================== */}
+
+      {catalog.map((release) =>
+        release.presaveMode === true && release.streamingLinks?.hyperfollow ? (
+          <div key={release.slug}>
+            <div className="flex flex-row items-center justify-center py-4 md:py-4">
+              <h2 className={subtitle()}>Pre-salva la prossima uscita</h2>
+            </div>
+            <Card className="flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-5xl md:max-w-fit">
+              {/* Blurred artwork backdrop — fixed dark scrim keeps text readable regardless of cover colors */}
+              <img
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
+                src={resolveImageSource(release.artwork)}
+              />
+              <div className="absolute inset-0 bg-black/55" />
+
+              <div className="relative shrink-0 flex items-center justify-center">
+                <SmartImage
+                  isBlurred
+                  priority
+                  alt={`Cover di ${release.title}`}
+                  sizes="320px"
+                  src={release.artwork}
+                  style={{ aspectRatio: "1/1", objectFit: "cover" }}
+                  width={320}
+                />
+              </div>
+              <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md">
+                <div className="space-y-1">
+                  <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                    {release.title}
+                  </h1>
+                  <p className="text-white/70 text-sm tracking-widest font-medium">
+                    {release.artist ?? "Lacco"}
+                  </p>
+                </div>
+                <Countdown releaseDate={release.releaseDate} variant="dark" />
+                <PresaveButton
+                  hyperfollowUrl={release.streamingLinks.hyperfollow}
+                  releaseDate={release.releaseDate}
+                />
+              </div>
+            </Card>
+          </div>
+        ) : null,
+      )}
 
       {/* ========================== LINKS SECTION ========================== */}
       <div className="flex flex-row items-center justify-center py-4 md:py-4">
