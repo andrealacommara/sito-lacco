@@ -10,17 +10,8 @@ Redirect 301 /instagram https://instagram.com/laccoverse
 Redirect 301 /tiktok https://tiktok.com/@laccoverse
 Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
 Redirect 301 /youtube https://www.youtube.com/@Laccoverse
-
-# Song redirects (slug diversi dalle pagine SPA — nessun conflitto)
-# /tuxtu → tu-x-tu è gestita dalla SPA
-# /tra-le-nuvole-sv → la SPA usa /tra-le-nuvole-sunset-version (slug diverso)
 Redirect 301 /nokoru-mono https://distrokid.com/hyperfollow/lacco/nokoru-mono
 Redirect 301 /preview-nokoru-mono https://on.soundcloud.com/u3ZP1Y26moVlmrQSIO
-
-# Le seguenti slug sono gestite dalla SPA (SongPage/ReleasePage):
-# /bella-al-buio /tu-x-tu /per-gli-altri /davvero /ricordo
-# /rumore-di-fondo /cercami /tra-le-nuvole-sunset-version
-# /tra-le-nuvole /mondo-dentro /tempo-perso
 
 # ====================== STATIC FILES & SPA FALLBACK ======================
 
