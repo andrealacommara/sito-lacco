@@ -1,19 +1,33 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, getSupabaseAdmin, jsonResponse, RESEND_AUDIENCE_ID } from "../_shared/clients.ts";
+
+import {
+  corsHeaders,
+  getSupabaseAdmin,
+  jsonResponse,
+  RESEND_AUDIENCE_ID,
+} from "../_shared/clients.ts";
+import { FIRST_NAME_MERGE_TAG, resendSendBatch } from "../_shared/email.ts";
+import { syncResendContacts } from "../_shared/resendSync.ts";
 
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "";
 const FROM = "Lacco <fan@lacco.it>";
 
 async function verifyAdmin(req: Request): Promise<boolean> {
   const authHeader = req.headers.get("authorization");
+
   if (!authHeader?.startsWith("Bearer ")) return false;
   const token = authHeader.slice(7);
   const supabaseAnon = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
   );
-  const { data: { user }, error } = await supabaseAnon.auth.getUser(token);
+  const {
+    data: { user },
+    error,
+  } = await supabaseAnon.auth.getUser(token);
+
   if (error || !user || user.email !== ADMIN_EMAIL) return false;
+
   return true;
 }
 
@@ -32,16 +46,70 @@ Deno.serve(async (req) => {
   }
 
   let body: Record<string, unknown>;
+
   try {
     body = await req.json();
   } catch {
     return jsonResponse({ ok: false, error: "Invalid JSON" }, 400, origin);
   }
 
-  const { subject, htmlBody, dry } = body;
+  const { subject, htmlBody, dry, recipientIds } = body;
 
-  if (!subject || typeof subject !== "string" || !htmlBody || typeof htmlBody !== "string") {
-    return jsonResponse({ ok: false, error: "subject e htmlBody richiesti" }, 400, origin);
+  if (
+    !subject ||
+    typeof subject !== "string" ||
+    !htmlBody ||
+    typeof htmlBody !== "string"
+  ) {
+    return jsonResponse(
+      { ok: false, error: "subject e htmlBody richiesti" },
+      400,
+      origin,
+    );
+  }
+
+  const targeted = Array.isArray(recipientIds) && recipientIds.length > 0;
+
+  if (targeted) {
+    const supabase = getSupabaseAdmin();
+    const { data: recipients, error } = await supabase
+      .from("subscribers")
+      .select("email, first_name")
+      .in("id", recipientIds as string[])
+      .eq("status", "confirmed");
+
+    if (error)
+      return jsonResponse({ ok: false, error: error.message }, 500, origin);
+
+    if (dry === true) {
+      return jsonResponse(
+        { ok: true, dry: true, recipientCount: recipients?.length ?? 0 },
+        200,
+        origin,
+      );
+    }
+
+    const emails = (recipients ?? []).map((r) => ({
+      to: r.email,
+      subject,
+      html: htmlBody
+        .split(FIRST_NAME_MERGE_TAG)
+        .join(r.first_name?.trim() || ""),
+    }));
+
+    const { sent, failed } = await resendSendBatch(emails);
+
+    await supabase.from("broadcasts").insert({
+      template: "targeted",
+      subject,
+      recipient_count: sent,
+    });
+
+    return jsonResponse(
+      { ok: true, sent, failed, recipientCount: sent },
+      200,
+      origin,
+    );
   }
 
   if (dry === true) {
@@ -50,19 +118,45 @@ Deno.serve(async (req) => {
       .from("subscribers")
       .select("id", { count: "exact" })
       .eq("status", "confirmed");
-    return jsonResponse({ ok: true, dry: true, recipientCount: count ?? 0 }, 200, origin);
+
+    return jsonResponse(
+      { ok: true, dry: true, recipientCount: count ?? 0 },
+      200,
+      origin,
+    );
   }
 
   if (!RESEND_AUDIENCE_ID) {
-    return jsonResponse({ ok: false, error: "RESEND_AUDIENCE_ID non configurato" }, 500, origin);
+    return jsonResponse(
+      { ok: false, error: "RESEND_AUDIENCE_ID non configurato" },
+      500,
+      origin,
+    );
   }
 
   const apiKey = Deno.env.get("RESEND_API_KEY")!;
 
+  // Riallinea gli status con Resend prima di un invio massivo, per non spedire a
+  // chi si è disiscritto nel frattempo e il cui stato non si fosse ancora
+  // propagato qui. Non bloccante: se la sync fallisce, l'invio procede comunque
+  // (Resend stesso esclude già chi è unsubscribed sulla sua Audience).
+  let syncUpdated = 0;
+
+  try {
+    const syncResult = await syncResendContacts(apiKey);
+
+    syncUpdated = syncResult.updated;
+  } catch (err) {
+    console.error("Pre-broadcast Resend sync error:", err);
+  }
+
   // Crea broadcast Resend
   const broadcastRes = await fetch("https://api.resend.com/broadcasts", {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       audience_id: RESEND_AUDIENCE_ID,
       from: FROM,
@@ -74,20 +168,33 @@ Deno.serve(async (req) => {
 
   if (!broadcastRes.ok) {
     const err = await broadcastRes.text();
-    return jsonResponse({ ok: false, error: `Resend error: ${err}` }, 500, origin);
+
+    return jsonResponse(
+      { ok: false, error: `Resend error: ${err}` },
+      500,
+      origin,
+    );
   }
 
-  const { id: broadcastId } = await broadcastRes.json() as { id: string };
+  const { id: broadcastId } = (await broadcastRes.json()) as { id: string };
 
   // Invia immediatamente
-  const sendRes = await fetch(`https://api.resend.com/broadcasts/${broadcastId}/send`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}` },
-  });
+  const sendRes = await fetch(
+    `https://api.resend.com/broadcasts/${broadcastId}/send`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}` },
+    },
+  );
 
   if (!sendRes.ok) {
     const err = await sendRes.text();
-    return jsonResponse({ ok: false, error: `Resend send error: ${err}` }, 500, origin);
+
+    return jsonResponse(
+      { ok: false, error: `Resend send error: ${err}` },
+      500,
+      origin,
+    );
   }
 
   // Log in Supabase
@@ -104,5 +211,9 @@ Deno.serve(async (req) => {
     recipient_count: count ?? 0,
   });
 
-  return jsonResponse({ ok: true, broadcastId, recipientCount: count ?? 0 }, 200, origin);
+  return jsonResponse(
+    { ok: true, broadcastId, recipientCount: count ?? 0, syncUpdated },
+    200,
+    origin,
+  );
 });
