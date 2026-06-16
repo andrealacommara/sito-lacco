@@ -113,7 +113,7 @@ export default defineConfig({
         // Splits main bundles for better caching and performance
         manualChunks: {
           react: ["react", "react-dom"],
-          "heroui": ["@heroui/react"],
+          heroui: ["@heroui/react"],
           "framer-motion": ["framer-motion"],
         },
 
