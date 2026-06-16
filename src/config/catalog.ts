@@ -66,7 +66,7 @@ export const catalog: Song[] = [
   {
     slug: "tu-x-tu",
     title: "tu x tu",
-    releaseDate: d("2026-01-01"),
+    releaseDate: d("2026-03-27"),
     presaveMode: false,
     artwork: tuxtuArtwork,
     alt: "Cover artwork di 'tu x tu'",
@@ -84,7 +84,7 @@ export const catalog: Song[] = [
   {
     slug: "per-gli-altri",
     title: "per gli altri",
-    releaseDate: d("2026-01-01"),
+    releaseDate: d("2026-01-30"),
     presaveMode: false,
     artwork: nokoruMonoArtwork,
     alt: "Cover artwork di 'per gli altri'",
@@ -103,7 +103,7 @@ export const catalog: Song[] = [
   {
     slug: "davvero",
     title: "davvero",
-    releaseDate: d("2026-01-01"),
+    releaseDate: d("2026-01-30"),
     presaveMode: false,
     artwork: nokoruMonoArtwork,
     alt: "Cover artwork di 'davvero'",
@@ -122,7 +122,7 @@ export const catalog: Song[] = [
   {
     slug: "ricordo",
     title: "ricordo",
-    releaseDate: d("2026-01-01"),
+    releaseDate: d("2026-01-30"),
     presaveMode: false,
     artwork: nokoruMonoArtwork,
     alt: "Cover artwork di 'ricordo'",
@@ -141,7 +141,7 @@ export const catalog: Song[] = [
   {
     slug: "rumore-di-fondo",
     title: "rumore di fondo",
-    releaseDate: d("2025-01-01"),
+    releaseDate: d("2025-11-14"),
     presaveMode: false,
     artwork: rumoreDiFondoArtwork,
     alt: "Cover artwork di 'rumore di fondo'",
@@ -160,7 +160,7 @@ export const catalog: Song[] = [
   {
     slug: "cercami",
     title: "cercami",
-    releaseDate: d("2025-01-01"),
+    releaseDate: d("2025-10-03"),
     presaveMode: false,
     artwork: cercamiArtwork,
     alt: "Cover artwork di 'cercami'",
@@ -179,7 +179,7 @@ export const catalog: Song[] = [
   {
     slug: "tra-le-nuvole-sunset-version",
     title: "tra le nuvole - sunset version",
-    releaseDate: d("2025-01-01"),
+    releaseDate: d("2025-08-07"),
     presaveMode: false,
     artwork: traLeNuvoleSVArtwork,
     alt: "Cover artwork di 'tra le nuvole - sunset version'",
@@ -199,7 +199,7 @@ export const catalog: Song[] = [
   {
     slug: "tra-le-nuvole",
     title: "tra le nuvole",
-    releaseDate: d("2025-01-01"),
+    releaseDate: d("2025-06-27"),
     presaveMode: false,
     artwork: traLeNuvoleArtwork,
     alt: "Cover artwork di 'tra le nuvole'",
@@ -218,7 +218,7 @@ export const catalog: Song[] = [
   {
     slug: "mondo-dentro",
     title: "mondo dentro",
-    releaseDate: d("2024-01-01"),
+    releaseDate: d("2024-12-13"),
     presaveMode: false,
     artwork: mondoDentroArtwork,
     alt: "Cover artwork di 'mondo dentro'",
@@ -237,7 +237,7 @@ export const catalog: Song[] = [
   {
     slug: "tempo-perso",
     title: "tempo perso",
-    releaseDate: d("2024-01-01"),
+    releaseDate: d("2024-10-11"),
     presaveMode: false,
     artwork: tempoPersoArtwork,
     alt: "Cover artwork di 'tempo perso'",
