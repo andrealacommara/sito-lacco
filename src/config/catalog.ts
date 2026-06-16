@@ -25,6 +25,7 @@ export const RESERVED_SLUGS = [
   "confirm",
   "unsubscribe",
   "admin",
+  "live",
 ];
 
 export type Song = {

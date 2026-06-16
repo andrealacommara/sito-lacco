@@ -17,6 +17,7 @@ export const UnsubscribePage = lazyWithPreload(
   () => import("@/pages/unsubscribePage"),
 );
 export const AdminPage = lazyWithPreload(() => import("@/pages/adminPage"));
+export const LivePage = lazyWithPreload(() => import("@/pages/livePage"));
 export const ReleasePage = lazyWithPreload(() => import("@/pages/releasePage"));
 export const NotFoundPage = lazyWithPreload(
   () => import("@/pages/notFoundPage"),
@@ -33,6 +34,7 @@ const preloaders: Record<string, () => Promise<unknown>> = {
   "/presskit": PressKitPage.preload,
   "/newsletter": NewsletterPage.preload,
   "/privacy": PrivacyPage.preload,
+  "/live": LivePage.preload,
 };
 
 // ========================== HELPERS ========================== //
