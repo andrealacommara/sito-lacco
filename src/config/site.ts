@@ -18,6 +18,7 @@ export const siteConfig = {
   navItems: [
     { label: "Home", href: "/" },
     { label: "La mia musica", href: "/la-mia-musica" },
+    { label: "Live", href: "/live" },
     { label: "Su di me", href: "/su-di-me" },
     { label: "Contatti", href: "/contatti" },
   ],
@@ -27,6 +28,7 @@ export const siteConfig = {
   navMenuItems: [
     { label: "Home", href: "/" },
     { label: "La mia musica", href: "/la-mia-musica" },
+    { label: "Live", href: "/live" },
     { label: "Su di me", href: "/su-di-me" },
     { label: "Contatti", href: "/contatti" },
   ],

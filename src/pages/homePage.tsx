@@ -20,8 +20,10 @@ import {
 } from "@/components/icons";
 import { siteConfig } from "@/config/site";
 import { catalog } from "@/config/catalog";
+import { getUpcomingLiveEvents } from "@/config/liveEvents";
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
+import LiveEventCard from "@/components/liveEventCard";
 
 // ========================== HOME PAGE COMPONENT ========================== //
 // Displays an introduction to the artist and includes a Spotify player.
@@ -88,6 +90,17 @@ export default function HomePage() {
         </div>
       </Card>
 
+      {/* ========================== LIVE SECTION ========================== */}
+
+      {getUpcomingLiveEvents().map((event) => (
+        <div key={event.slug}>
+          <div className="flex flex-row items-center justify-center py-4 md:py-4">
+            <h2 className={subtitle()}>Lacco dal vivo</h2>
+          </div>
+          <LiveEventCard event={event} />
+        </div>
+      ))}
+
       {/* ========================== SPOTIFY PRE-SAVE SECTION ========================== */}
 
       {catalog.map((release) =>
@@ -136,7 +149,6 @@ export default function HomePage() {
           </div>
         ) : null,
       )}
-
       {/* ========================== LINKS SECTION ========================== */}
       <div className="flex flex-row items-center justify-center py-4 md:py-4">
         <h2 className={subtitle()}>Link</h2>

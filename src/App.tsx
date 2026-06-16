@@ -6,6 +6,7 @@ import {
   AdminPage,
   ContactPage,
   HomePage,
+  LivePage,
   MusicPage,
   NewsletterPage,
   NotFoundPage,
@@ -32,6 +33,7 @@ function App() {
       "/contatti",
       "/presskit",
       "/newsletter",
+      "/live",
     ];
     const warm = () => warmupRoutes(pathsToWarm);
 
@@ -87,6 +89,9 @@ function App() {
 
         {/* Privacy policy */}
         <Route element={<PrivacyPage />} path="/privacy" />
+
+        {/* Live */}
+        <Route element={<LivePage />} path="/live" />
 
         {/* Release pages: /:slug deve stare DOPO tutte le route specifiche */}
         <Route element={<ReleasePage />} path="/:slug" />

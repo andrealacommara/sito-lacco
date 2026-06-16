@@ -36,6 +36,7 @@ src/
 │   ├── cardSongExposer.tsx   # Song card with modal (presave + streaming links)
 │   ├── countdown.tsx         # Release countdown timer (dark/light variant)
 │   ├── icons.tsx             # SVG icons + Logo component
+│   ├── liveEventCard.tsx     # Live event card (poster, countdown, ticket CTA)
 │   ├── navbar.tsx
 │   ├── presaveButton.tsx     # DistroKid hyperfollow presave CTA
 │   ├── primitives.ts         # Typography utility classes
@@ -43,7 +44,8 @@ src/
 │   ├── songCarousel.tsx      # Horizontal snap carousel of catalog songs
 │   └── subscribeForm.tsx     # Newsletter subscribe form (full + compact)
 ├── config/
-│   └── catalog.ts            # Single source of truth: all songs + release config
+│   ├── catalog.ts             # Single source of truth: all songs + release config
+│   └── liveEvents.ts          # Live events: upcoming/past shows + ticket links
 ├── emails/
 │   └── templates.ts          # HTML email templates (welcome + broadcast preview)
 ├── layouts/
@@ -55,6 +57,7 @@ src/
 │   ├── adminPage.tsx         # Admin dashboard (subscriber list + broadcast)
 │   ├── contactPage.tsx       # Contact form via EmailJS
 │   ├── homePage.tsx          # Home
+│   ├── livePage.tsx          # "Live" — upcoming/past shows
 │   ├── musicPage.tsx         # "La mia musica" (song carousel)
 │   ├── newsletterPage.tsx    # Newsletter subscribe page
 │   ├── notFoundPage.tsx      # 404
@@ -95,7 +98,8 @@ supabase/
 
 ## ✨ Main Features
 
-- **Home:** Introduction to Lacco with an on-demand Spotify player that loads only when needed on mobile, plus a presave card (blurred artwork backdrop, countdown, DistroKid presave button) for the next upcoming release.
+- **Home:** Introduction to Lacco with an on-demand Spotify player that loads only when needed on mobile, plus a presave card (blurred artwork backdrop, countdown, DistroKid presave button) for the next upcoming release, and a live event card for the next upcoming show.
+- **Live (`/live`):** Driven by `liveEvents.ts`. Shows upcoming live dates (poster, countdown, venue/lineup details, ticket link) and an archive of past shows; displays a "new dates coming soon" message when nothing is upcoming.
 - **La mia musica:** Horizontal snap carousel of singles, with descriptions and streaming links (Spotify + Apple Music) in a modal. Supports presave mode with "COMING SOON" badge.
 - **Release pages (`/:slug`):** Full-screen landing pages driven by `catalog.ts`. Two modes:
   - **Presave mode** — artwork, countdown timer, DistroKid presave button, newsletter subscribe form.
