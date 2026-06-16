@@ -470,7 +470,7 @@ export default function PressKitPage() {
               </a>
             </div>
             <p className="text-default-500 text-xs text-center pt-4">
-              "Lacco" è un marchio registrato.
+              &quot;Lacco&quot; è un marchio registrato.
               <br />
               Tutti i diritti sono riservati.
             </p>

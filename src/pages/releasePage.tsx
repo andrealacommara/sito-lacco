@@ -37,26 +37,23 @@ export default function ReleasePage() {
         <meta content={`${release.title} — Lacco`} property="og:title" />
         <meta content={release.description} property="og:description" />
         <meta content={release.ogImage} property="og:image" />
-        <meta
-          content={`https://lacco.it/${release.slug}`}
-          property="og:url"
-        />
+        <meta content={`https://lacco.it/${release.slug}`} property="og:url" />
         <meta content="music.song" property="og:type" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content={release.ogImage} name="twitter:image" />
       </Helmet>
 
       {/* Background blur: cover artwork a tutto schermo */}
-      <div
-        aria-hidden="true"
-        className="fixed inset-0 -z-10 overflow-hidden"
-      >
+      <div aria-hidden="true" className="fixed inset-0 -z-10 overflow-hidden">
         {bgUrl && (
           <img
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             src={bgUrl}
-            style={{ filter: "blur(40px) brightness(0.35)", transform: "scale(1.15)" }}
+            style={{
+              filter: "blur(40px) brightness(0.35)",
+              transform: "scale(1.15)",
+            }}
           />
         )}
         <div className="absolute inset-0 bg-black/20" />
@@ -127,7 +124,9 @@ function PresaveSection({ release }: SectionProps) {
           {/* CTA pre-save */}
           {release.streamingLinks?.hyperfollow && (
             <motion.div {...fadeUp(0.3)}>
-              <PresaveButton hyperfollowUrl={release.streamingLinks.hyperfollow} />
+              <PresaveButton
+                hyperfollowUrl={release.streamingLinks.hyperfollow}
+              />
             </motion.div>
           )}
 
@@ -186,10 +185,7 @@ function LiveSection({ release }: SectionProps) {
           </motion.div>
 
           {/* Streaming CTA — verticale, larghezza piena, nome store */}
-          <motion.div
-            {...fadeUp(0.2)}
-            className="flex flex-col gap-3 w-full"
-          >
+          <motion.div {...fadeUp(0.2)} className="flex flex-col gap-3 w-full">
             {release.streamingLinks?.spotify && (
               <Button
                 fullWidth

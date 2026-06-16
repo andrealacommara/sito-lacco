@@ -31,7 +31,7 @@ export default function MusicPage() {
 
       <div className="flex flex-col justify-center min-h-fit md:min-h-fit">
         <div className="pb-6">
-          <h2 className={subtitle()}>Scopri la storia dell'EP</h2>
+          <h2 className={subtitle()}>Scopri la storia dell&apos;EP</h2>
         </div>
 
         <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 mx-auto w-full max-w-5xl">
@@ -57,8 +57,8 @@ export default function MusicPage() {
           <div className="flex flex-col p-4">
             <div className="pb-4">
               <p>
-                <em className="text-danger pr-1">nokoru mono</em> ("quelli che
-                restano") è il nome del primo progetto.
+                <em className="text-danger pr-1">nokoru mono</em> (&quot;quelli
+                che restano&quot;) è il nome del primo progetto.
               </p>
               <p>
                 Racconta il mondo interiore, le emozioni che accompagnano la
@@ -68,11 +68,11 @@ export default function MusicPage() {
               <p>
                 È un EP che osserva da vicino: stratificato, intimo,
                 profondamente personale. Il suono si avvicina a una dimensione
-                più R&B, calda e meditativa, che accompagna l'ascoltatore in un
-                viaggio verso sè stesso.
+                più R&B, calda e meditativa, che accompagna l&apos;ascoltatore
+                in un viaggio verso sè stesso.
               </p>
               <p>
-                L'artwork, realizzato da Nicolò Piazza ( in arte
+                L&apos;artwork, realizzato da Nicolò Piazza ( in arte
                 <a
                   className="text-primary px-1 hover:underline"
                   href="https://www.instagram.com/torino_ink"
@@ -81,13 +81,13 @@ export default function MusicPage() {
                 >
                   Torino Ink
                 </a>
-                ) sotto la direzione artistica di Lacco, si ispira all'omonima
-                opera di Umberto Boccioni, facente parte del trittico "Stati
-                d'animo".
+                ) sotto la direzione artistica di Lacco, si ispira
+                all&apos;omonima opera di Umberto Boccioni, facente parte del
+                trittico &quot;Stati d&apos;animo&quot;.
               </p>
               <p>
-                "nokoru mono" rappresenta il primo pezzo di un puzzle più
-                grande, il primo passo di un lungo percorso.
+                &quot;nokoru mono&quot; rappresenta il primo pezzo di un puzzle
+                più grande, il primo passo di un lungo percorso.
                 <br /> Un viaggio attraverso noi stessi e le altre persone.
               </p>
             </div>
@@ -107,7 +107,7 @@ export default function MusicPage() {
                   }
                 >
                   <SpotifyIcon />
-                  Ascolta su Spotify                  
+                  Ascolta su Spotify
                 </Button>
               </div>
               <div className="flex-1 min-w-0">

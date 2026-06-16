@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Button } from "@heroui/button";
+
 import CardSongExposer from "@/components/cardSongExposer";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
 import { catalog } from "@/config/catalog";
@@ -13,28 +14,37 @@ export default function SongCarousel() {
 
   const scroll = (direction: "left" | "right") => {
     const container = scrollContainerRef.current;
+
     if (!container) return;
     const card = container.querySelector(".card-song");
+
     if (!card) return;
     container.scrollBy({
-      left: direction === "left" ? -(card as HTMLElement).offsetWidth : (card as HTMLElement).offsetWidth,
+      left:
+        direction === "left"
+          ? -(card as HTMLElement).offsetWidth
+          : (card as HTMLElement).offsetWidth,
       behavior: "smooth",
     });
   };
 
   const detectCenteredCard = useCallback(() => {
     const container = scrollContainerRef.current;
+
     if (!container) return;
     const cards = container.querySelectorAll(".card-song");
+
     if (cards.length === 0) return;
     const containerCenter =
       container.getBoundingClientRect().left +
       container.getBoundingClientRect().width / 2;
     let closestIndex = 0;
     let closestDistance = Infinity;
+
     cards.forEach((card, index) => {
       const rect = card.getBoundingClientRect();
       const distance = Math.abs(rect.left + rect.width / 2 - containerCenter);
+
       if (distance < closestDistance) {
         closestDistance = distance;
         closestIndex = index;
@@ -48,23 +58,28 @@ export default function SongCarousel() {
     const container = scrollContainerRef.current;
     const startSpacer = startSpacerRef.current;
     const endSpacer = endSpacerRef.current;
+
     if (!container || !startSpacer || !endSpacer) return;
 
     let rafId: number | null = null;
 
     const updateLayout = () => {
       const card = container.querySelector(".card-song") as HTMLElement;
+
       if (!card) return;
       const padding = Math.max(
         0,
         (container.getBoundingClientRect().width - card.offsetWidth) / 2,
       );
+
       startSpacer.style.minWidth = `${padding}px`;
       endSpacer.style.minWidth = `${padding}px`;
     };
 
     updateLayout();
-    requestAnimationFrame(() => container.scrollTo({ left: 0, behavior: "auto" }));
+    requestAnimationFrame(() =>
+      container.scrollTo({ left: 0, behavior: "auto" }),
+    );
 
     const handleScroll = () => {
       if (rafId !== null) cancelAnimationFrame(rafId);

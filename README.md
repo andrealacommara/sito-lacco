@@ -17,7 +17,7 @@ The website features a modern, responsive, and high-performance structure, with 
 | **Styling**            | [TailwindCSS v4](https://tailwindcss.com/)                                 |
 | **Animations**         | [Framer Motion](https://www.framer.com/motion/)                            |
 | **Backend / DB**       | [Supabase](https://supabase.com/) (Postgres + Edge Functions + Auth)       |
-| **Email Service**      | [EmailJS](https://www.emailjs.com/) for contact form · Aruba SMTP for newsletter |
+| **Email Service**      | [EmailJS](https://www.emailjs.com/) for contact form · [Resend](https://resend.com/) for newsletter (welcome + broadcast) |
 | **Image Handling**     | Custom `SmartImage` component with AVIF/WebP/JPEG fallback                 |
 | **Build Tools**        | Vite + TailwindCSS (PostCSS) + HeroUI Theme                                |
 | **CI/CD**              | [GitHub Actions](https://github.com/features/actions) + FTPS deploy to Aruba |
@@ -45,7 +45,7 @@ src/
 ├── config/
 │   └── catalog.ts            # Single source of truth: all songs + release config
 ├── emails/
-│   └── templates.ts          # HTML email templates (confirm + broadcast preview)
+│   └── templates.ts          # HTML email templates (welcome + broadcast preview)
 ├── layouts/
 │   └── default.tsx           # Shared layout (Navbar + Footer)
 ├── lib/
@@ -53,7 +53,6 @@ src/
 ├── pages/
 │   ├── aboutPage.tsx         # "Su di me"
 │   ├── adminPage.tsx         # Admin dashboard (subscriber list + broadcast)
-│   ├── confirmPage.tsx       # Email confirmation landing
 │   ├── contactPage.tsx       # Contact form via EmailJS
 │   ├── homePage.tsx          # Home
 │   ├── musicPage.tsx         # "La mia musica" (song carousel)
@@ -78,15 +77,18 @@ src/
 
 supabase/
 ├── functions/
-│   ├── _shared/              # Shared helpers (Supabase clients, email, validation)
-│   ├── subscribe/            # POST: add subscriber + send confirmation email
-│   ├── confirm/              # GET: confirm subscription via token
-│   ├── unsubscribe/          # GET: unsubscribe via token
-│   ├── admin-subscribers/    # GET: list all subscribers (admin-only)
-│   └── admin-broadcast/      # POST: send broadcast email to all confirmed subscribers
+│   ├── _shared/              # Shared helpers (Supabase clients, email, Resend sync, validation)
+│   ├── subscribe/            # POST: add subscriber (single opt-in) + welcome email
+│   ├── unsubscribe/          # GET: unsubscribe via personal token
+│   ├── resend-webhook/       # POST: Resend webhook (unsubscribe/bounce status sync)
+│   ├── admin-subscribers/    # GET/POST/PATCH: list, add, manually unsubscribe (admin-only)
+│   ├── admin-broadcast/      # POST: send broadcast to all confirmed subscribers or to selected ones
+│   ├── admin-sync-resend/    # POST: reconcile subscriber status with the Resend Audience
+│   └── admin-stats/          # GET: dashboard counters (confirmed, unsubscribed, bounced, new)
 └── migrations/
     ├── 20260614000001_create_subscribers.sql
-    └── 20260614000002_keep_alive_cron.sql
+    ├── 20260614000002_keep_alive_cron.sql
+    └── 20260616000001_remove_pending_status.sql
 ```
 
 ---
@@ -98,8 +100,8 @@ supabase/
 - **Release pages (`/:slug`):** Full-screen landing pages driven by `catalog.ts`. Two modes:
   - **Presave mode** — artwork, countdown timer, DistroKid presave button, newsletter subscribe form.
   - **Live mode** — artwork, streaming CTAs (Spotify / Apple Music), song carousel.
-- **Newsletter:** Subscribe form with name + email + consent. Double opt-in via confirmation email. Unsubscribe link in every email.
-- **Admin (`/admin`):** Protected by Supabase magic link auth. Shows full subscriber list and a broadcast composer (body, optional image upload, optional CTA button) with live email preview.
+- **Newsletter:** Subscribe form with name + email + consent. Single opt-in — confirmed immediately, with a welcome email sent right away. Unsubscribe link in every email, kept in sync with the Resend Audience via webhook and manual reconciliation.
+- **Admin (`/admin`):** Protected by Supabase magic link auth. Dashboard with live counters (confirmed, unsubscribed, bounced, new in last 7 days), searchable/sortable/filterable subscriber list with configurable page size, manual unsubscribe for selected subscribers, and a broadcast composer (body, optional image, optional CTA button) with live email preview — sendable to all confirmed subscribers or to individually selected ones.
 - **Contatti:** Contact form via EmailJS.
 - **PressKit:** Dedicated private page (lazy-loaded, noindex) with official media assets, extended bio, press photos, and professional contacts.
 - **Privacy Policy (`/privacy`):** GDPR-compliant privacy policy in Italian.

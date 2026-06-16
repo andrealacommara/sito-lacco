@@ -4,7 +4,6 @@ import { Suspense, useEffect } from "react";
 import {
   AboutPage,
   AdminPage,
-  ConfirmPage,
   ContactPage,
   HomePage,
   MusicPage,
@@ -81,7 +80,6 @@ function App() {
 
         {/* Newsletter e subscription flow */}
         <Route element={<NewsletterPage />} path="/newsletter" />
-        <Route element={<ConfirmPage />} path="/confirm" />
         <Route element={<UnsubscribePage />} path="/unsubscribe" />
 
         {/* Admin (protetto da Supabase Auth) */}
