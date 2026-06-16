@@ -1,4 +1,9 @@
-import { corsHeaders, getSupabaseAdmin, jsonResponse, RESEND_AUDIENCE_ID } from "../_shared/clients.ts";
+import {
+  corsHeaders,
+  getSupabaseAdmin,
+  jsonResponse,
+  RESEND_AUDIENCE_ID,
+} from "../_shared/clients.ts";
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
@@ -43,11 +48,15 @@ Deno.serve(async (req) => {
   if (RESEND_AUDIENCE_ID) {
     try {
       const apiKey = Deno.env.get("RESEND_API_KEY")!;
+
       await fetch(
         `https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts`,
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ email: subscriber.email, unsubscribed: true }),
         },
       );

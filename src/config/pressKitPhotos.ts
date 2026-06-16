@@ -16,7 +16,6 @@ import pressKitPic13 from "@/assets/images/presskit/pressKitPic13.avif";
 import pressKitPic14 from "@/assets/images/presskit/pressKitPic14.avif";
 import pressKitPic15 from "@/assets/images/presskit/pressKitPic15.avif";
 import pressKitPic16 from "@/assets/images/presskit/pressKitPic16.avif";
-
 //Import of high quality press kit photos.
 import pressKitHQPic1 from "@/assets/images/presskit/HQ/pressKitPic1.jpg";
 import pressKitHQPic2 from "@/assets/images/presskit/HQ/pressKitPic2.jpg";

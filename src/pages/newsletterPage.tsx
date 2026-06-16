@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+
 import DefaultLayout from "@/layouts/default";
 import SubscribeForm from "@/components/subscribeForm";
 import { title } from "@/components/primitives";

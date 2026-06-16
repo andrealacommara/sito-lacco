@@ -2,8 +2,14 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
-import { useRef, useCallback, useState } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { useRef, useCallback, useState, useEffect } from "react";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/modal";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 
@@ -20,16 +26,21 @@ type ToolbarButtonProps = {
   children: React.ReactNode;
 };
 
-function ToolbarButton({ active, onClick, title, children }: ToolbarButtonProps) {
+function ToolbarButton({
+  active,
+  onClick,
+  title,
+  children,
+}: ToolbarButtonProps) {
   return (
     <button
-      title={title}
-      type="button"
       className={`px-2 py-1 rounded text-sm font-medium transition-colors ${
         active
           ? "bg-default-200 text-default-900"
           : "text-default-500 hover:bg-default-100 hover:text-default-800"
       }`}
+      title={title}
+      type="button"
       onMouseDown={(e) => {
         e.preventDefault();
         onClick();
@@ -40,7 +51,11 @@ function ToolbarButton({ active, onClick, title, children }: ToolbarButtonProps)
   );
 }
 
-export default function RichTextEditor({ value, onChange, placeholder }: Props) {
+export default function RichTextEditor({
+  value,
+  onChange,
+  placeholder,
+}: Props) {
   // Track whether the latest change came from inside the editor to avoid
   // calling setContent on every keystroke (which would lose the cursor).
   const lastEmitted = useRef<string>(value);
@@ -60,11 +75,13 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
     content: value,
     editorProps: {
       attributes: {
-        class: "outline-none min-h-25 text-sm text-default-800 leading-relaxed rte-content",
+        class:
+          "outline-none min-h-25 text-sm text-default-800 leading-relaxed rte-content",
       },
     },
     onUpdate({ editor }) {
       const html = editor.getHTML();
+
       lastEmitted.current = html;
       onChange(html);
     },
@@ -72,10 +89,12 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
 
   // Sync only when the parent resets the value externally (e.g. after send).
   // Skip if the change originated from inside the editor.
-  if (editor && value !== lastEmitted.current && value !== editor.getHTML()) {
-    editor.commands.setContent(value, false);
-    lastEmitted.current = value;
-  }
+  useEffect(() => {
+    if (editor && value !== lastEmitted.current && value !== editor.getHTML()) {
+      editor.commands.setContent(value, { emitUpdate: false });
+      lastEmitted.current = value;
+    }
+  }, [editor, value]);
 
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
@@ -90,6 +109,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
     if (!editor) return;
     if (linkUrl.trim()) {
       let href = linkUrl.trim();
+
       if (!/^[a-z]+:\/\//i.test(href)) href = `https://${href}`;
       editor.chain().focus().setLink({ href }).run();
     } else {
@@ -117,14 +137,21 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
       `}</style>
 
       <div className="flex flex-col gap-0">
-        <label className="text-sm font-medium mb-1.5">Testo email</label>
+        <span className="text-sm font-medium mb-1.5">Testo email</span>
         <div className="rounded-xl border-2 border-default-200 hover:border-default-400 focus-within:border-default-foreground transition-colors">
           {/* Toolbar */}
           <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-default-200">
             <ToolbarButton
               active={editor.isActive("bold")}
               title="Grassetto"
-              onClick={() => editor.chain().focus().extendMarkRange("bold").toggleBold().run()}
+              onClick={() =>
+                editor
+                  .chain()
+                  .focus()
+                  .extendMarkRange("bold")
+                  .toggleBold()
+                  .run()
+              }
             >
               <strong>B</strong>
             </ToolbarButton>
@@ -145,10 +172,14 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
             <div className="w-px h-4 bg-default-200 mx-1" />
             <ToolbarButton
               active={editor.isActive("link")}
-              title={editor.isActive("link") ? "Modifica link" : "Inserisci link"}
+              title={
+                editor.isActive("link") ? "Modifica link" : "Inserisci link"
+              }
               onClick={openLinkModal}
             >
-              <span className="text-xs">{editor.isActive("link") ? "modifica link" : "link"}</span>
+              <span className="text-xs">
+                {editor.isActive("link") ? "modifica link" : "link"}
+              </span>
             </ToolbarButton>
           </div>
 
@@ -164,14 +195,18 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
         </div>
       </div>
 
-      <Modal isOpen={linkModalOpen} placement="center" size="sm" onClose={() => setLinkModalOpen(false)}>
+      <Modal
+        isOpen={linkModalOpen}
+        placement="center"
+        size="sm"
+        onClose={() => setLinkModalOpen(false)}
+      >
         <ModalContent>
           <ModalHeader className="text-base font-semibold">
             {editor.isActive("link") ? "Modifica link" : "Inserisci link"}
           </ModalHeader>
           <ModalBody>
             <Input
-              autoFocus
               label="URL"
               labelPlacement="outside"
               placeholder="https://…"
@@ -183,14 +218,23 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
           </ModalBody>
           <ModalFooter className="flex justify-between">
             {editor.isActive("link") ? (
-              <Button color="danger" size="sm" variant="light" onPress={removeLink}>
+              <Button
+                color="danger"
+                size="sm"
+                variant="light"
+                onPress={removeLink}
+              >
                 Rimuovi link
               </Button>
             ) : (
               <div />
             )}
             <div className="flex gap-2">
-              <Button size="sm" variant="light" onPress={() => setLinkModalOpen(false)}>
+              <Button
+                size="sm"
+                variant="light"
+                onPress={() => setLinkModalOpen(false)}
+              >
                 Annulla
               </Button>
               <Button color="primary" size="sm" onPress={confirmLink}>
