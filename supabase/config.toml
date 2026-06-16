@@ -4,6 +4,18 @@
 # working directory name when running `supabase init`.
 project_id = "sito-lacco"
 
+# Function pubbliche: chiamate da form/webhook esterni senza Bearer JWT Supabase.
+# Senza questa sezione, `supabase functions deploy` resetta verify_jwt a true
+# e blocca le richieste pubbliche con 401 a livello di gateway.
+[functions.subscribe]
+verify_jwt = false
+
+[functions.unsubscribe]
+verify_jwt = false
+
+[functions.resend-webhook]
+verify_jwt = false
+
 [api]
 enabled = true
 # Port to use for the API URL.

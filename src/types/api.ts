@@ -15,13 +15,6 @@ export type SubscribeResponse = {
   message: string;
 };
 
-// GET /functions/v1/confirm?token=xxx
-export type ConfirmResponse = {
-  ok: boolean;
-  alreadyConfirmed?: boolean;
-  error?: string;
-};
-
 // GET /functions/v1/unsubscribe?token=xxx
 export type UnsubscribeResponse = {
   ok: boolean;
@@ -33,7 +26,7 @@ export type AdminSubscriber = {
   id: string;
   email: string;
   firstName?: string;
-  status: "pending" | "confirmed" | "unsubscribed" | "bounced";
+  status: "confirmed" | "unsubscribed" | "bounced";
   source: "presave_form" | "newsletter_form" | "manual";
   releaseSlug?: string;
   consentTimestamp?: string;
@@ -52,17 +45,51 @@ export type AdminAddSubscriberBody = {
   note?: string;
 };
 
+// PATCH /functions/v1/admin-subscribers (disiscrizione manuale, richiede Bearer JWT)
+export type AdminUnsubscribeBody = {
+  ids: string[];
+};
+export type AdminUnsubscribeResponse = {
+  ok: boolean;
+  updated?: number;
+  error?: string;
+};
+
 // POST /functions/v1/admin-broadcast (richiede Bearer JWT)
-// Il FE renderizza l'HTML via announcementEmailHtml() e lo passa come htmlBody
+// Il FE renderizza l'HTML via announcementEmailHtml() e lo passa come htmlBody.
+// Se recipientIds è presente, invia solo a quei subscriber (invio singolo) invece
+// che all'intera audience Resend.
 export type BroadcastBody = {
   subject: string;
   htmlBody: string;
   dry?: boolean; // se true, restituisce solo recipientCount senza inviare
+  recipientIds?: string[];
 };
 export type BroadcastResponse = {
   ok: boolean;
   broadcastId?: string;
   recipientCount?: number;
+  sent?: number;
+  failed?: number;
   dry?: boolean;
+  syncUpdated?: number; // quanti subscriber sono stati riallineati con Resend prima dell'invio "a tutti"
+  error?: string;
+};
+
+// POST /functions/v1/admin-sync-resend (richiede Bearer JWT)
+export type AdminSyncResendResponse = {
+  ok: boolean;
+  checked?: number;
+  updated?: number;
+  error?: string;
+};
+
+// GET /functions/v1/admin-stats (richiede Bearer JWT)
+export type AdminStatsResponse = {
+  ok: boolean;
+  confirmed?: number;
+  unsubscribed?: number;
+  bounced?: number;
+  newLast7Days?: number;
   error?: string;
 };

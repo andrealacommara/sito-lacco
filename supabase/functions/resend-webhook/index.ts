@@ -5,6 +5,7 @@ import { getSupabaseAdmin, jsonResponse } from "../_shared/clients.ts";
 
 async function verifySignature(req: Request, body: string): Promise<boolean> {
   const secret = Deno.env.get("RESEND_WEBHOOK_SECRET");
+
   if (!secret) return false;
   const signature = req.headers.get("svix-signature") ?? "";
   const msgId = req.headers.get("svix-id") ?? "";
@@ -18,11 +19,21 @@ async function verifySignature(req: Request, body: string): Promise<boolean> {
     ["verify"],
   );
   const signedContent = `${msgId}.${msgTimestamp}.${body}`;
-  const expectedSig = signature.split(" ").find((s) => s.startsWith("v1,"))?.slice(3);
+  const expectedSig = signature
+    .split(" ")
+    .find((s) => s.startsWith("v1,"))
+    ?.slice(3);
+
   if (!expectedSig) return false;
 
   const sigBytes = Uint8Array.from(atob(expectedSig), (c) => c.charCodeAt(0));
-  return crypto.subtle.verify("HMAC", key, sigBytes, new TextEncoder().encode(signedContent));
+
+  return crypto.subtle.verify(
+    "HMAC",
+    key,
+    sigBytes,
+    new TextEncoder().encode(signedContent),
+  );
 }
 
 Deno.serve(async (req) => {
@@ -32,11 +43,13 @@ Deno.serve(async (req) => {
 
   const body = await req.text();
   const valid = await verifySignature(req, body);
+
   if (!valid) {
     return jsonResponse({ ok: false, error: "Invalid signature" }, 401);
   }
 
   let event: Record<string, unknown>;
+
   try {
     event = JSON.parse(body) as Record<string, unknown>;
   } catch {
@@ -45,19 +58,41 @@ Deno.serve(async (req) => {
 
   const type = event.type as string;
   const data = event.data as Record<string, unknown>;
-  const email = (data?.email_to as string[] | undefined)?.[0] ?? (data?.email as string);
+  const email =
+    (data?.email_to as string[] | undefined)?.[0] ?? (data?.email as string);
 
   if (!email) return jsonResponse({ ok: true }, 200);
 
   const supabase = getSupabaseAdmin();
 
-  if (type === "contact.unsubscribed") {
-    await supabase.from("subscribers").update({ status: "unsubscribed" }).eq("email", email);
-  } else if (type === "email.bounced") {
-    await supabase.from("subscribers").update({ status: "bounced" }).eq("email", email);
+  if (type === "email.bounced") {
+    await supabase
+      .from("subscribers")
+      .update({ status: "bounced" })
+      .eq("email", email);
   } else if (type === "email.complained") {
     // Complaint GDPR: status unsubscribed immediatamente
-    await supabase.from("subscribers").update({ status: "unsubscribed" }).eq("email", email);
+    await supabase
+      .from("subscribers")
+      .update({ status: "unsubscribed" })
+      .eq("email", email);
+  } else if (type === "contact.created" || type === "contact.updated") {
+    // Resend non ha un evento "contact.unsubscribed": lo stato si legge da data.unsubscribed
+    // su contact.created/contact.updated (es. dopo click sul link di disiscrizione del broadcast).
+    const unsubscribed = data?.unsubscribed;
+
+    if (unsubscribed === true) {
+      await supabase
+        .from("subscribers")
+        .update({ status: "unsubscribed" })
+        .eq("email", email);
+    } else if (unsubscribed === false) {
+      await supabase
+        .from("subscribers")
+        .update({ status: "confirmed" })
+        .eq("email", email)
+        .eq("status", "unsubscribed");
+    }
   }
 
   return jsonResponse({ ok: true }, 200);

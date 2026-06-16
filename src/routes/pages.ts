@@ -13,7 +13,6 @@ export const PressKitPage = lazyWithPreload(
 export const NewsletterPage = lazyWithPreload(
   () => import("@/pages/newsletterPage"),
 );
-export const ConfirmPage = lazyWithPreload(() => import("@/pages/confirmPage"));
 export const UnsubscribePage = lazyWithPreload(
   () => import("@/pages/unsubscribePage"),
 );
@@ -22,9 +21,7 @@ export const ReleasePage = lazyWithPreload(() => import("@/pages/releasePage"));
 export const NotFoundPage = lazyWithPreload(
   () => import("@/pages/notFoundPage"),
 );
-export const PrivacyPage = lazyWithPreload(
-  () => import("@/pages/privacyPage"),
-);
+export const PrivacyPage = lazyWithPreload(() => import("@/pages/privacyPage"));
 
 // ========================== PRELOAD MAP ========================== //
 // Maps route paths to the respective preload function for quick lookups.
