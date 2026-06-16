@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 
@@ -36,7 +37,8 @@ export default function PrivacyPage() {
 
             <Section title="Dati raccolti">
               <p>
-                Tramite il modulo di iscrizione alla newsletter vengono raccolti:
+                Tramite il modulo di iscrizione alla newsletter vengono
+                raccolti:
               </p>
               <ul className="list-disc list-inside mt-2 flex flex-col gap-1">
                 <li>Indirizzo email (obbligatorio)</li>
@@ -46,24 +48,25 @@ export default function PrivacyPage() {
 
             <Section title="Finalità del trattamento">
               <p>
-                I dati sono trattati esclusivamente per l'invio di aggiornamenti
-                sulle uscite musicali, eventi e notizie relative a Lacco.
+                I dati sono trattati esclusivamente per l&apos;invio di
+                aggiornamenti sulle uscite musicali, eventi e notizie relative a
+                Lacco.
               </p>
             </Section>
 
             <Section title="Base giuridica">
               <p>
-                Il trattamento si basa sul consenso esplicito dell'interessato
-                (art. 6, par. 1, lett. a del Regolamento UE 2016/679 — GDPR),
-                prestato al momento dell'iscrizione.
+                Il trattamento si basa sul consenso esplicito
+                dell&apos;interessato (art. 6, par. 1, lett. a del Regolamento
+                UE 2016/679 — GDPR), prestato al momento dell&apos;iscrizione.
               </p>
             </Section>
 
             <Section title="Conservazione dei dati">
               <p>
                 I dati sono conservati fino alla revoca del consenso da parte
-                dell'interessato. È possibile disiscriversi in qualsiasi momento
-                tramite il link presente in ogni email o scrivendo a{" "}
+                dell&apos;interessato. È possibile disiscriversi in qualsiasi
+                momento tramite il link presente in ogni email o scrivendo a{" "}
                 <a
                   className="text-primary hover:underline"
                   href="mailto:management@lacco.it"
@@ -77,15 +80,15 @@ export default function PrivacyPage() {
             <Section title="Responsabile del trattamento">
               <p>
                 I dati sono archiviati su infrastruttura fornita da{" "}
-                <strong>Supabase Inc.</strong>, con server situati nell'Unione
-                Europea. Supabase agisce in qualità di responsabile del
-                trattamento ai sensi dell'art. 28 GDPR.
+                <strong>Supabase Inc.</strong>, con server situati
+                nell&apos;Unione Europea. Supabase agisce in qualità di
+                responsabile del trattamento ai sensi dell&apos;art. 28 GDPR.
               </p>
             </Section>
 
             <Section title="Diritti dell'interessato">
               <p>
-                In conformità agli artt. 15–22 del GDPR, l'interessato ha
+                In conformità agli artt. 15–22 del GDPR, l&apos;interessato ha
                 diritto di:
               </p>
               <ul className="list-disc list-inside mt-2 flex flex-col gap-1">
@@ -109,9 +112,8 @@ export default function PrivacyPage() {
 
             <Section title="Reclami">
               <p>
-                L'interessato ha il diritto di proporre reclamo al{" "}
-                <strong>Garante per la Protezione dei Dati Personali</strong>{" "}
-                (
+                L&apos;interessato ha il diritto di proporre reclamo al{" "}
+                <strong>Garante per la Protezione dei Dati Personali</strong> (
                 <a
                   className="text-primary hover:underline"
                   href="https://www.garanteprivacy.it"

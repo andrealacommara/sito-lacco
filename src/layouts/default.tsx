@@ -2,6 +2,7 @@
 // Import core components and configurations needed for the main site layout.
 
 import { Link } from "react-router-dom";
+
 import { Navbar } from "@/components/navbar";
 import {
   AppleMusicIcon,
@@ -50,42 +51,42 @@ export default function DefaultLayout({
           Iscriviti alla newsletter
         </Link>
         <div className="flex items-center gap-2">
-        {/* Each Link opens in a new tab */}
-        <button
-          aria-label="Vai al profilo Spotify di Lacco"
-          title="Spotify"
-          onClick={() => window.open(siteConfig.links.spotify, "_blank")}
-        >
-          <SpotifyIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </button>
-        <button
-          aria-label="Vai al profilo Instagram di Lacco"
-          title="Instagram"
-          onClick={() => window.open(siteConfig.links.instagram, "_blank")}
-        >
-          <InstagramIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </button>
-        <button
-          aria-label="Vai al profilo TikTok di Lacco"
-          title="TikTok"
-          onClick={() => window.open(siteConfig.links.tiktok, "_blank")}
-        >
-          <TikTokIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </button>
-        <button
-          aria-label="Vai al profilo Apple Music di Lacco"
-          title="Apple Music"
-          onClick={() => window.open(siteConfig.links.appleMusic, "_blank")}
-        >
-          <AppleMusicIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </button>
-        <button
-          aria-label="Vai al canale YouTube di Lacco"
-          title="YouTube"
-          onClick={() => window.open(siteConfig.links.youtube, "_blank")}
-        >
-          <YouTubeIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
-        </button>
+          {/* Each Link opens in a new tab */}
+          <button
+            aria-label="Vai al profilo Spotify di Lacco"
+            title="Spotify"
+            onClick={() => window.open(siteConfig.links.spotify, "_blank")}
+          >
+            <SpotifyIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
+          </button>
+          <button
+            aria-label="Vai al profilo Instagram di Lacco"
+            title="Instagram"
+            onClick={() => window.open(siteConfig.links.instagram, "_blank")}
+          >
+            <InstagramIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
+          </button>
+          <button
+            aria-label="Vai al profilo TikTok di Lacco"
+            title="TikTok"
+            onClick={() => window.open(siteConfig.links.tiktok, "_blank")}
+          >
+            <TikTokIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
+          </button>
+          <button
+            aria-label="Vai al profilo Apple Music di Lacco"
+            title="Apple Music"
+            onClick={() => window.open(siteConfig.links.appleMusic, "_blank")}
+          >
+            <AppleMusicIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
+          </button>
+          <button
+            aria-label="Vai al canale YouTube di Lacco"
+            title="YouTube"
+            onClick={() => window.open(siteConfig.links.youtube, "_blank")}
+          >
+            <YouTubeIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
+          </button>
         </div>
       </footer>
     </div>

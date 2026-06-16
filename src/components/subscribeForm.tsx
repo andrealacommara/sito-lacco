@@ -1,11 +1,13 @@
+import type { SubscribeBody, SubscribeResponse } from "@/types/api";
+
 import { useState, useId } from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { Checkbox } from "@heroui/checkbox";
 import { addToast } from "@heroui/toast";
 import { motion, AnimatePresence } from "framer-motion";
+
 import { EF_BASE } from "@/lib/supabase";
-import type { SubscribeBody, SubscribeResponse } from "@/types/api";
 
 type Props = {
   source: "presave_form" | "newsletter_form";
@@ -13,7 +15,11 @@ type Props = {
   compact?: boolean;
 };
 
-export default function SubscribeForm({ source, releaseSlug, compact = false }: Props) {
+export default function SubscribeForm({
+  source,
+  releaseSlug,
+  compact = false,
+}: Props) {
   const formId = useId();
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -27,14 +33,17 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
       return "Inserisci un'email valida.";
     }
     if (!consent) return "Accetta il consenso per continuare.";
+
     return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const err = validate();
+
     if (err) {
       addToast({ title: err, color: "danger" });
+
       return;
     }
     setLoading(true);
@@ -53,6 +62,7 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
         body: JSON.stringify(body),
       });
       const data = (await res.json()) as SubscribeResponse;
+
       if (data.ok) {
         setDone(true);
         addToast({
@@ -60,7 +70,10 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
           color: "success",
         });
       } else {
-        addToast({ title: data.message ?? "Errore. Riprova.", color: "danger" });
+        addToast({
+          title: data.message ?? "Errore. Riprova.",
+          color: "danger",
+        });
       }
     } catch {
       addToast({ title: "Errore di rete. Riprova.", color: "danger" });
@@ -86,9 +99,9 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
         <motion.form
           key="form"
           animate={{ opacity: 1 }}
+          className="flex flex-col gap-3 w-full"
           exit={{ opacity: 0 }}
           initial={{ opacity: 1 }}
-          className="flex flex-col gap-3 w-full"
           onSubmit={handleSubmit}
         >
           {/* Honeypot nascosto */}
@@ -148,11 +161,7 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
             />
           )}
 
-          <Checkbox
-            isSelected={consent}
-            size="sm"
-            onValueChange={setConsent}
-          >
+          <Checkbox isSelected={consent} size="sm" onValueChange={setConsent}>
             <span className="text-xs text-default-500">
               Accetto di ricevere aggiornamenti sulle uscite di Lacco.
             </span>
@@ -161,8 +170,8 @@ export default function SubscribeForm({ source, releaseSlug, compact = false }: 
           {!compact && (
             <>
               <Button
-                color="danger"
                 fullWidth
+                color="danger"
                 isLoading={loading}
                 type="submit"
               >

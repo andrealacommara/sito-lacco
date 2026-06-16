@@ -203,7 +203,7 @@ export default function CardSongExposer({
                               "noopener,noreferrer",
                             )
                           }
-                        >                          
+                        >
                           <AppleMusicIcon />
                           Apple Music
                         </Button>
