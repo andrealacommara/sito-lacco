@@ -1,4 +1,5 @@
 import type { ImageLikeImport } from "@/components/smartImage";
+
 import tempoPersoLIVEPoster from "@/assets/images/liveEvents/tempoPersoLIVEPoster.avif";
 
 export type LiveEvent = {
