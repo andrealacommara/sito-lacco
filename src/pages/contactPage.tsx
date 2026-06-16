@@ -114,7 +114,6 @@ export default function ContactPage() {
       formReset("all");
     } catch (error) {
       if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console -- useful during local debugging only
         console.error("error: ", error);
       }
       addToast({

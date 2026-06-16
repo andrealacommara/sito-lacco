@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@heroui/button";
+
 import { SpotifyIcon } from "@/components/icons";
 
 type Props = {
@@ -16,6 +17,7 @@ function openCenteredPopup(url: string, fallbackUrl: string) {
     "presave-spotify",
     `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes`,
   );
+
   if (!popup || popup.closed || typeof popup.closed === "undefined") {
     window.open(fallbackUrl, "_blank", "noopener,noreferrer");
   }

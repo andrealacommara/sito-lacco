@@ -10,7 +10,9 @@ type TimeLeft = {
 
 function getTimeLeft(target: Date): TimeLeft | null {
   const diff = target.getTime() - Date.now();
+
   if (diff <= 0) return null;
+
   return {
     days: Math.floor(diff / (1000 * 60 * 60 * 24)),
     hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -37,6 +39,7 @@ export default function Countdown({
     const timer = setInterval(() => {
       setTimeLeft(getTimeLeft(releaseDate));
     }, 1000);
+
     return () => clearInterval(timer);
   }, [releaseDate, timeLeft]);
 
@@ -61,19 +64,29 @@ export default function Countdown({
   ];
 
   return (
-    <div className="flex items-center gap-1 md:gap-3" role="timer" aria-live="off">
+    <div
+      aria-live="off"
+      className="flex items-center gap-1 md:gap-3"
+      role="timer"
+    >
       {units.map((unit, i) => (
         <div key={unit.label} className="flex items-center gap-1 md:gap-3">
           <div className="flex flex-col items-center min-w-10 md:min-w-14">
-            <span className={`text-3xl md:text-5xl font-bold tabular-nums leading-none ${variant === "light" ? "text-gray-900" : "text-white"}`}>
+            <span
+              className={`text-3xl md:text-5xl font-bold tabular-nums leading-none ${variant === "light" ? "text-gray-900" : "text-white"}`}
+            >
               {unit.value}
             </span>
-            <span className={`text-[9px] md:text-[11px] font-medium tracking-widest mt-1 uppercase ${variant === "light" ? "text-gray-500" : "text-white/50"}`}>
+            <span
+              className={`text-[9px] md:text-[11px] font-medium tracking-widest mt-1 uppercase ${variant === "light" ? "text-gray-500" : "text-white/50"}`}
+            >
               {unit.label}
             </span>
           </div>
           {i < units.length - 1 && (
-            <span className={`text-2xl md:text-4xl font-bold pb-4 select-none ${variant === "light" ? "text-gray-300" : "text-white/40"}`}>
+            <span
+              className={`text-2xl md:text-4xl font-bold pb-4 select-none ${variant === "light" ? "text-gray-300" : "text-white/40"}`}
+            >
               :
             </span>
           )}

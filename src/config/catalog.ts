@@ -1,4 +1,5 @@
 import type { ImageLikeImport } from "@/components/smartImage";
+
 import bellaAlBuioArtwork from "@/assets/images/artworks/bellaAlBuioArtwork.avif";
 import tuxtuArtwork from "@/assets/images/artworks/tuxtuArtwork.avif";
 import nokoruMonoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";

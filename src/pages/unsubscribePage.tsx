@@ -1,21 +1,22 @@
+import type { UnsubscribeResponse } from "@/types/api";
+
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
 import DefaultLayout from "@/layouts/default";
-import type { UnsubscribeResponse } from "@/types/api";
 
 const EF_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
 
 export default function UnsubscribePage() {
   const [params] = useSearchParams();
   const token = params.get("token");
-  const [state, setState] = useState<"loading" | "ok" | "error">("loading");
+  const [state, setState] = useState<"loading" | "ok" | "error">(() =>
+    token ? "loading" : "error",
+  );
 
   useEffect(() => {
-    if (!token) {
-      setState("error");
-      return;
-    }
+    if (!token) return;
     fetch(`${EF_BASE}/unsubscribe?token=${encodeURIComponent(token)}`)
       .then((r) => r.json())
       .then((data: UnsubscribeResponse) => {

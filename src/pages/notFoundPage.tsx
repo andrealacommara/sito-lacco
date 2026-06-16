@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
 import DefaultLayout from "@/layouts/default";
 
 export default function NotFoundPage() {
@@ -15,10 +16,7 @@ export default function NotFoundPage() {
         <p className="text-default-500">
           La pagina che cerchi non esiste o è stata spostata.
         </p>
-        <Link
-          className="text-danger hover:underline font-medium"
-          to="/"
-        >
+        <Link className="text-danger hover:underline font-medium" to="/">
           ← Torna alla home
         </Link>
       </div>
