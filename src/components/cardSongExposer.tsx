@@ -32,6 +32,7 @@ interface CardSongExposerProps {
   songAppleMusicLink: string; // External link to the song on Apple Music
   preSaveMode: boolean; // Flag indicating if "pre-save" mode is active
   hyperfollowUrl?: string; // DistroKid hyperfollow URL for pre-save mode
+  releaseDate: Date; // Release date, used to switch the pre-save CTA once the song is out
 }
 
 // ========================== COMPONENT: CardSongExposer ========================== //
@@ -50,6 +51,7 @@ export default function CardSongExposer({
   songAppleMusicLink,
   preSaveMode,
   hyperfollowUrl,
+  releaseDate,
 }: CardSongExposerProps) {
   const [isLoaded, setIsLoaded] = useState(false); // Tracks artwork image loading state
   const { isOpen, onOpen, onClose } = useDisclosure(); // Manages modal open/close state
@@ -165,7 +167,10 @@ export default function CardSongExposer({
                 <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
                   {preSaveMode ? (
                     <div className="flex-1 min-w-0 flex justify-center">
-                      <PresaveButton hyperfollowUrl={hyperfollowUrl ?? ""} />
+                      <PresaveButton
+                        hyperfollowUrl={hyperfollowUrl ?? ""}
+                        releaseDate={releaseDate}
+                      />
                     </div>
                   ) : (
                     <>

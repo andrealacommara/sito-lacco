@@ -51,7 +51,7 @@ export const catalog: Song[] = [
     slug: "bella-al-buio",
     title: "bella al buio",
     releaseDate: d("2026-07-03"),
-    presaveMode: true, // ← girare a false dopo uscita, aggiungere streamingLinks
+    presaveMode: true,
     artwork: bellaAlBuioArtwork,
     alt: "Cover artwork di 'bella al buio'",
     ogImage: "/og-bella-al-buio.jpg",
