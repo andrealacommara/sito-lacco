@@ -45,7 +45,7 @@ export default function DefaultLayout({
         role="contentinfo"
       >
         <Link
-          className="text-xs text-default-400 hover:text-default-600 transition-colors underline underline-offset-2"
+          className="text-xs text-default-500 hover:text-default-700 transition-colors underline underline-offset-2"
           to="/newsletter"
         >
           Iscriviti alla newsletter
