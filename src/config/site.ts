@@ -10,16 +10,13 @@ export const siteConfig = {
   // Project or brand name
   name: "Lacco",
 
-  // Short description for SEO or social sharing
-  description: "Scopri Lacco, la sua musica e ciò che la ispira!",
-
   // ========================== MAIN NAVBAR ========================== //
   // Items shown in the desktop navigation bar
   navItems: [
     { label: "Home", href: "/" },
-    { label: "La mia musica", href: "/la-mia-musica" },
+    { label: "Musica", href: "/musica" },
     { label: "Live", href: "/live" },
-    { label: "Su di me", href: "/su-di-me" },
+    { label: "Chi sono", href: "/chi-sono" },
     { label: "Contatti", href: "/contatti" },
   ],
 
@@ -27,9 +24,9 @@ export const siteConfig = {
   // Items shown in the dropdown menu on mobile
   navMenuItems: [
     { label: "Home", href: "/" },
-    { label: "La mia musica", href: "/la-mia-musica" },
+    { label: "Musica", href: "/musica" },
     { label: "Live", href: "/live" },
-    { label: "Su di me", href: "/su-di-me" },
+    { label: "Chi sono", href: "/chi-sono" },
     { label: "Contatti", href: "/contatti" },
   ],
 

@@ -2,13 +2,12 @@
 // Import layout, UI components, and assets used to build the homepage.
 
 import { Card } from "@heroui/card"; // UI component for container
-import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
-import { useState } from "react"; // React hook for local state management
+import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
 
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)
 import SpotifyPlayer from "@/components/spotifyPlayer"; // Custom component for Spotify player
-import { subtitle, title } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
+import { subtitle } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
 import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
 import SmartImage, { resolveImageSource } from "@/components/smartImage"; // Optimized image component with automatic loading
 import {
@@ -31,123 +30,182 @@ import LiveEventCard from "@/components/liveEventCard";
 export default function HomePage() {
   // State that tracks whether the image has been loaded.
   // Used to show a “skeleton” effect until the image is ready.
-  const [isLoaded, setIsLoaded] = useState(false);
+  const upcomingLive = getUpcomingLiveEvents();
+  const presaveReleases = catalog.filter(
+    (release) =>
+      release.presaveMode === true && !!release.streamingLinks?.hyperfollow,
+  );
 
   return (
     <DefaultLayout>
       {/* ========================== HELMET ========================== */}
-      {/* Dynamic title and description for Google SEO */}
       <Helmet>
-        <title>Lacco | Home</title>
+        <title>Lacco</title>
         <meta
-          content="Scopri Lacco: R&B e hip-hop in un viaggio introspettivo alla scoperta di sé."
+          content="Lacco è un cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Ascolta la sua musica, scopri i live e rimani aggiornato."
           name="description"
         />
         <meta content="index, follow" name="robots" />
+        <link href="https://lacco.it" rel="canonical" />
+
+        {/* Open Graph */}
+        <meta content="profile" property="og:type" />
+        <meta content="Lacco" property="og:site_name" />
+        <meta content="Lacco" property="og:title" />
+        <meta
+          content="Lacco è un cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Ascolta la sua musica, scopri i live e rimani aggiornato."
+          property="og:description"
+        />
+        <meta content="https://lacco.it" property="og:url" />
+        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="it_IT" property="og:locale" />
+
+        {/* Twitter / X */}
+        <meta content="summary_large_image" name="twitter:card" />
+        <meta content="Lacco" name="twitter:title" />
+        <meta
+          content="Lacco è un cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire."
+          name="twitter:description"
+        />
+        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
+
+        {/* Structured data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "MusicGroup",
+            name: "Lacco",
+            genre: ["Pop", "R&B", "Hip-Hop"],
+            url: "https://lacco.it",
+            image: "https://lacco.it/og-image.jpg",
+            sameAs: [
+              siteConfig.links.spotify,
+              siteConfig.links.tiktok,
+              siteConfig.links.instagram,
+              siteConfig.links.appleMusic,
+              siteConfig.links.youtube,
+            ],
+          })}
+        </script>
       </Helmet>
 
-      {/* ========================== INTRO SECTION ========================== */}
-      <section className="flex flex-row text-center justify-center gap-4 py-8 md:py-10">
-        <h1 className={title()}>Scopri di più su Lacco</h1>
+      {/* ========================== HERO SECTION ========================== */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 items-center max-w-5xl mx-auto py-8 md:py-12 px-4">
+        <motion.div
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex justify-center"
+          initial={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
+          <SmartImage
+            isBlurred
+            priority
+            alt="Lacco"
+            className="w-full h-full max-w-sm md:max-w-full"
+            src={heroLacco}
+            style={{ aspectRatio: "1 / 1" }}
+            width={400}
+          />
+        </motion.div>
+
+        <div className="flex flex-col gap-5 text-center md:text-left">
+          <motion.span
+            animate={{ opacity: 1, y: 0 }}
+            className="text-danger uppercase tracking-[0.2em] text-xs font-bold"
+            initial={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Pop · R&B · Hip-Hop
+          </motion.span>
+
+          <motion.p
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground leading-tight font-display"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+          >
+            Per chi sente più di quanto riesca a dire.
+          </motion.p>
+
+          <motion.p
+            animate={{ opacity: 1, y: 0 }}
+            className="text-base lg:text-lg text-default-500 leading-relaxed font-display"
+            initial={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            Lacco è un cantautore che trasforma emozioni, esperienze e frammenti
+            di vita in storie da ascoltare.
+          </motion.p>
+        </div>
       </section>
-
-      {/* ========================== MAIN CARD ========================== */}
-      {/* Contains the artist image and description */}
-      <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 mx-auto  w-full max-w-5xl">
-        {/* Visual placeholder while the image is loading */}
-        {!isLoaded && (
-          <Skeleton className="absolute inset-0 rounded-lg">
-            <div className="h-full w-full bg-default-300 rounded-lg" />
-          </Skeleton>
-        )}
-
-        {/* ========================== ARTIST IMAGE ========================== */}
-        <div className="p-4 md:p-4 shrink-0 flex items-center justify-center">
-          <div className="w-fit md:w-full items-center">
-            <SmartImage
-              isBlurred // Applies a slight blur effect
-              priority
-              alt="Lacco" // Alt text for accessibility
-              className="w-full h-full"
-              sizes="400px"
-              src={heroLacco} // Imported image
-              style={{ aspectRatio: "1 / 1" }}
-              onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to decode
-              onLoad={() => setIsLoaded(true)} // Removes skeleton when the image is fully loaded
-            />
-          </div>
-        </div>
-
-        {/* ========================== ARTIST DESCRIPTION ========================== */}
-        <div className="p-2 md:p-4">
-          <h1 className={subtitle()}>
-            Lacco unisce R&B e sonorità hip-hop in un viaggio introspettivo alla
-            scoperta di sé.
-            <br />
-            Racconta in musica ciò che è solito rimanere nascosto, in assordante
-            silenzio, dentro ognuno di noi.
-          </h1>
-        </div>
-      </Card>
 
       {/* ========================== LIVE SECTION ========================== */}
 
-      {getUpcomingLiveEvents().map((event) => (
-        <div key={event.slug}>
+      {upcomingLive.length > 0 && (
+        <>
           <div className="flex flex-row items-center justify-center py-4 md:py-4">
             <h2 className={subtitle()}>Lacco dal vivo</h2>
           </div>
-          <LiveEventCard event={event} />
-        </div>
-      ))}
+          <div className="flex flex-col gap-8">
+            {upcomingLive.map((event) => (
+              <LiveEventCard key={event.slug} event={event} />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* ========================== SPOTIFY PRE-SAVE SECTION ========================== */}
 
-      {catalog.map((release) =>
-        release.presaveMode === true && release.streamingLinks?.hyperfollow ? (
-          <div key={release.slug}>
-            <div className="flex flex-row items-center justify-center py-4 md:py-4">
-              <h2 className={subtitle()}>Pre-salva la prossima uscita</h2>
-            </div>
-            <Card className="flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-5xl md:max-w-fit">
-              {/* Blurred artwork backdrop — fixed dark scrim keeps text readable regardless of cover colors */}
-              <img
-                alt=""
-                aria-hidden="true"
-                className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
-                src={resolveImageSource(release.artwork)}
-              />
-              <div className="absolute inset-0 bg-black/55" />
-
-              <div className="relative shrink-0 flex items-center justify-center">
-                <SmartImage
-                  isBlurred
-                  priority
-                  alt={`Cover di ${release.title}`}
-                  sizes="320px"
-                  src={release.artwork}
-                  style={{ aspectRatio: "1/1", objectFit: "cover" }}
-                  width={320}
-                />
-              </div>
-              <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md">
-                <div className="space-y-1">
-                  <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
-                    {release.title}
-                  </h1>
-                  <p className="text-white/70 text-sm tracking-widest font-medium">
-                    {release.artist ?? "Lacco"}
-                  </p>
-                </div>
-                <Countdown releaseDate={release.releaseDate} variant="dark" />
-                <PresaveButton
-                  hyperfollowUrl={release.streamingLinks.hyperfollow}
-                  releaseDate={release.releaseDate}
-                />
-              </div>
-            </Card>
+      {presaveReleases.length > 0 && (
+        <>
+          <div className="flex flex-row items-center justify-center py-4 md:py-4">
+            <h2 className={subtitle()}>Pre-salva la prossima uscita</h2>
           </div>
-        ) : null,
+          <div className="flex flex-col gap-8">
+            {presaveReleases.map((release) => (
+              <Card
+                key={release.slug}
+                className="flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl"
+              >
+                {/* Blurred artwork backdrop — fixed dark scrim keeps text readable regardless of cover colors */}
+                <img
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
+                  src={resolveImageSource(release.artwork)}
+                />
+                <div className="absolute inset-0 bg-black/55" />
+
+                <div className="relative shrink-0 flex items-center justify-center">
+                  <SmartImage
+                    isBlurred
+                    priority
+                    alt={`Cover di ${release.title}`}
+                    src={release.artwork}
+                    style={{ aspectRatio: "1/1", objectFit: "cover" }}
+                    width={350}
+                  />
+                </div>
+                <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full md:w-xl">
+                  <div className="space-y-1">
+                    <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                      {release.title}
+                    </h1>
+                    <p className="text-white/70 text-sm tracking-widest font-medium">
+                      {release.artist ?? "Lacco"}
+                    </p>
+                  </div>
+                  <Countdown releaseDate={release.releaseDate} variant="dark" />
+                  <PresaveButton
+                    hyperfollowUrl={release.streamingLinks!.hyperfollow!}
+                    releaseDate={release.releaseDate}
+                  />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
       {/* ========================== LINKS SECTION ========================== */}
       <div className="flex flex-row items-center justify-center py-4 md:py-4">

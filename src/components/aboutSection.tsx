@@ -1,21 +1,17 @@
-// ========================== MAIN IMPORTS ========================== //
-// Import core libraries and components for animations, image handling, state management, and layout.
-import { motion } from "framer-motion"; // Provides scroll-based entrance animations
-import { useEffect, useRef, useState } from "react"; // React hooks for state, effects, and DOM references
-import { Card } from "@heroui/card"; // UI component for layout
-import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { Card } from "@heroui/card";
 
-import { subtitle } from "./primitives"; // Predefined styling function for subtitles
-import SmartImage from "./smartImage"; // Optimized image component with automatic loading
+import SmartImage, {
+  resolveImageSource,
+  type ImageLikeImport,
+} from "./smartImage";
 
-// ========================== CUSTOM HOOK: useInView ========================== //
-// Detects if a DOM element is currently visible in the viewport (scroll reveal).
-// Uses IntersectionObserver to trigger animations only when the element enters the screen.
 function useInView(
   ref: React.RefObject<HTMLDivElement | null>,
   threshold = 0.1,
 ) {
-  const [isInView, setIsInView] = useState(false); // Tracks visibility state
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
@@ -23,91 +19,76 @@ function useInView(
     if (!element) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting), // Update visibility state when intersection changes
-      { threshold }, // Visibility threshold to consider the element "in view"
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold },
     );
 
-    observer.observe(element); // Start observing the element
+    observer.observe(element);
 
     return () => {
-      observer.unobserve(element); // Cleanup observer on unmount
+      observer.unobserve(element);
     };
   }, [ref, threshold]);
 
-  return isInView; // Returns true if the element is currently in view
+  return isInView;
 }
 
-// ========================== COMPONENT: AboutSection ========================== //
-// Represents a single "About Me" section with animated text and image.
-// Props:
-// - text: string content of the section
-// - image: URL of the image to display
-// - reversed: optional boolean to invert the layout (image/text order)
 export function AboutSection({
   text,
   image,
   reversed = false,
 }: {
   text: string;
-  image: string;
+  image: ImageLikeImport;
   reversed?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null); // DOM reference for viewport detection
-  const inView = useInView(ref); // Boolean indicating if the section is visible
-  const [isLoaded, setIsLoaded] = useState(false); // Tracks image loading state
-
-  // Safety fallback: prevents an infinite skeleton on browsers that don't fire image events reliably.
-  useEffect(() => {
-    if (isLoaded) return;
-
-    const timeout = window.setTimeout(() => setIsLoaded(true), 6000);
-
-    return () => window.clearTimeout(timeout);
-  }, [isLoaded]);
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref);
 
   return (
-    // motion.div enables animation when the section appears on screen
-    <div className="overflow-x-hidden p-4">
-      <motion.div
-        ref={ref}
-        animate={inView ? { opacity: 1, x: 0 } : {}} // Animate only when visible
-        initial={{ opacity: 0, x: reversed ? 100 : -100 }} // Initial entrance direction based on layout
-        transition={{ duration: 0.8, ease: "easeOut" }} // Animation duration and easing
+    <div ref={ref} className="overflow-x-hidden px-4 py-6">
+      <Card
+        className={`relative overflow-hidden flex flex-col md:flex-row ${
+          reversed ? "md:flex-row-reverse" : ""
+        } items-center justify-center p-6 md:p-8 gap-8 mx-auto w-full max-w-4xl`}
       >
-        {/* Card containing text and image arranged in rows or columns */}
-        <Card
-          className={`flex flex-col-reverse md:flex-row ${
-            reversed ? "md:flex-row-reverse" : ""
-          } items-center md:items-center justify-center md:justify-center p-2 md:p-4 gap-2 md:gap-4 mx-auto  w-full max-w-5xl`}
+        {/* Blurred photo backdrop */}
+        <img
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
+          src={resolveImageSource(image)}
+        />
+        <div className="absolute inset-0 bg-black/60" />
+
+        <motion.div
+          animate={inView ? { opacity: 1, scale: 1 } : {}}
+          className="relative shrink-0 flex justify-center"
+          initial={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
         >
-          {/* Skeleton placeholder displayed until the image finishes loading */}
-          {!isLoaded && (
-            <Skeleton className="absolute inset-0 rounded-lg">
-              <div className="h-full w-full bg-default-300 rounded-lg" />
-            </Skeleton>
-          )}
+          <SmartImage
+            alt="Lacco"
+            className="w-full max-w-xs md:max-w-full"
+            src={image}
+            style={{ aspectRatio: "1 / 1" }}
+            width={350}
+          />
+        </motion.div>
 
-          {/* Section descriptive text */}
-          <div className="p-2 md:p-4">
-            <h1 className={subtitle()}>{text}</h1>
-          </div>
-
-          {/* Section image with controlled loading and styling */}
-          <div className="p-4 md:p-4 shrink-0 flex items-center justify-center">
-            <div className="w-fit md:max-w-96 items-center">
-              <SmartImage
-                alt="Lacco"
-                className="w-full h-full"
-                sizes="400px"
-                src={image}
-                style={{ aspectRatio: "1 / 1" }}
-                onError={() => setIsLoaded(true)} // Avoid stuck skeleton if image fails to load
-                onLoad={() => setIsLoaded(true)} // Hide skeleton once the image has loaded
-              />
-            </div>
-          </div>
-        </Card>
-      </motion.div>
+        <motion.p
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          className="relative text-large md:text-2xl text-white/90 leading-relaxed text-left"
+          initial={{ opacity: 0, x: reversed ? -80 : 80 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          {text.split(". ").map((sentence, i, arr) => (
+            <span key={i} className="block">
+              {sentence}{i < arr.length - 1 ? "." : ""}
+            </span>
+          ))}
+        </motion.p>
+      </Card>
     </div>
   );
 }

@@ -28,8 +28,8 @@ export const PrivacyPage = lazyWithPreload(() => import("@/pages/privacyPage"));
 // Maps route paths to the respective preload function for quick lookups.
 const preloaders: Record<string, () => Promise<unknown>> = {
   "/": HomePage.preload,
-  "/la-mia-musica": MusicPage.preload,
-  "/su-di-me": AboutPage.preload,
+  "/musica": MusicPage.preload,
+  "/chi-sono": AboutPage.preload,
   "/contatti": ContactPage.preload,
   "/presskit": PressKitPage.preload,
   "/newsletter": NewsletterPage.preload,

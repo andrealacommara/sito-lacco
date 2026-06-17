@@ -1,32 +1,47 @@
-import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
-import { Skeleton } from "@heroui/skeleton";
 
 import { subtitle, title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import SongCarousel from "@/components/songCarousel";
 import { AppleMusicIcon, SpotifyIcon } from "@/components/icons";
-import SmartImage from "@/components/smartImage";
+import SmartImage, { resolveImageSource } from "@/components/smartImage";
 import nokoruMonoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
 
 export default function MusicPage() {
-  const [isLoaded, setIsLoaded] = useState(false);
-
   return (
     <DefaultLayout>
       <Helmet>
-        <title>Lacco | La mia musica</title>
+        <title>Lacco | Musica</title>
         <meta
-          content="Scopri la musica di Lacco: la storia di ogni brano, l'artwork e il link per ascoltarlo su Spotify."
+          content="Ascolta la musica di Lacco, cantautore italiano di R&B e Hip-Hop. Scopri i suoi EP, singoli e la storia dietro ogni brano."
           name="description"
         />
         <meta content="index, follow" name="robots" />
+        <link href="https://lacco.it/musica" rel="canonical" />
+        <meta content="music.musician" property="og:type" />
+        <meta content="Lacco" property="og:site_name" />
+        <meta content="Lacco | Musica" property="og:title" />
+        <meta
+          content="Ascolta la musica di Lacco, cantautore italiano di R&B e Hip-Hop. Scopri i suoi EP, singoli e la storia dietro ogni brano."
+          property="og:description"
+        />
+        <meta content="https://lacco.it/musica" property="og:url" />
+        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="it_IT" property="og:locale" />
+        <meta content="summary_large_image" name="twitter:card" />
+        <meta content="Lacco | Musica" name="twitter:title" />
+        <meta
+          content="Ascolta la musica di Lacco, cantautore italiano di R&B e Hip-Hop."
+          name="twitter:description"
+        />
+        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
       </Helmet>
 
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-        <h1 className={title()}>La mia musica</h1>
+        <h1 className={title()}>Musica</h1>
       </div>
 
       <div className="flex flex-col justify-center min-h-fit md:min-h-fit">
@@ -34,64 +49,66 @@ export default function MusicPage() {
           <h2 className={subtitle()}>Scopri la storia dell&apos;EP</h2>
         </div>
 
-        <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 mx-auto w-full max-w-5xl">
-          {!isLoaded && (
-            <Skeleton className="absolute inset-0 rounded-lg">
-              <div className="h-full w-full bg-default-300 rounded-lg" />
-            </Skeleton>
-          )}
-          <div className="p-4 md:p-4 w-fit md:w-full items-center">
+        <Card className="relative overflow-hidden flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl">
+          {/* Blurred artwork backdrop */}
+          <img
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
+            src={resolveImageSource(nokoruMonoArtwork)}
+          />
+          <div className="absolute inset-0 bg-black/55" />
+
+          <div className="relative shrink-0 flex items-center justify-center">
             <SmartImage
               isBlurred
               priority
               alt="nokoru mono Artwork"
-              className="item-center"
-              sizes="400px"
               src={nokoruMonoArtwork}
-              style={{ aspectRatio: "1 / 1" }}
-              width={400}
-              onError={() => setIsLoaded(true)}
-              onLoad={() => setIsLoaded(true)}
+              style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+              width={350}
             />
           </div>
-          <div className="flex flex-col p-4">
-            <div className="pb-4">
+
+          <div className="relative flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md flex-1">
+            <div className="space-y-1 text-center md:text-left">
+              <span className="text-danger uppercase tracking-[0.2em] text-xs font-bold">
+                EP · 2026
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+                nokoru mono
+              </h2>
+            </div>
+
+            <div className="text-white/80 text-sm leading-relaxed space-y-3">
               <p>
-                <em className="text-danger pr-1">nokoru mono</em> (&quot;quelli
-                che restano&quot;) è il nome del primo progetto.
+                <em>nokoru mono</em> — &ldquo;quelli che restano&rdquo;
               </p>
               <p>
-                Racconta il mondo interiore, le emozioni che accompagnano la
-                crescita e gli spazi che si muovono dentro di noi, anche quando
-                tutto sembra fermo.
+                Un EP stratificato, intimo e profondamente personale. Racconta
+                il mondo interiore, le emozioni che accompagnano la crescita e
+                gli spazi che si muovono dentro di noi, anche quando tutto
+                sembra fermo. Il suono è R&amp;B: caldo, meditativo, riflessivo.
               </p>
               <p>
-                È un EP che osserva da vicino: stratificato, intimo,
-                profondamente personale. Il suono si avvicina a una dimensione
-                più R&B, calda e meditativa, che accompagna l&apos;ascoltatore
-                in un viaggio verso sè stesso.
-              </p>
-              <p>
-                L&apos;artwork, realizzato da Nicolò Piazza ( in arte
+                L&apos;artwork di{" "}
                 <a
-                  className="text-primary px-1 hover:underline"
+                  className="text-white hover:underline"
                   href="https://www.instagram.com/torino_ink"
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  Torino Ink
+                  Nicolò Piazza (Torino Ink)
                 </a>
-                ) sotto la direzione artistica di Lacco, si ispira
-                all&apos;omonima opera di Umberto Boccioni, facente parte del
-                trittico &quot;Stati d&apos;animo&quot;.
-              </p>
-              <p>
-                &quot;nokoru mono&quot; rappresenta il primo pezzo di un puzzle
-                più grande, il primo passo di un lungo percorso.
-                <br /> Un viaggio attraverso noi stessi e le altre persone.
+                , ispirato all&apos;omonima opera di Boccioni dal trittico{" "}
+                <em>&ldquo;Stati d&apos;animo&rdquo;</em>, è il primo pezzo di
+                un puzzle più grande.
               </p>
             </div>
-            <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
+            <p className="text-white/60 text-xs text-center">
+              Ascolta ora
+            </p>
+            <div className="flex flex-col md:flex-row gap-2 w-full">
               <div className="flex-1 min-w-0">
                 <Button
                   fullWidth
@@ -107,7 +124,7 @@ export default function MusicPage() {
                   }
                 >
                   <SpotifyIcon />
-                  Ascolta su Spotify
+                  Spotify
                 </Button>
               </div>
               <div className="flex-1 min-w-0">
@@ -125,7 +142,7 @@ export default function MusicPage() {
                   }
                 >
                   <AppleMusicIcon />
-                  Ascolta su Apple Music
+                  Apple Music
                 </Button>
               </div>
             </div>
