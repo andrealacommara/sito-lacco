@@ -103,6 +103,7 @@ export default function HomePage() {
             priority
             alt="Lacco"
             className="w-full h-full max-w-sm md:max-w-full"
+            sizes="(max-width: 768px) 100vw, 50vw"
             src={heroLacco}
             style={{ aspectRatio: "1 / 1" }}
             width={400}
