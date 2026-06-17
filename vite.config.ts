@@ -116,10 +116,11 @@ export default defineConfig(async () => {
       rollupOptions: {
         output: {
           // Splits main bundles for better caching and performance
+          // Note: framer-motion removed from manualChunks so it lazy-loads with the routes that use it (AboutPage, ReleasePage)
+          // This saves ~64KB on initial page load for visitors who never navigate to those pages
           manualChunks: {
             react: ["react", "react-dom"],
             heroui: ["@heroui/react"],
-            "framer-motion": ["framer-motion"],
           },
 
           // Add hash only to JS and CSS — keep images and OG assets with fixed names
