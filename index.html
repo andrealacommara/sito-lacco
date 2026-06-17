@@ -10,6 +10,7 @@
     <link rel="preload" as="style" href="<%= entryCss %>" />
     <% } %> <% if (preloadJs) { %>
     <link rel="modulepreload" href="<%= entryJs %>" />
+    <link rel="preload" as="script" href="<%= entryJs %>" />
     <% } %>
 
     <!-- ========================== BASIC SEO ========================== -->
@@ -82,6 +83,10 @@
 
     <!-- ========================== RESOURCE HINTS ========================== -->
     <!-- Speed up third-party embeds and critical routes used across the site -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://open.spotify.com" crossorigin />
     <link rel="preconnect" href="https://i.scdn.co" crossorigin />
     <link rel="preconnect" href="https://api.emailjs.com" crossorigin />
@@ -123,6 +128,6 @@
 
     <!-- ========================== ENTRY SCRIPT ========================== -->
     <!-- Main entry point: initializes React app and providers -->
-    <script type="module" src="/src/main.tsx"></script>
+    <script fetchpriority="high" type="module" src="/src/main.tsx"></script>
   </body>
 </html>
