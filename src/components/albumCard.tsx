@@ -60,7 +60,6 @@ export default function AlbumCard({ album }: Props) {
         >
           <SmartImage
             isBlurred
-            priority
             alt={album.alt}
             src={album.artwork}
             style={{ aspectRatio: "1 / 1", objectFit: "cover" }}

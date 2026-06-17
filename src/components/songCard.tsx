@@ -34,7 +34,6 @@ export default function SongCard({ single }: Props) {
       >
         <SmartImage
           isBlurred
-          priority
           alt={`Cover di ${single.title}`}
           src={single.artwork}
           style={{ aspectRatio: "1/1", objectFit: "cover" }}
