@@ -1,36 +1,50 @@
 // Generates 1200×630 OG images for each release: artwork centered on blurred background.
 // Runs as part of postbuild — output goes directly to dist/.
+//
+// La lista delle release è derivata automaticamente da src/config/catalog.ts:
+// aggiungere una release nel catalog genera il suo OG, senza toccare questo script.
 import sharp from "sharp";
 import path from "path";
 import fs from "fs";
+
+import { loadCatalog } from "./catalog-loader.mjs";
 
 const ARTWORKS_DIR = "src/assets/images/artworks";
 const OUTPUT_DIR = "dist";
 const OG_W = 1200;
 const OG_H = 630;
 
-const releases = [
-  { slug: "bella-al-buio", artwork: "bellaAlBuioArtwork.avif" },
-  { slug: "tu-x-tu", artwork: "tuxtuArtwork.avif" },
-  { slug: "per-gli-altri", artwork: "nokoruMonoArtwork.avif" },
-  { slug: "davvero", artwork: "nokoruMonoArtwork.avif" },
-  { slug: "ricordo", artwork: "nokoruMonoArtwork.avif" },
-  { slug: "rumore-di-fondo", artwork: "rumoreDiFondoArtwork.avif" },
-  { slug: "cercami", artwork: "cercamiArtwork.avif" },
-  { slug: "tra-le-nuvole-sunset-version", artwork: "traLeNuvoleSunsetVersionArtwork.avif" },
-  { slug: "tra-le-nuvole", artwork: "traLeNuvoleArtwork.avif" },
-  { slug: "mondo-dentro", artwork: "mondoDentroArtwork.avif" },
-  { slug: "tempo-perso", artwork: "tempoPersoArtwork.avif" },
-];
+// ----- 1. Legge il catalog (TS) tramite il loader condiviso ----- //
+const { catalog } = await loadCatalog();
 
-for (const release of releases) {
-  const artworkPath = path.join(ARTWORKS_DIR, release.artwork);
-  const outputPath = path.join(OUTPUT_DIR, `og-${release.slug}.jpg`);
+// ----- 2. Indicizza gli artwork su disco per basename (ricorsivo) ----- //
+function walk(dir) {
+  const out = {};
 
-  if (!fs.existsSync(artworkPath)) {
-    console.warn(`⚠  artwork not found, skipping: ${artworkPath}`);
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) Object.assign(out, walk(full));
+    else out[entry.name] = full;
+  }
+
+  return out;
+}
+
+const artworkByName = walk(ARTWORKS_DIR);
+
+// ----- 3. Genera un OG per ogni release ----- //
+for (const release of catalog) {
+  const artworkPath = artworkByName[release.artwork];
+
+  if (!artworkPath) {
+    console.warn(
+      `⚠  artwork non trovato per "${release.slug}" (${release.artwork}), skip`,
+    );
     continue;
   }
+
+  const outputPath = path.join(OUTPUT_DIR, `og-${release.slug}.jpg`);
 
   // Background: artwork stretched to 1200×630, blurred and darkened
   const bgBuffer = await sharp(artworkPath)
@@ -56,4 +70,4 @@ for (const release of releases) {
   console.log(`  ✓ og-${release.slug}.jpg`);
 }
 
-console.log(`\nOG images → dist/ (${releases.length} releases)`);
+console.log(`\nOG images → dist/ (${catalog.length} releases)`);

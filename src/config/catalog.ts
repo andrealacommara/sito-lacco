@@ -1,5 +1,6 @@
 import type { ImageLikeImport } from "@/components/smartImage";
 
+import { d } from "@/config/date";
 import bellaAlBuioArtwork from "@/assets/images/artworks/bellaAlBuioArtwork.avif";
 import tuxtuArtwork from "@/assets/images/artworks/tuxtuArtwork.avif";
 import nokoruMonoArtwork from "@/assets/images/artworks/nokoruMonoArtwork.avif";
@@ -10,25 +11,13 @@ import traLeNuvoleArtwork from "@/assets/images/artworks/traLeNuvoleArtwork.avif
 import mondoDentroArtwork from "@/assets/images/artworks/mondoDentroArtwork.avif";
 import tempoPersoArtwork from "@/assets/images/artworks/tempoPersoArtwork.avif";
 
-function d(dateStr: string): Date {
-  return new Date(dateStr + "T00:00:00");
-}
+export type AlbumCredit = {
+  label: string;
+  url?: string;
+};
 
-// Slug già usati da route esistenti — una song non può usarli.
-export const RESERVED_SLUGS = [
-  "musica",
-  "chi-sono",
-  "contatti",
-  "presskit",
-  "newsletter",
-  "iscriviti",
-  "confirm",
-  "unsubscribe",
-  "admin",
-  "live",
-];
-
-export type Song = {
+// Campi comuni a ogni release (singolo o album).
+type ReleaseBase = {
   slug: string;
   title: string;
   releaseDate: Date;
@@ -47,8 +36,20 @@ export type Song = {
   };
 };
 
-export const catalog: Song[] = [
+export type Single = ReleaseBase & { kind: "Singolo" };
+export type Album = ReleaseBase & {
+  kind: "EP" | "Album";
+  credits?: AlbumCredit[];
+  trackSlugs: string[]; // ordine ufficiale dell'album, fonte di verità del legame album → tracce
+};
+export type Release = Single | Album;
+
+// Compat: alias storico, una "Song" è un singolo.
+export type Song = Single;
+
+export const catalog: Release[] = [
   {
+    kind: "Singolo",
     slug: "bella-al-buio",
     title: "bella al buio",
     releaseDate: d("2026-07-03"),
@@ -65,6 +66,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "tu-x-tu",
     title: "tu x tu",
     releaseDate: d("2026-03-27"),
@@ -83,6 +85,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "per-gli-altri",
     title: "per gli altri",
     releaseDate: d("2026-01-30"),
@@ -102,6 +105,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "davvero",
     title: "davvero",
     releaseDate: d("2026-01-30"),
@@ -121,6 +125,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "ricordo",
     title: "ricordo",
     releaseDate: d("2026-01-30"),
@@ -140,6 +145,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "rumore-di-fondo",
     title: "rumore di fondo",
     releaseDate: d("2025-11-14"),
@@ -159,6 +165,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "cercami",
     title: "cercami",
     releaseDate: d("2025-10-03"),
@@ -178,6 +185,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "tra-le-nuvole-sunset-version",
     title: "tra le nuvole - sunset version",
     releaseDate: d("2025-08-07"),
@@ -198,6 +206,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "tra-le-nuvole",
     title: "tra le nuvole",
     releaseDate: d("2025-06-27"),
@@ -217,6 +226,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "mondo-dentro",
     title: "mondo dentro",
     releaseDate: d("2024-12-13"),
@@ -236,6 +246,7 @@ export const catalog: Song[] = [
     },
   },
   {
+    kind: "Singolo",
     slug: "tempo-perso",
     title: "tempo perso",
     releaseDate: d("2024-10-11"),
@@ -254,12 +265,91 @@ export const catalog: Song[] = [
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/tempo-perso",
     },
   },
+  {
+    kind: "EP",
+    slug: "nokoru-mono",
+    title: "nokoru mono",
+    releaseDate: d("2026-01-30"),
+    presaveMode: false,
+    artwork: nokoruMonoArtwork,
+    alt: "Cover artwork dell'EP 'nokoru mono'",
+    ogImage: "/og-nokoru-mono.jpg",
+    description: `nokoru mono — "quelli che restano".\nUn EP stratificato, intimo e profondamente personale. Racconta il mondo interiore, le emozioni che accompagnano la crescita e gli spazi che si muovono dentro di noi, anche quando tutto sembra fermo. Il suono è R&B: caldo, meditativo, riflessivo.\nL'artwork, ispirato all'omonima opera di Boccioni dal trittico "Stati d'animo", è il primo pezzo di un puzzle più grande.`,
+    pressKitDescription: `Un EP R&B intimo e stratificato sul mondo interiore, la crescita e ciò che resta.`,
+    year: 2026,
+    credits: [
+      {
+        label: "Artwork di Nicolò Piazza (Torino Ink)",
+        url: "https://www.instagram.com/torino_ink",
+      },
+    ],
+    streamingLinks: {
+      spotify:
+        "https://open.spotify.com/intl-it/album/03t1vGNiDM9ORxsVWSnp8E?si=G7J5EBWJTNm3QMXpQytV1Q",
+      appleMusic: "https://music.apple.com/it/album/nokoru-mono/1863599627",
+      hyperfollow: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
+    },
+    trackSlugs: [
+      "tempo-perso",
+      "cercami",
+      "tra-le-nuvole",
+      "ricordo",
+      "mondo-dentro",
+      "rumore-di-fondo",
+      "davvero",
+      "per-gli-altri",
+    ],
+  },
 ];
 
-export function getSongBySlug(slug: string): Song | undefined {
-  return catalog.find((s) => s.slug === slug);
+// ===================== TYPE GUARDS & LISTE DERIVATE ===================== //
+export function isAlbum(release: Release): release is Album {
+  return release.kind !== "Singolo";
 }
 
-export function getSongSlugList(): string[] {
-  return catalog.map((s) => s.slug);
+export function isSingle(release: Release): release is Single {
+  return release.kind === "Singolo";
+}
+
+export const singles: Single[] = catalog.filter(isSingle);
+export const albums: Album[] = catalog.filter(isAlbum);
+
+// ===================== LOOKUP HELPERS ===================== //
+export function getReleaseBySlug(slug: string): Release | undefined {
+  return catalog.find((r) => r.slug === slug);
+}
+
+export function getSongBySlug(slug: string): Single | undefined {
+  return singles.find((s) => s.slug === slug);
+}
+
+export function getAlbumBySlug(slug: string): Album | undefined {
+  return albums.find((a) => a.slug === slug);
+}
+
+// Tracce dell'album nell'ordine di trackSlugs (scarta gli slug non trovati).
+export function getAlbumTracks(album: Album): Single[] {
+  return album.trackSlugs
+    .map((slug) => getSongBySlug(slug))
+    .filter((song): song is Single => song !== undefined);
+}
+
+// Derivazione inversa: a quale album appartiene un dato singolo (se esiste).
+export function getAlbumForSong(songSlug: string): Album | undefined {
+  return albums.find((a) => a.trackSlugs.includes(songSlug));
+}
+
+// Tutela in dev: ogni trackSlug deve corrispondere a un singolo del catalogo.
+if (import.meta.env.DEV) {
+  const knownSongSlugs = new Set(singles.map((s) => s.slug));
+
+  for (const album of albums) {
+    for (const slug of album.trackSlugs) {
+      if (!knownSongSlugs.has(slug)) {
+        console.warn(
+          `[catalog] trackSlug "${slug}" dell'album "${album.slug}" non esiste tra i singoli.`,
+        );
+      }
+    }
+  }
 }

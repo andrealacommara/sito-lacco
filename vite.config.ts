@@ -12,139 +12,143 @@ import VitePluginSitemap from "vite-plugin-sitemap";
 import { imagetools } from "vite-imagetools";
 import { createHtmlPlugin } from "vite-plugin-html";
 
-export default defineConfig({
-  plugins: [
-    // React support with Fast Refresh
-    react(),
+// @ts-expect-error — loader build-time in ESM puro, niente type declarations
+import { loadCatalog } from "./scripts/catalog-loader.mjs";
 
-    // HTML preload CSS
-    createHtmlPlugin({
-      minify: true,
-      inject: {
-        data: (() => {
-          let entryCss = "";
-          let entryJs = "";
-          let preloadCss = false;
-          let preloadJs = false;
+// Route statiche indicizzabili (curate a mano: NON include admin/presskit/unsubscribe).
+// Le route delle release sono derivate dal catalog → unica fonte di verità.
+const STATIC_ROUTES = [
+  "/musica",
+  "/chi-sono",
+  "/live",
+  "/contatti",
+  "/newsletter",
+  "/privacy",
+];
 
-          try {
-            const manifestPath = path.resolve(
-              __dirname,
-              "dist/.vite/manifest.json",
-            );
+export default defineConfig(async () => {
+  const { catalog } = await loadCatalog();
+  const releaseRoutes = catalog.map(
+    (release: { slug: string }) => `/${release.slug}`,
+  );
+  const sitemapRoutes = [...STATIC_ROUTES, ...releaseRoutes];
 
-            if (fs.existsSync(manifestPath)) {
-              const manifest = JSON.parse(
-                fs.readFileSync(manifestPath, "utf-8"),
+  return {
+    plugins: [
+      // React support with Fast Refresh
+      react(),
+
+      // HTML preload CSS
+      createHtmlPlugin({
+        minify: true,
+        inject: {
+          data: (() => {
+            let entryCss = "";
+            let entryJs = "";
+            let preloadCss = false;
+            let preloadJs = false;
+
+            try {
+              const manifestPath = path.resolve(
+                __dirname,
+                "dist/.vite/manifest.json",
               );
-              const main = manifest["src/main.tsx"];
 
-              if (main && main.css && main.css.length) {
-                entryCss = `/${main.css[0].replace(/^\//, "")}`;
-                preloadCss = true;
-              }
+              if (fs.existsSync(manifestPath)) {
+                const manifest = JSON.parse(
+                  fs.readFileSync(manifestPath, "utf-8"),
+                );
+                const main = manifest["src/main.tsx"];
 
-              if (main && main.file) {
-                entryJs = `/${main.file.replace(/^\//, "")}`;
-                preloadJs = true;
+                if (main && main.css && main.css.length) {
+                  entryCss = `/${main.css[0].replace(/^\//, "")}`;
+                  preloadCss = true;
+                }
+
+                if (main && main.file) {
+                  entryJs = `/${main.file.replace(/^\//, "")}`;
+                  preloadJs = true;
+                }
               }
+            } catch {
+              /* fallback */
             }
-          } catch {
-            /* fallback */
-          }
 
-          return {
-            preloadCss,
-            preloadJs,
-            entryCss,
-            entryJs,
-          };
-        })(),
-      },
-    }),
-
-    // Automatic sitemap generation for SEO
-    VitePluginSitemap({
-      hostname: "https://lacco.it",
-      dynamicRoutes: [
-        "/musica",
-        "/chi-sono",
-        "/live",
-        "/contatti",
-        "/newsletter",
-        "/privacy",
-        "/bella-al-buio",
-        "/tu-x-tu",
-        "/per-gli-altri",
-        "/davvero",
-        "/ricordo",
-        "/rumore-di-fondo",
-        "/cercami",
-        "/tra-le-nuvole-sunset-version",
-        "/tra-le-nuvole",
-        "/mondo-dentro",
-        "/tempo-perso",
-      ],
-      generateRobotsTxt: false, // Prevents the plugin from probing dist/ for robots.txt
-    }),
-
-    // Resolves path aliases defined in tsconfig.json
-    tsconfigPaths(),
-
-    // TailwindCSS integration
-    tailwindcss(),
-
-    // Import SVG files as React components
-    svgr(),
-
-    // Process only AVIF imports through imagetools so we can generate
-    // compatible fallbacks (webp/jpeg) on older mobile browsers.
-    // PNG/JPG/SVG imports stay as plain URLs.
-    imagetools({
-      include: /^[^?]+\.avif(\?.*)?$/,
-      defaultDirectives: () =>
-        new URLSearchParams({
-          format: "avif;webp;jpeg",
-        }),
-    }),
-  ],
-
-  build: {
-    rollupOptions: {
-      output: {
-        // Splits main bundles for better caching and performance
-        manualChunks: {
-          react: ["react", "react-dom"],
-          heroui: ["@heroui/react"],
-          "framer-motion": ["framer-motion"],
+            return {
+              preloadCss,
+              preloadJs,
+              entryCss,
+              entryJs,
+            };
+          })(),
         },
+      }),
 
-        // Add hash only to JS and CSS — keep images and OG assets with fixed names
-        entryFileNames: `assets/[name]-[hash].js`,
-        chunkFileNames: `assets/[name]-[hash].js`,
-        assetFileNames: (assetInfo) => {
-          const fileName = assetInfo.name ?? "";
+      // Automatic sitemap generation for SEO
+      VitePluginSitemap({
+        hostname: "https://lacco.it",
+        dynamicRoutes: sitemapRoutes,
+        generateRobotsTxt: false, // Prevents the plugin from probing dist/ for robots.txt
+      }),
 
-          // Files that must NOT be hashed
-          const fixedNames = [
-            "og-image.jpg",
-            "favicon.ico",
-            "favicon.svg",
-            "favicon-512.png",
-            "apple-touch-icon.png",
-            "android-chrome-192x192.png",
-            "android-chrome-512x512.png",
-            "mstile-150x150.png",
-          ];
+      // Resolves path aliases defined in tsconfig.json
+      tsconfigPaths(),
 
-          if (fixedNames.includes(fileName)) {
-            return `[name][extname]`;
-          }
+      // TailwindCSS integration
+      tailwindcss(),
 
-          // All other assets get hashed
-          return `assets/[name]-[hash][extname]`;
+      // Import SVG files as React components
+      svgr(),
+
+      // Process only AVIF imports through imagetools so we can generate
+      // compatible fallbacks (webp/jpeg) on older mobile browsers.
+      // PNG/JPG/SVG imports stay as plain URLs.
+      imagetools({
+        include: /^[^?]+\.avif(\?.*)?$/,
+        defaultDirectives: () =>
+          new URLSearchParams({
+            format: "avif;webp;jpeg",
+          }),
+      }),
+    ],
+
+    build: {
+      rollupOptions: {
+        output: {
+          // Splits main bundles for better caching and performance
+          manualChunks: {
+            react: ["react", "react-dom"],
+            heroui: ["@heroui/react"],
+            "framer-motion": ["framer-motion"],
+          },
+
+          // Add hash only to JS and CSS — keep images and OG assets with fixed names
+          entryFileNames: `assets/[name]-[hash].js`,
+          chunkFileNames: `assets/[name]-[hash].js`,
+          assetFileNames: (assetInfo) => {
+            const fileName = assetInfo.name ?? "";
+
+            // Files that must NOT be hashed
+            const fixedNames = [
+              "og-image.jpg",
+              "favicon.ico",
+              "favicon.svg",
+              "favicon-512.png",
+              "apple-touch-icon.png",
+              "android-chrome-192x192.png",
+              "android-chrome-512x512.png",
+              "mstile-150x150.png",
+            ];
+
+            if (fixedNames.includes(fileName)) {
+              return `[name][extname]`;
+            }
+
+            // All other assets get hashed
+            return `assets/[name]-[hash][extname]`;
+          },
         },
       },
     },
-  },
+  };
 });
