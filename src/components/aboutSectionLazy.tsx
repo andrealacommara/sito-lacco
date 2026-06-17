@@ -1,10 +1,14 @@
 import { lazy, Suspense } from "react";
 
+import { resolveImageSource, type ImageLikeImport } from "./smartImage";
+
 // Lazy-load AboutSection with Framer Motion — only when user navigates to /chi-sono
 const AboutSectionLazy = lazy(() => import("@/components/aboutSection").then(m => ({ default: m.AboutSection })));
 
 // Fallback component without animations
-function AboutSectionFallback({ text, image, reversed }: any) {
+function AboutSectionFallback({ text, image, reversed }: { text: string; image: ImageLikeImport; reversed?: boolean }) {
+  const imgSrc = resolveImageSource(image);
+
   return (
     <div className={`overflow-x-hidden px-4 py-6`}>
       <div
@@ -16,14 +20,14 @@ function AboutSectionFallback({ text, image, reversed }: any) {
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
-          src={image.src || image}
+          src={imgSrc}
         />
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative shrink-0 flex justify-center">
           <img
             alt="Lacco"
             className="w-full max-w-xs md:max-w-full rounded-lg"
-            src={image.src || image}
+            src={imgSrc}
             style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
           />
         </div>
@@ -39,7 +43,7 @@ function AboutSectionFallback({ text, image, reversed }: any) {
   );
 }
 
-export function AboutSectionWithLazy(props: any) {
+export function AboutSectionWithLazy(props: { text: string; image: ImageLikeImport; reversed?: boolean }) {
   return (
     <Suspense fallback={<AboutSectionFallback {...props} />}>
       <AboutSectionLazy {...props} />

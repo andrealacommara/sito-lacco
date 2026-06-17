@@ -10,7 +10,6 @@
     <link rel="preload" as="style" href="<%= entryCss %>" />
     <% } %> <% if (preloadJs) { %>
     <link rel="modulepreload" href="<%= entryJs %>" />
-    <link rel="preload" as="script" href="<%= entryJs %>" />
     <% } %>
 
     <!-- ========================== BASIC SEO ========================== -->
@@ -84,9 +83,6 @@
 
     <!-- ========================== RESOURCE HINTS ========================== -->
     <!-- Speed up third-party embeds and critical routes used across the site -->
-    <link rel="dns-prefetch" href="https://open.spotify.com" />
-    <link rel="dns-prefetch" href="https://i.scdn.co" />
-    <link rel="dns-prefetch" href="https://api.emailjs.com" />
     <link rel="preconnect" href="https://open.spotify.com" crossorigin />
     <link rel="preconnect" href="https://i.scdn.co" crossorigin />
     <link rel="preconnect" href="https://api.emailjs.com" crossorigin />
