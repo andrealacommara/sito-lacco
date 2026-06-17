@@ -9,7 +9,7 @@ import DefaultLayout from "@/layouts/default"; // General site layout (navbar + 
 import SpotifyPlayer from "@/components/spotifyPlayer"; // Custom component for Spotify player
 import { subtitle } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
 import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
-import SmartImage, { resolveImageSource } from "@/components/smartImage"; // Optimized image component with automatic loading
+import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
 import {
   AppleMusicIcon,
   InstagramIcon,
@@ -18,11 +18,11 @@ import {
   YouTubeIcon,
 } from "@/components/icons";
 import { siteConfig } from "@/config/site";
-import { catalog } from "@/config/catalog";
+import { albums, isAlbum, singles } from "@/config/catalog";
 import { getUpcomingLiveEvents } from "@/config/liveEvents";
-import Countdown from "@/components/countdown";
-import PresaveButton from "@/components/presaveButton";
 import LiveEventCard from "@/components/liveEventCard";
+import AlbumCard from "@/components/albumCard";
+import SongCard from "@/components/songCard";
 
 // ========================== HOME PAGE COMPONENT ========================== //
 // Displays an introduction to the artist and includes a Spotify player.
@@ -31,10 +31,13 @@ export default function HomePage() {
   // State that tracks whether the image has been loaded.
   // Used to show a “skeleton” effect until the image is ready.
   const upcomingLive = getUpcomingLiveEvents();
-  const presaveReleases = catalog.filter(
-    (release) =>
-      release.presaveMode === true && !!release.streamingLinks?.hyperfollow,
-  );
+  // Tutte le release in pre-save (album + singoli), in ordine cronologico di uscita.
+  const presaveReleases = [...albums, ...singles]
+    .filter(
+      (release) =>
+        release.presaveMode === true && !!release.streamingLinks?.hyperfollow,
+    )
+    .sort((a, b) => a.releaseDate.getTime() - b.releaseDate.getTime());
 
   return (
     <DefaultLayout>
@@ -163,47 +166,13 @@ export default function HomePage() {
             <h2 className={subtitle()}>Pre-salva la prossima uscita</h2>
           </div>
           <div className="flex flex-col gap-8">
-            {presaveReleases.map((release) => (
-              <Card
-                key={release.slug}
-                className="flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl"
-              >
-                {/* Blurred artwork backdrop — fixed dark scrim keeps text readable regardless of cover colors */}
-                <img
-                  alt=""
-                  aria-hidden="true"
-                  className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
-                  src={resolveImageSource(release.artwork)}
-                />
-                <div className="absolute inset-0 bg-black/55" />
-
-                <div className="relative shrink-0 flex items-center justify-center">
-                  <SmartImage
-                    isBlurred
-                    priority
-                    alt={`Cover di ${release.title}`}
-                    src={release.artwork}
-                    style={{ aspectRatio: "1/1", objectFit: "cover" }}
-                    width={350}
-                  />
-                </div>
-                <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full md:w-xl">
-                  <div className="space-y-1">
-                    <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
-                      {release.title}
-                    </h1>
-                    <p className="text-white/70 text-sm tracking-widest font-medium">
-                      {release.artist ?? "Lacco"}
-                    </p>
-                  </div>
-                  <Countdown releaseDate={release.releaseDate} variant="dark" />
-                  <PresaveButton
-                    hyperfollowUrl={release.streamingLinks!.hyperfollow!}
-                    releaseDate={release.releaseDate}
-                  />
-                </div>
-              </Card>
-            ))}
+            {presaveReleases.map((release) =>
+              isAlbum(release) ? (
+                <AlbumCard key={release.slug} album={release} />
+              ) : (
+                <SongCard key={release.slug} single={release} />
+              ),
+            )}
           </div>
         </>
       )}

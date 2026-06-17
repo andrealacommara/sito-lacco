@@ -2,7 +2,6 @@
 // Import core libraries and UI components for building the song card.
 // Includes HeroUI components for layout, badges, buttons, modals, skeletons, and links,
 // as well as React hooks for state management and media query detection.
-import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
 import {
@@ -15,7 +14,6 @@ import {
 import { Skeleton } from "@heroui/skeleton";
 import { useDisclosure } from "@heroui/use-disclosure";
 import { useEffect, useState } from "react"; // React hooks for local state and side effects
-import { useMediaQuery } from "@react-hook/media-query"; // Hook to detect viewport size
 
 import { AppleMusicIcon, SpotifyIcon } from "./icons"; // Custom Spotify icon component
 import PresaveButton from "./presaveButton";
@@ -33,6 +31,8 @@ interface CardSongExposerProps {
   preSaveMode: boolean; // Flag indicating if "pre-save" mode is active
   hyperfollowUrl?: string; // DistroKid hyperfollow URL for pre-save mode
   releaseDate: Date; // Release date, used to switch the pre-save CTA once the song is out
+  kind: string; // Tipo di release mostrato come tag (es. "Singolo")
+  year: number; // Anno di uscita mostrato accanto al tag
 }
 
 // ========================== COMPONENT: CardSongExposer ========================== //
@@ -52,6 +52,8 @@ export default function CardSongExposer({
   preSaveMode,
   hyperfollowUrl,
   releaseDate,
+  kind,
+  year,
 }: CardSongExposerProps) {
   const [isLoaded, setIsLoaded] = useState(false); // Tracks artwork image loading state
   const { isOpen, onOpen, onClose } = useDisclosure(); // Manages modal open/close state
@@ -68,8 +70,6 @@ export default function CardSongExposer({
   const handleOpen = () => {
     onOpen(); // Wrapper function to open modal
   };
-
-  const isSmallScreen = useMediaQuery("(max-width: 400px)"); // Detects small screen sizes for badge scaling
 
   return (
     <div>
@@ -88,40 +88,42 @@ export default function CardSongExposer({
           </Skeleton>
         )}
 
-        {/* Card content: artwork and optional badge */}
-        <div>
-          <Card className="border-none" radius="lg">
-            <Badge
-              disableAnimation
-              classNames={{
-                badge:
-                  "translate-x-0 translate-y-0 font-semibold border-black!",
-              }}
-              color="success"
-              content="COMING SOON"
-              isInvisible={!preSaveMode} // Badge visible only in pre-save mode
-              placement="top-right"
-              size={isSmallScreen ? "sm" : "md"} // Adjust badge size based on screen
-            >
-              {/* Song artwork image */}
-              <SmartImage
-                alt={artworkAlt}
-                className="rounded-lg"
-                sizes="320px"
-                src={artworkSrc}
-                style={{ aspectRatio: "1 / 1" }}
-                width={300}
-                onError={() => setIsLoaded(true)} // Avoid stuck skeleton on mobile decode failures
-                onLoad={() => setIsLoaded(true)} // Hide skeleton once image is loaded
-              />
-            </Badge>
-          </Card>
+        {/* Card content: artwork + overlay "coming soon" */}
+        <div className="relative overflow-hidden rounded-2xl">
+          <SmartImage
+            alt={artworkAlt}
+            className="rounded-2xl"
+            sizes="320px"
+            src={artworkSrc}
+            style={{ aspectRatio: "1 / 1" }}
+            width={300}
+            onError={() => setIsLoaded(true)} // Avoid stuck skeleton on mobile decode failures
+            onLoad={() => setIsLoaded(true)} // Hide skeleton once image is loaded
+          />
+
+          {/* Pre-save badge: pill con dot pulsante */}
+          {preSaveMode && (
+            <div className="absolute left-2.5 top-2.5 z-20 flex items-center gap-1.5 rounded-full bg-black/65 px-2.5 py-1 shadow-lg ring-1 ring-white/25 backdrop-blur-md">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-danger opacity-80" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-danger" />
+              </span>
+              <span className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white">
+                Coming soon
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Song title */}
-        <h1 className="text-center font-medium text-black transition-colors duration-300 group-hover:text-white truncate">
-          {songTitle}
-        </h1>
+        {/* Tag tipo · anno + titolo */}
+        <div className="flex w-full flex-col items-center gap-1.5">
+          <span className="inline-flex items-center rounded-full bg-danger/10 px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-danger transition-colors duration-300 group-hover:bg-white/20 group-hover:text-white">
+            {kind} · {year}
+          </span>
+          <h3 className="w-full truncate text-center font-bold text-black transition-colors duration-300 group-hover:text-white">
+            {songTitle}
+          </h3>
+        </div>
       </Card>
 
       {/* Modal displaying song details and Spotify link */}
@@ -138,14 +140,15 @@ export default function CardSongExposer({
         <ModalContent className="bg-white text-black dark:bg-white! dark:text-black! p-4 rounded-2xl shadow-xl max-w-120 mx-auto">
           {() => (
             <>
-              {/* Modal header showing song title */}
-              <ModalHeader className="items-center justify-center">
-                <Card
-                  className="bg-danger text-white dark:bg-danger dark:text-white items-center justify-center py-0.5 px-2"
-                  radius="lg"
-                >
+              {/* Modal header: tag + titolo del brano */}
+              <ModalHeader className="flex flex-col items-center gap-1.5 pb-1 pt-2">
+                <span className="inline-flex items-center rounded-full bg-danger/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-danger">
+                  {kind} · {year}
+                </span>
+                <h2 className="text-balance text-center font-display text-2xl md:text-3xl font-bold tracking-tight text-black">
                   {songTitle}
-                </Card>
+                </h2>
+                <span className="h-0.5 w-10 rounded-full bg-danger/30" />
               </ModalHeader>
 
               {/* Modal body with song description */}

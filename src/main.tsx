@@ -11,6 +11,7 @@ import { Provider } from "./provider.tsx"; // Global context provider (theme, st
 
 import "@/styles/globals.css"; // Global stylesheet
 import { ensureMediaKeySystemRobustness } from "@/utils/ensureMediaKeySystemRobustness";
+import "@/config/slugs"; // Side-effect: in dev avvisa su collisioni di slug (reserved/singoli/album)
 
 // ========================== ENTRY POINT ========================== //
 /**
