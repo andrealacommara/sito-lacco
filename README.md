@@ -184,7 +184,7 @@ Branch protection on `main` requires the CI check to pass before merging.
 | Command | Description |
 | --- | --- |
 | `npm run dev` | Start local development server |
-| `npm run build` | Build for production (+ copies `.htaccess`) |
+| `npm run build` | Build for production |
 | `npm run preview` | Preview the production build locally |
 | `npm run lint` | Lint and auto-fix with ESLint |
 | `npm run format` | Format code with Prettier |
