@@ -31,8 +31,6 @@ function App() {
       "/musica",
       "/chi-sono",
       "/contatti",
-      "/presskit",
-      "/newsletter",
       "/live",
     ];
     const warm = () => warmupRoutes(pathsToWarm);

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 
 type TimeLeft = {
   days: number;
@@ -49,14 +48,12 @@ export default function Countdown({
 
   if (timeLeft === null) {
     return (
-      <motion.p
-        animate={{ opacity: 1 }}
+      <p
         className="text-3xl md:text-4xl font-bold text-danger"
-        initial={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        style={{ animation: "fadeIn 0.5s ease both" }}
       >
         Uscita oggi!
-      </motion.p>
+      </p>
     );
   }
 

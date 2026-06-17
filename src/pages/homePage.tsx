@@ -2,7 +2,6 @@
 // Import layout, UI components, and assets used to build the homepage.
 
 import { Card } from "@heroui/card"; // UI component for container
-import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
 
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)
@@ -95,11 +94,9 @@ export default function HomePage() {
 
       {/* ========================== HERO SECTION ========================== */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 items-center max-w-5xl mx-auto py-8 md:py-12 px-4">
-        <motion.div
-          animate={{ opacity: 1, scale: 1 }}
+        <div
           className="flex justify-center"
-          initial={{ opacity: 0, scale: 0.97 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+          style={{ animation: "fadeInScale 0.7s ease-out both" }}
         >
           <SmartImage
             isBlurred
@@ -110,36 +107,30 @@ export default function HomePage() {
             style={{ aspectRatio: "1 / 1" }}
             width={400}
           />
-        </motion.div>
+        </div>
 
         <div className="flex flex-col gap-5 text-center md:text-left">
-          <motion.span
-            animate={{ opacity: 1, y: 0 }}
+          <span
             className="text-danger uppercase tracking-[0.2em] text-xs font-bold"
-            initial={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            style={{ animation: "fadeInUp 0.5s ease 0.2s both" }}
           >
             Pop · R&B · Hip-Hop
-          </motion.span>
+          </span>
 
-          <motion.p
-            animate={{ opacity: 1, y: 0 }}
+          <p
             className="text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground leading-tight font-display"
-            initial={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.35 }}
+            style={{ animation: "fadeInUp 0.6s ease 0.35s both" }}
           >
             Per chi sente più di quanto riesca a dire.
-          </motion.p>
+          </p>
 
-          <motion.p
-            animate={{ opacity: 1, y: 0 }}
+          <p
             className="text-base lg:text-lg text-default-500 leading-relaxed font-display"
-            initial={{ opacity: 0, y: 12 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            style={{ animation: "fadeInUp 0.5s ease 0.5s both" }}
           >
             Lacco è un cantautore che trasforma emozioni, esperienze e frammenti
             di vita in storie da ascoltare.
-          </motion.p>
+          </p>
         </div>
       </section>
 

@@ -3,6 +3,29 @@
 :root {
   overflow-y: auto;
   scrollbar-gutter: stable;
+  /* Darker danger shade — passes WCAG AA (≥4.5:1) for small text on white */
+  --heroui-danger: 339 86.54% 40.78%;
+  --heroui-danger-foreground: 0 0% 100%;
+}
+
+/* Keep original bright red in dark mode (dark cards have enough contrast) */
+.dark {
+  --heroui-danger: 339.2 90.36% 51.18%;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .hidden.group-data-\[has-helper\=true\]\:flex.p-1.relative.flex-col.gap-1\.5 {
