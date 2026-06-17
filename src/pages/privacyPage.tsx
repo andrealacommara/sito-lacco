@@ -7,12 +7,31 @@ export default function PrivacyPage() {
   return (
     <DefaultLayout>
       <Helmet>
-        <title>Privacy Policy | Lacco</title>
+        <title>Lacco | Privacy Policy</title>
         <meta
           content="Informativa sul trattamento dei dati personali raccolti tramite la newsletter di Lacco."
           name="description"
         />
         <meta content="index, follow" name="robots" />
+        <link href="https://lacco.it/privacy" rel="canonical" />
+        <meta content="website" property="og:type" />
+        <meta content="Lacco" property="og:site_name" />
+        <meta content="Lacco | Privacy Policy" property="og:title" />
+        <meta
+          content="Informativa sul trattamento dei dati personali raccolti tramite la newsletter di Lacco."
+          property="og:description"
+        />
+        <meta content="https://lacco.it/privacy" property="og:url" />
+        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="it_IT" property="og:locale" />
+        <meta content="summary_large_image" name="twitter:card" />
+        <meta content="Lacco | Privacy Policy" name="twitter:title" />
+        <meta
+          content="Informativa sul trattamento dei dati personali raccolti tramite la newsletter di Lacco."
+          name="twitter:description"
+        />
+        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
       </Helmet>
 
       <div className="flex flex-col items-center py-8 md:py-10 mx-auto w-full max-w-5xl px-4">

@@ -67,10 +67,12 @@ export default defineConfig({
     VitePluginSitemap({
       hostname: "https://lacco.it",
       dynamicRoutes: [
-        "/la-mia-musica",
-        "/su-di-me",
+        "/musica",
+        "/chi-sono",
+        "/live",
         "/contatti",
         "/newsletter",
+        "/privacy",
         "/bella-al-buio",
         "/tu-x-tu",
         "/per-gli-altri",

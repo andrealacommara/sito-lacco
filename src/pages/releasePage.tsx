@@ -27,20 +27,28 @@ export default function ReleasePage() {
   if (!release) return <NotFoundPage />;
 
   const bgUrl = resolveImageSource(release.artwork);
+  const metaDescription = release.description.replace(/\n/g, " ").trim();
+  const ogImageUrl = `https://lacco.it${release.ogImage}`;
 
   return (
     <>
       <Helmet>
-        <title>{release.title} | Lacco</title>
-        <meta content={release.description} name="description" />
+        <title>{`${release.title} | Lacco`}</title>
+        <meta content={metaDescription} name="description" />
         <meta content="index, follow" name="robots" />
-        <meta content={`${release.title} — Lacco`} property="og:title" />
-        <meta content={release.description} property="og:description" />
-        <meta content={release.ogImage} property="og:image" />
-        <meta content={`https://lacco.it/${release.slug}`} property="og:url" />
+        <link href={`https://lacco.it/${release.slug}`} rel="canonical" />
         <meta content="music.song" property="og:type" />
+        <meta content="Lacco" property="og:site_name" />
+        <meta content={`${release.title} | Lacco`} property="og:title" />
+        <meta content={metaDescription} property="og:description" />
+        <meta content={ogImageUrl} property="og:image" />
+        <meta content={`${release.title} — Lacco`} property="og:image:alt" />
+        <meta content={`https://lacco.it/${release.slug}`} property="og:url" />
+        <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
-        <meta content={release.ogImage} name="twitter:image" />
+        <meta content={`${release.title} | Lacco`} name="twitter:title" />
+        <meta content={metaDescription} name="twitter:description" />
+        <meta content={ogImageUrl} name="twitter:image" />
       </Helmet>
 
       {/* Background blur: cover artwork a tutto schermo */}

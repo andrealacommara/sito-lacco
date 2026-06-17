@@ -28,8 +28,8 @@ function App() {
     if (typeof window === "undefined") return;
 
     const pathsToWarm = [
-      "/la-mia-musica",
-      "/su-di-me",
+      "/musica",
+      "/chi-sono",
       "/contatti",
       "/presskit",
       "/newsletter",
@@ -75,8 +75,8 @@ function App() {
       <Routes>
         {/* Core pages */}
         <Route element={<HomePage />} path="/" />
-        <Route element={<MusicPage />} path="/la-mia-musica" />
-        <Route element={<AboutPage />} path="/su-di-me" />
+        <Route element={<MusicPage />} path="/musica" />
+        <Route element={<AboutPage />} path="/chi-sono" />
         <Route element={<ContactPage />} path="/contatti" />
         <Route element={<PressKitPage />} path="/presskit" />
 
