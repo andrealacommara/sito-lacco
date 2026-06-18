@@ -5,7 +5,6 @@ import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { Checkbox } from "@heroui/checkbox";
 import { addToast } from "@heroui/toast";
-import { motion, AnimatePresence } from "framer-motion";
 
 import { EF_BASE } from "@/lib/supabase";
 
@@ -83,25 +82,17 @@ export default function SubscribeForm({
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <>
       {done ? (
-        <motion.p
-          key="done"
-          animate={{ opacity: 1, y: 0 }}
+        <p
           className="text-center text-sm text-default-500 py-2"
-          exit={{ opacity: 0 }}
-          initial={{ opacity: 0, y: 8 }}
-          transition={{ duration: 0.4 }}
+          style={{ animation: "fadeInUp 0.4s ease both" }}
         >
           Benvenuto in famiglia
-        </motion.p>
+        </p>
       ) : (
-        <motion.form
-          key="form"
-          animate={{ opacity: 1 }}
+        <form
           className="flex flex-col gap-3 w-full"
-          exit={{ opacity: 0 }}
-          initial={{ opacity: 1 }}
           onSubmit={handleSubmit}
         >
           {/* Honeypot nascosto */}
@@ -189,8 +180,8 @@ export default function SubscribeForm({
               </p>
             </>
           )}
-        </motion.form>
+        </form>
       )}
-    </AnimatePresence>
+    </>
   );
 }

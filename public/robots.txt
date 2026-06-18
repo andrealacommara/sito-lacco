@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /presskit
 
 Sitemap: https://lacco.it/sitemap.xml

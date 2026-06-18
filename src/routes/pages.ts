@@ -17,6 +17,7 @@ export const UnsubscribePage = lazyWithPreload(
   () => import("@/pages/unsubscribePage"),
 );
 export const AdminPage = lazyWithPreload(() => import("@/pages/adminPage"));
+export const LivePage = lazyWithPreload(() => import("@/pages/livePage"));
 export const ReleasePage = lazyWithPreload(() => import("@/pages/releasePage"));
 export const NotFoundPage = lazyWithPreload(
   () => import("@/pages/notFoundPage"),
@@ -27,12 +28,13 @@ export const PrivacyPage = lazyWithPreload(() => import("@/pages/privacyPage"));
 // Maps route paths to the respective preload function for quick lookups.
 const preloaders: Record<string, () => Promise<unknown>> = {
   "/": HomePage.preload,
-  "/la-mia-musica": MusicPage.preload,
-  "/su-di-me": AboutPage.preload,
+  "/musica": MusicPage.preload,
+  "/chi-sono": AboutPage.preload,
   "/contatti": ContactPage.preload,
   "/presskit": PressKitPage.preload,
   "/newsletter": NewsletterPage.preload,
   "/privacy": PrivacyPage.preload,
+  "/live": LivePage.preload,
 };
 
 // ========================== HELPERS ========================== //

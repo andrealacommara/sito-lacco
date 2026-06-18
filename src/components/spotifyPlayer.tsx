@@ -59,7 +59,7 @@ export default function SpotifyPlayer({ srcPlayer, size }: SpotifyPlayerProps) {
             di dati sui dispositivi mobili.
           </p>
           <button
-            className="px-4 py-2 rounded-full bg-green-600 text-white text-sm font-semibold transition hover:bg-green-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-500"
+            className="px-4 py-2 rounded-full bg-green-700 text-white text-sm font-semibold transition hover:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600"
             type="button"
             onClick={() => setShouldLoadPlayer(true)}
           >

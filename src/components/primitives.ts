@@ -8,7 +8,7 @@ import { tv } from "tailwind-variants";
 // Uses variants for color, size, and width.
 export const title = tv({
   // Base styles applied to all titles
-  base: "tracking-tight inline font-semibold text-center",
+  base: "tracking-tight inline font-display text-center",
 
   // Configurable variants to customize the title
   variants: {
@@ -20,14 +20,15 @@ export const title = tv({
       cyan: "from-[#00b7fa] to-[#01cfea]",
       green: "from-[#6FEE8D] to-[#17c964]",
       pink: "from-[#FF72E1] to-[#F54C7A]",
+      danger: "text-[#F31260]",
       foreground: "dark:from-[#FFFFFF] dark:to-[#4B4B4B]", // Neutral color for dark mode
     },
 
     // Title size
     size: {
-      sm: "text-3xl lg:text-4xl",
-      md: "text-[2.3rem] lg:text-5xl",
-      lg: "text-4xl lg:text-6xl",
+      sm: "text-4xl lg:text-5xl",
+      md: "text-5xl lg:text-6xl",
+      lg: "text-5xl lg:text-7xl",
     },
 
     // Option to make the title full width
@@ -63,7 +64,7 @@ export const title = tv({
 // Styles for subtitles or introductory paragraphs below main titles.
 export const subtitle = tv({
   // Base styles for the subtitle
-  base: "w-full md:w-1/2 my-2 text-lg lg:text-xl text-default-600 block max-w-full font-semibold text-center",
+  base: "w-full md:w-1/2 my-2 text-xl lg:text-2xl text-foreground block max-w-full font-semibold font-display text-center",
 
   // Configurable variants
   variants: {

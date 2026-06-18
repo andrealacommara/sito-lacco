@@ -1,0 +1,131 @@
+import type { LiveEvent } from "@/config/liveEvents";
+
+import { Button } from "@heroui/button";
+import { Card } from "@heroui/card";
+
+import heroLacco from "@/assets/images/lacco/heroLacco.avif";
+import Countdown from "@/components/countdown";
+import SmartImage, { resolveImageSource } from "@/components/smartImage";
+
+function MapPinIcon() {
+  return (
+    <svg className="shrink-0 opacity-60" fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg className="shrink-0 opacity-60" fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+function MicIcon() {
+  return (
+    <svg className="shrink-0 opacity-60" fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+      <line x1="12" x2="12" y1="19" y2="22" />
+    </svg>
+  );
+}
+
+function TicketIcon() {
+  return (
+    <svg className="shrink-0 opacity-60" fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+      <line x1="9" x2="9" y1="6" y2="18" />
+    </svg>
+  );
+}
+
+type Props = {
+  event: LiveEvent;
+};
+
+export default function LiveEventCard({ event }: Props) {
+  const artwork = event.poster ?? heroLacco;
+
+  return (
+    <Card className="flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl">
+      {/* Blurred backdrop — fixed dark scrim keeps text readable regardless of poster colors */}
+      <img
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
+        src={resolveImageSource(artwork)}
+      />
+      <div className="absolute inset-0 bg-black/55" />
+
+      <div className="relative shrink-0 flex items-center justify-center">
+        <SmartImage
+          isBlurred
+          priority
+          alt={`Locandina di ${event.title}`}
+          width={350}
+          src={artwork}
+          style={{ aspectRatio: "1/1", objectFit: "cover" }}
+        />
+      </div>
+
+      <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full md:w-xl">
+        <div className="space-y-1">
+          <h1 className="text-2xl md:text-4xl font-bold text-white tracking-tight whitespace-pre">
+            {event.title}
+          </h1>
+          <p className="text-white/70 text-sm tracking-widest font-medium">
+            {event.venue} · {event.city}
+          </p>
+        </div>
+
+        <Countdown releaseDate={event.date} variant="dark" />
+
+        <div className="flex flex-col gap-2 w-full text-white/70 text-sm items-center">
+          {event.address && (
+            <div className="flex items-center gap-2">
+              <MapPinIcon />
+              <span>{event.address}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <ClockIcon />
+            <span>
+              {event.doorsTime && `Ingresso ${event.doorsTime}`}
+              {event.doorsTime && <span className="mx-1.5 opacity-40">·</span>}
+              {`Show ${event.date.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`}
+            </span>
+          </div>
+          {event.lineup && event.lineup.length > 0 && (
+            <div className="flex items-center gap-2">
+              <MicIcon />
+              <span>{event.lineup.join(", ")}</span>
+            </div>
+          )}
+          {event.price && (
+            <div className="flex items-center gap-2">
+              <TicketIcon />
+              <span>{event.price}</span>
+            </div>
+          )}
+        </div>
+
+        <Button
+          aria-label="Compra i biglietti"
+          className="font-semibold px-8"
+          color="danger"
+          size="lg"
+          onPress={() =>
+            window.open(event.ticketUrl, "_blank", "noopener,noreferrer")
+          }
+        >
+          Compra i biglietti
+        </Button>
+      </div>
+    </Card>
+  );
+}

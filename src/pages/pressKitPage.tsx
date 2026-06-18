@@ -20,7 +20,7 @@ import SmartImage from "@/components/smartImage"; // Optimized image component w
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)
 import CountUp from "@/components/countUp"; // Component for count up effect
 import { pressKitStats } from "@/config/pressKitStats"; // Stats
-import { catalog } from "@/config/catalog"; // Discography
+import { singles } from "@/config/catalog"; // Discography
 import PressKitSongCard from "@/components/pressKitSongCard"; //UI component for songs card
 import { pressKitPhotos } from "@/config/pressKitPhotos";
 import PressKitPhotoModal from "@/components/pressKitPhotoModal";
@@ -187,7 +187,7 @@ export default function PressKitPage() {
                   <CountUp
                     duration={1000}
                     end={
-                      catalog.filter((song) => song.presaveMode === false)
+                      singles.filter((song) => song.presaveMode === false)
                         .length
                     }
                   />
@@ -364,7 +364,7 @@ export default function PressKitPage() {
           <h2 className={subtitle()}>Discografia</h2>
         </div>
         <div className="flex flex-col gap-4 w-full max-w-5xl mx-auto">
-          {catalog
+          {singles
             .filter((song) => song.presaveMode === false)
             .map((song) => (
               <PressKitSongCard
