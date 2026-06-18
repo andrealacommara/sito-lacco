@@ -1092,26 +1092,49 @@ export default function AdminPage() {
                   />
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium">Immagine</p>
-                    <label
-                      className="flex items-center justify-center w-full h-40 rounded-lg border-2 border-dashed border-default-200 hover:border-default-400 transition-colors cursor-pointer overflow-hidden bg-default-50"
-                      htmlFor="image-upload"
-                    >
-                      {imageUploading ? (
-                        <span className="text-xs text-default-400">
-                          Caricamento…
-                        </span>
-                      ) : imagePublicUrl ? (
-                        <img
-                          alt="Anteprima"
-                          className="w-full h-full object-cover"
-                          src={imagePublicUrl}
-                        />
-                      ) : (
-                        <span className="text-default-400 text-2xl leading-none">
-                          +
-                        </span>
+                    <div className="relative">
+                      <label
+                        className="flex items-center justify-center w-full h-40 rounded-lg border-2 border-dashed border-default-200 hover:border-default-400 transition-colors cursor-pointer overflow-hidden bg-default-50"
+                        htmlFor="image-upload"
+                      >
+                        {imageUploading ? (
+                          <span className="text-xs text-default-400">
+                            Caricamento…
+                          </span>
+                        ) : imagePublicUrl ? (
+                          <img
+                            alt="Anteprima"
+                            className="w-full h-full object-cover"
+                            src={imagePublicUrl}
+                          />
+                        ) : (
+                          <span className="text-default-400 text-2xl leading-none">
+                            +
+                          </span>
+                        )}
+                      </label>
+                      {imagePublicUrl && (
+                        <button
+                          aria-label="Rimuovi immagine"
+                          className="absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                          type="button"
+                          onClick={() => setImagePublicUrl("")}
+                        >
+                          <svg
+                            fill="none"
+                            height="12"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeWidth="2"
+                            viewBox="0 0 12 12"
+                            width="12"
+                          >
+                            <line x1="1" x2="11" y1="1" y2="11" />
+                            <line x1="11" x2="1" y1="1" y2="11" />
+                          </svg>
+                        </button>
                       )}
-                    </label>
+                    </div>
                     <input
                       accept="image/*"
                       className="hidden"
@@ -1119,17 +1142,6 @@ export default function AdminPage() {
                       type="file"
                       onChange={handleImageUpload}
                     />
-                    {imagePublicUrl && (
-                      <Button
-                        className="self-start"
-                        color="danger"
-                        size="sm"
-                        variant="light"
-                        onPress={() => setImagePublicUrl("")}
-                      >
-                        Rimuovi
-                      </Button>
-                    )}
                   </div>
                   <div className="flex gap-3 flex-wrap">
                     <Input
