@@ -9,14 +9,26 @@
 const _base = import.meta.env.PROD ? "https://lacco.it" : "";
 const HEADER_IMG = `<img class="header-img" src="${_base}/header-email.png" width="520" height="128" alt="Lacco" style="display:block;width:100%;height:auto;border:0;">`;
 
-function baseTemplate(content: string, unsubscribeUrl?: string): string {
-  const unsubFooter = unsubscribeUrl
-    ? `<p class="footer-link" style="margin:12px 0 0;font-size:11px;color:#555;">
-        <a href="${unsubscribeUrl}" style="color:#555;text-decoration:underline;">
-          Disiscriviti dalla newsletter
-        </a>
-       </p>`
-    : "";
+function baseTemplate(
+  content: string,
+  opts?: { unsubscribeUrl?: string; transactional?: boolean },
+): string {
+  const signature = opts?.transactional
+    ? ""
+    : `<p class="email-text" style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong style="color:#F31260;">Lacco</strong></p>`;
+
+  const footerContent = opts?.transactional
+    ? `<p class="footer-text" style="margin:0;font-size:12px;color:#555;line-height:1.5;">
+            Se non hai richiesto tu questo accesso, ignora questa email.
+          </p>`
+    : `<p class="footer-text" style="margin:0;font-size:12px;color:#555;line-height:1.5;">
+            Hai ricevuto questa email perché sei iscritto alla newsletter di Lacco.
+          </p>
+          ${opts?.unsubscribeUrl ? `<p class="footer-link" style="margin:12px 0 0;font-size:11px;color:#555;">
+            <a href="${opts.unsubscribeUrl}" style="color:#555;text-decoration:underline;">
+              Disiscriviti dalla newsletter
+            </a>
+          </p>` : ""}`;
 
   return `<!DOCTYPE html>
 <html lang="it" style="color-scheme:light dark;">
@@ -59,15 +71,12 @@ function baseTemplate(content: string, unsubscribeUrl?: string): string {
       <tr>
         <td class="email-body" bgcolor="#ffffff" style="padding:32px;background:#ffffff;">
           ${content}
-          <p class="email-text" style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong style="color:#F31260;">Lacco</strong></p>
+          ${signature}
         </td>
       </tr>
       <tr>
         <td class="email-footer" bgcolor="#ffffff" style="padding:16px 32px 24px;border-top:1px solid #e4e4e7;text-align:center;background:#ffffff;">
-          <p class="footer-text" style="margin:0;font-size:12px;color:#555;line-height:1.5;">
-            Hai ricevuto questa email perché sei iscritto alla newsletter di Lacco.
-          </p>
-          ${unsubFooter}
+          ${footerContent}
         </td>
       </tr>
     </table>
@@ -125,6 +134,6 @@ export function broadcastEmailHtml(opts: {
 
   return baseTemplate(
     `${greeting}<div class="rte-body" style="font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</div>${imageSection}${ctaSection}`,
-    opts.unsubscribeUrl,
+    { unsubscribeUrl: opts.unsubscribeUrl },
   );
 }
