@@ -1,6 +1,7 @@
 import type { ImageLikeImport } from "@/components/smartImage";
 
 import tempoPersoLIVEPoster from "@/assets/images/liveEvents/tempoPersoLIVEPoster.avif";
+import INTOTHELACCOVERSEPoster from "@/assets/images/liveEvents/INTOTHELACCOVERSEPoster.avif";
 
 export type LiveEvent = {
   slug: string;
@@ -26,6 +27,7 @@ export const liveEvents: LiveEvent[] = [
     address: "Strada delle Cacce, 36, 10135 Torino (TO)",
     city: "Torino",
     ticketUrl: "https://www.mailticket.it/evento/53852/lacco",
+    poster: INTOTHELACCOVERSEPoster,
     price: "€10 + prevendita (€15 in cassa)",
     lineup: ["SCA", "Tommiottocento"],
   },
