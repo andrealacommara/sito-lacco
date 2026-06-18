@@ -84,6 +84,15 @@ export type AdminSyncResendResponse = {
   error?: string;
 };
 
+// POST /functions/v1/send-magic-link
+export type SendMagicLinkBody = {
+  redirectTo?: string;
+};
+export type SendMagicLinkResponse = {
+  ok: boolean;
+  message?: string;
+};
+
 // GET /functions/v1/admin-stats (richiede Bearer JWT)
 export type AdminStatsResponse = {
   ok: boolean;
