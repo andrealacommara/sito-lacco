@@ -14,7 +14,8 @@
     "test:env": "node scripts/checkEnv.js",
     "test:full": "npm run lint && npm run type-check && npm run build && npm run test:env && npm run test:smoke",
     "update": "npx npm-check-updates -u && npm install",
-    "test:smoke": "node scripts/smoke-test.js"
+    "test:smoke": "node scripts/smoke-test.js",
+    "generate-email-assets": "node scripts/generate-email-assets.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
