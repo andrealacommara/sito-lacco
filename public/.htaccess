@@ -10,7 +10,6 @@ Redirect 301 /instagram https://instagram.com/laccoverse
 Redirect 301 /tiktok https://tiktok.com/@laccoverse
 Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
 Redirect 301 /youtube https://www.youtube.com/@Laccoverse
-Redirect 301 /nokoru-mono https://distrokid.com/hyperfollow/lacco/nokoru-mono
 Redirect 301 /preview-nokoru-mono https://on.soundcloud.com/u3ZP1Y26moVlmrQSIO
 
 # ====================== STATIC FILES & SPA FALLBACK ======================
