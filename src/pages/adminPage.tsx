@@ -625,7 +625,7 @@ export default function AdminPage() {
         <meta content="noindex, nofollow" name="robots" />
       </Helmet>
       <div className="py-8">
-        <div className="max-w-3xl mx-auto mb-2">
+        <div className="max-w-3xl mx-auto mb-2 flex justify-end">
           <Button
             color="danger"
             size="sm"
