@@ -27,12 +27,7 @@ function App() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const pathsToWarm = [
-      "/musica",
-      "/chi-sono",
-      "/contatti",
-      "/live",
-    ];
+    const pathsToWarm = ["/musica", "/chi-sono", "/contatti", "/live"];
     const warm = () => warmupRoutes(pathsToWarm);
 
     const idleCallback = (

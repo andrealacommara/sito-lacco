@@ -15,7 +15,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders(origin) });
   }
   if (req.method !== "POST") {
-    return jsonResponse({ ok: false, message: "Method not allowed" }, 405, origin);
+    return jsonResponse(
+      { ok: false, message: "Method not allowed" },
+      405,
+      origin,
+    );
   }
 
   let body: Record<string, unknown>;
@@ -27,9 +31,7 @@ Deno.serve(async (req) => {
   }
 
   const redirectTo =
-    typeof body.redirectTo === "string"
-      ? body.redirectTo
-      : `${SITE_URL}/admin`;
+    typeof body.redirectTo === "string" ? body.redirectTo : `${SITE_URL}/admin`;
 
   const supabase = getSupabaseAdmin();
 
@@ -41,6 +43,7 @@ Deno.serve(async (req) => {
 
   if (error || !data?.properties?.action_link) {
     console.error("generateLink error:", error);
+
     return jsonResponse({ ok: false, message: "Errore interno" }, 500, origin);
   }
 
@@ -52,7 +55,12 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("Resend error:", err);
-    return jsonResponse({ ok: false, message: "Errore nell'invio dell'email" }, 500, origin);
+
+    return jsonResponse(
+      { ok: false, message: "Errore nell'invio dell'email" },
+      500,
+      origin,
+    );
   }
 
   return jsonResponse({ ok: true }, 200, origin);

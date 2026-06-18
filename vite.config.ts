@@ -1,10 +1,11 @@
 // ========================== MAIN IMPORTS ========================== //
 // Node helpers plus the Vite plugins required to build the SPA.
+import type { PreRenderedAsset } from "rollup";
+
 import fs from "fs";
 import path from "path";
 
 import { defineConfig } from "vite";
-import type { PreRenderedAsset } from "rollup";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";

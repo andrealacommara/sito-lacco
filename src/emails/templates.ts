@@ -86,27 +86,6 @@ function baseTemplate(
 </html>`;
 }
 
-export function welcomeEmailHtml(
-  firstName: string | undefined,
-  unsubscribeUrl: string,
-): string {
-  const name = firstName?.trim();
-  const greeting = name
-    ? `<p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">Ciao ${name}!</p>`
-    : "";
-
-  return baseTemplate(
-    `
-    ${greeting}
-    <p style="margin:0;font-size:16px;color:#333;line-height:1.6;">
-      Benvenuto in famiglia!<br/>
-      Sarai la prima persona a sapere delle novità di Lacco — nuove uscite, anteprime e aggiornamenti arriveranno direttamente qui.
-    </p>
-  `,
-    { unsubscribeUrl },
-  );
-}
-
 export function broadcastEmailHtml(opts: {
   body: string;
   imageUrl?: string;

@@ -31,7 +31,6 @@ type FilterStatus = "" | "confirmed" | "unsubscribed" | "bounced";
 type SortBy = "email" | "status" | "source" | "createdAt";
 type SortDir = "asc" | "desc";
 
-
 const STATUS_LABEL: Record<string, string> = {
   confirmed: "iscritto",
   unsubscribed: "disiscritto",
@@ -383,7 +382,10 @@ export default function AdminPage() {
       const data: SendMagicLinkResponse = await res.json();
 
       if (!data.ok) {
-        addToast({ title: data.message ?? "Errore nell'invio", color: "danger" });
+        addToast({
+          title: data.message ?? "Errore nell'invio",
+          color: "danger",
+        });
       } else {
         setView("check-email");
       }
@@ -474,8 +476,10 @@ export default function AdminPage() {
 
   const normalizeUrl = (url: string) => {
     const u = url.trim();
+
     if (!u) return u;
     if (/^[a-z]+:\/\//i.test(u)) return u;
+
     return /^www\./i.test(u) ? `https://${u}` : `https://www.${u}`;
   };
 
@@ -653,8 +657,8 @@ export default function AdminPage() {
           </Button>
         </div>
         <div className="bg-white/20 backdrop-blur-md border border-default-100 rounded-2xl p-6 max-w-3xl mx-auto flex flex-col gap-6">
-        {/* Tab bar */}
-        <div className="flex gap-1 sm:gap-2 overflow-x-auto">
+          {/* Tab bar */}
+          <div className="flex gap-1 sm:gap-2 overflow-x-auto">
             <Button
               className="font-semibold shrink-0"
               color={tab === "subscribers" ? "danger" : "default"}
@@ -686,551 +690,530 @@ export default function AdminPage() {
                 ? ` (${selectedSubscribers.length})`
                 : ""}
             </Button>
-        </div>
+          </div>
 
-        {/* ── SUBSCRIBERS TAB ─────────────────────────────────────────────── */}
-        {tab === "subscribers" && (
-          <div className="flex flex-col gap-6">
-            {/* Dashboard */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <StatCard
-                color="success"
-                label="Confermati"
-                value={stats?.confirmed}
-              />
-              <StatCard
-                color="default"
-                label="Disiscritti"
-                value={stats?.unsubscribed}
-              />
-              <StatCard
-                color="danger"
-                label="Rimbalzati"
-                value={stats?.bounced}
-              />
-              <StatCard
-                color="primary"
-                label="Nuovi (7gg)"
-                value={stats?.newLast7Days}
-              />
-            </div>
-
-            {/* Search */}
-            <Input
-              isClearable
-              className="w-full"
-              placeholder="Cerca per email o nome…"
-              size="sm"
-              startContent={
-                <svg
-                  className="text-default-400"
-                  fill="none"
-                  height="16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  width="16"
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" x2="16.65" y1="21" y2="16.65" />
-                </svg>
-              }
-              value={searchInput}
-              variant="bordered"
-              onClear={() => setSearchInput("")}
-              onValueChange={setSearchInput}
-            />
-
-            {/* Status filter + azioni */}
-            <div className="flex items-center justify-between gap-2">
-              <Select
-                aria-label="Filtra per stato"
-                className="w-40"
-                selectedKeys={[filterStatus || "all"]}
-                size="sm"
-                variant="bordered"
-                onSelectionChange={(keys) => {
-                  const value = Array.from(keys)[0] as string | undefined;
-
-                  setFilterStatus(
-                    (value === "all" ? "" : (value ?? "")) as FilterStatus,
-                  );
-                  setPage(1);
-                }}
-              >
-                <SelectItem key="all">Tutti</SelectItem>
-                <SelectItem key="confirmed">Confermati</SelectItem>
-                <SelectItem key="unsubscribed">Disiscritti</SelectItem>
-                <SelectItem key="bounced">Rimbalzati</SelectItem>
-              </Select>
-              <Button
-                color="secondary"
-                isLoading={syncLoading}
-                size="sm"
-                variant="flat"
-                onPress={handleSyncResend}
-              >
-                {!syncLoading && (
-                  <>
-                    Ricarica
-                    <svg
-                      fill="none"
-                      height="18"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      width="18"
-                    >
-                      <path d="M21 2v6h-6" />
-                      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-                      <path d="M3 22v-6h6" />
-                      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-                    </svg>
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {/* Selection bar */}
-            {selectedSubscribers.length > 0 && (
-              <div className="flex flex-col gap-3 text-sm rounded-lg px-3 py-3 bg-default-50 border border-default-100">
-                <div className="text-center text-default-700 font-semibold">
-                  {selectedSubscribers.length} selezionati
-                </div>
-
-                {!confirmUnsubscribe ? (
-                  <div className="flex gap-2">
-                    <Button
-                      className="flex-1"
-                      color="default"
-                      size="sm"
-                      variant="flat"
-                      onPress={() => setSelectedSubscribers([])}
-                    >
-                      Deseleziona
-                    </Button>
-                    <Button
-                      className="flex-1 font-semibold"
-                      color="primary"
-                      size="sm"
-                      onPress={() => switchTab("individuale")}
-                    >
-                      Scrivi
-                    </Button>
-                    <Button
-                      className="flex-1"
-                      color="danger"
-                      isDisabled={unsubscribableSelected.length === 0}
-                      size="sm"
-                      variant="flat"
-                      onPress={handleUnsubscribeSelected}
-                    >
-                      Disiscrivi
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <span className="text-xs text-danger font-medium">
-                      Confermi la disiscrizione?
-                    </span>
-                    <div className="flex gap-2">
-                      <Button
-                        color="danger"
-                        isLoading={unsubscribeLoading}
-                        size="sm"
-                        onPress={handleUnsubscribeSelected}
-                      >
-                        Sì, disiscrivi
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="light"
-                        onPress={() => setConfirmUnsubscribe(false)}
-                      >
-                        Annulla
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Header colonne */}
-            {!subsLoading && subscribers.length > 0 && (
-              <div className="flex items-center gap-3 px-2 pb-2 border-b border-default-200 text-xs font-medium text-default-400 uppercase tracking-wide">
-                <Checkbox
-                  isIndeterminate={someOnPageSelected}
-                  isSelected={allOnPageSelected}
-                  size="sm"
-                  onValueChange={toggleSelectAllOnPage}
+          {/* ── SUBSCRIBERS TAB ─────────────────────────────────────────────── */}
+          {tab === "subscribers" && (
+            <div className="flex flex-col gap-6">
+              {/* Dashboard */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <StatCard
+                  color="success"
+                  label="Confermati"
+                  value={stats?.confirmed}
                 />
-                <button
-                  className="flex-1 flex items-center gap-1 text-left hover:text-default-600"
-                  type="button"
-                  onClick={() => handleSort("email")}
-                >
-                  Iscritto
-                  {sortBy === "email" && (
-                    <span>{sortDir === "asc" ? "↓" : "↑"}</span>
-                  )}
-                </button>
-                <button
-                  className="flex items-center gap-1 hover:text-default-600"
-                  type="button"
-                  onClick={() => handleSort("status")}
-                >
-                  Stato
-                  {sortBy === "status" && (
-                    <span>{sortDir === "asc" ? "↓" : "↑"}</span>
-                  )}
-                </button>
-                <button
-                  className="hidden sm:flex items-center gap-1 w-24 shrink-0 hover:text-default-600"
-                  type="button"
-                  onClick={() => handleSort("source")}
-                >
-                  Fonte
-                  {sortBy === "source" && (
-                    <span>{sortDir === "asc" ? "↓" : "↑"}</span>
-                  )}
-                </button>
-                <button
-                  className="flex items-center justify-end gap-1 w-20 shrink-0 hover:text-default-600"
-                  type="button"
-                  onClick={() => handleSort("createdAt")}
-                >
-                  Data
-                  {sortBy === "createdAt" && (
-                    <span>{sortDir === "asc" ? "↓" : "↑"}</span>
-                  )}
-                </button>
+                <StatCard
+                  color="default"
+                  label="Disiscritti"
+                  value={stats?.unsubscribed}
+                />
+                <StatCard
+                  color="danger"
+                  label="Rimbalzati"
+                  value={stats?.bounced}
+                />
+                <StatCard
+                  color="primary"
+                  label="Nuovi (7gg)"
+                  value={stats?.newLast7Days}
+                />
               </div>
-            )}
 
-            {/* List */}
-            {subsLoading ? (
-              <div className="flex flex-col gap-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <Skeleton key={i} className="rounded-lg">
-                    <div className="h-10 w-full rounded-lg bg-default-200" />
-                  </Skeleton>
-                ))}
-              </div>
-            ) : subscribers.length === 0 ? (
-              <p className="text-default-400 text-sm py-6 text-center">
-                Nessun iscritto trovato.
-              </p>
-            ) : (
-              <div className="flex flex-col">
-                {subscribers.map((s) => (
-                  <div
-                    key={s.id}
-                    className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg border-b border-default-100 text-sm hover:bg-default-50 transition-colors"
+              {/* Search */}
+              <Input
+                isClearable
+                className="w-full"
+                placeholder="Cerca per email o nome…"
+                size="sm"
+                startContent={
+                  <svg
+                    className="text-default-400"
+                    fill="none"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    width="16"
                   >
-                    <Checkbox
-                      isSelected={selectedSubscribers.some(
-                        (sel) => sel.id === s.id,
-                      )}
-                      size="sm"
-                      onValueChange={() => toggleSelectSubscriber(s)}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{s.email}</p>
-                      {(s.firstName || s.releaseSlug) && (
-                        <p className="text-xs text-default-400 truncate">
-                          {[s.firstName, s.releaseSlug]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </p>
-                      )}
-                    </div>
-                    <Chip
-                      color={STATUS_COLOR[s.status] ?? "default"}
-                      size="sm"
-                      variant="flat"
-                    >
-                      {STATUS_LABEL[s.status] ?? s.status}
-                    </Chip>
-                    <span className="hidden sm:inline text-xs text-default-400 w-24 shrink-0 truncate">
-                      {SOURCE_LABEL[s.source] ?? s.source}
-                    </span>
-                    <span className="text-xs text-default-400 w-20 shrink-0 text-right">
-                      {new Date(s.createdAt).toLocaleDateString("it-IT")}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="21" x2="16.65" y1="21" y2="16.65" />
+                  </svg>
+                }
+                value={searchInput}
+                variant="bordered"
+                onClear={() => setSearchInput("")}
+                onValueChange={setSearchInput}
+              />
 
-            {/* Pagination */}
-            {!subsLoading && subscribers.length > 0 && (
-              <div className="flex items-center justify-center gap-2">
-                <Button
-                  isIconOnly
-                  aria-label="Pagina precedente"
-                  isDisabled={page <= 1}
-                  size="sm"
-                  variant="bordered"
-                  onPress={() => setPage((p) => p - 1)}
-                >
-                  ←
-                </Button>
-                <span className="text-sm text-default-500 whitespace-nowrap px-1">
-                  {page} / {totalPages}
-                </span>
-                <Button
-                  isIconOnly
-                  aria-label="Pagina successiva"
-                  isDisabled={page >= totalPages}
-                  size="sm"
-                  variant="bordered"
-                  onPress={() => setPage((p) => p + 1)}
-                >
-                  →
-                </Button>
+              {/* Status filter + azioni */}
+              <div className="flex items-center justify-between gap-2">
                 <Select
-                  aria-label="Contatti per pagina"
-                  className="w-20 ml-1"
-                  selectedKeys={[String(pageSize)]}
+                  aria-label="Filtra per stato"
+                  className="w-40"
+                  selectedKeys={[filterStatus || "all"]}
                   size="sm"
                   variant="bordered"
                   onSelectionChange={(keys) => {
-                    const value = Array.from(keys)[0];
+                    const value = Array.from(keys)[0] as string | undefined;
 
-                    if (value) {
-                      setPageSize(Number(value));
-                      setPage(1);
-                    }
+                    setFilterStatus(
+                      (value === "all" ? "" : (value ?? "")) as FilterStatus,
+                    );
+                    setPage(1);
                   }}
                 >
-                  {PAGE_SIZE_OPTIONS.map((n) => (
-                    <SelectItem key={String(n)} textValue={String(n)}>
-                      {n}
-                    </SelectItem>
-                  ))}
+                  <SelectItem key="all">Tutti</SelectItem>
+                  <SelectItem key="confirmed">Confermati</SelectItem>
+                  <SelectItem key="unsubscribed">Disiscritti</SelectItem>
+                  <SelectItem key="bounced">Rimbalzati</SelectItem>
                 </Select>
-              </div>
-            )}
-
-            {/* Add manually */}
-            <div className="bg-default-50 border border-default-100 rounded-xl p-4 md:p-5">
-              <h2 className="text-sm font-semibold mb-4">
-                Aggiungi manualmente
-              </h2>
-              <form
-                className="flex flex-col items-center gap-3"
-                onSubmit={handleAddSubscriber}
-              >
-                <div className="flex gap-3 flex-wrap w-full">
-                  <Input
-                    className="flex-1 min-w-48"
-                    label="Email"
-                    labelPlacement="outside"
-                    placeholder="nome@email.com"
-                    size="sm"
-                    type="email"
-                    value={addEmail}
-                    variant="bordered"
-                    onValueChange={setAddEmail}
-                  />
-                  <Input
-                    className="flex-1 min-w-32"
-                    label="Nome"
-                    labelPlacement="outside"
-                    placeholder="Nome"
-                    size="sm"
-                    type="text"
-                    value={addFirstName}
-                    variant="bordered"
-                    onValueChange={setAddFirstName}
-                  />
-                  <Input
-                    label="Data consenso"
-                    labelPlacement="outside"
-                    size="sm"
-                    type="date"
-                    value={addConsentDate}
-                    variant="bordered"
-                    onValueChange={setAddConsentDate}
-                  />
-                </div>
                 <Button
-                  className="font-semibold"
-                  color="danger"
-                  isLoading={addLoading}
-                  size="lg"
-                  type="submit"
+                  color="secondary"
+                  isLoading={syncLoading}
+                  size="sm"
+                  variant="flat"
+                  onPress={handleSyncResend}
                 >
-                  {addLoading ? "" : "Aggiungi"}
+                  {!syncLoading && (
+                    <>
+                      Ricarica
+                      <svg
+                        fill="none"
+                        height="18"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="18"
+                      >
+                        <path d="M21 2v6h-6" />
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                        <path d="M3 22v-6h6" />
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                      </svg>
+                    </>
+                  )}
                 </Button>
-              </form>
-            </div>
-          </div>
-        )}
+              </div>
 
-        {/* ── BROADCAST / INVIO SINGOLO (composer condiviso) ──────────────── */}
-        {(tab === "broadcast" || tab === "individuale") && (
-          <div className="flex flex-col gap-5">
-            {isIndividuale && selectedSubscribers.length === 0 ? (
-              <p className="text-default-400 text-sm py-6 text-center">
-                Nessun destinatario selezionato. Vai nella tab Iscritti e
-                seleziona almeno una persona.
-              </p>
-            ) : (
-              <>
-                {isIndividuale && (
-                  <div className="flex flex-wrap items-center gap-2 text-sm">
-                    <span className="text-default-500">Destinatari:</span>
-                    {selectedSubscribers.map((s) => (
-                      <Chip
-                        key={s.id}
+              {/* Selection bar */}
+              {selectedSubscribers.length > 0 && (
+                <div className="flex flex-col gap-3 text-sm rounded-lg px-3 py-3 bg-default-50 border border-default-100">
+                  <div className="text-center text-default-700 font-semibold">
+                    {selectedSubscribers.length} selezionati
+                  </div>
+
+                  {!confirmUnsubscribe ? (
+                    <div className="flex gap-2">
+                      <Button
+                        className="flex-1"
+                        color="default"
                         size="sm"
                         variant="flat"
-                        onClose={() => toggleSelectSubscriber(s)}
+                        onPress={() => setSelectedSubscribers([])}
                       >
-                        {s.email}
-                      </Chip>
-                    ))}
-                  </div>
-                )}
-
-                {/* Composer */}
-                <div className="flex flex-col gap-4">
-                  <Input
-                    label="Oggetto email"
-                    labelPlacement="outside"
-                    placeholder="Es: Nuovo singolo in arrivo"
-                    value={subject}
-                    variant="bordered"
-                    onValueChange={setSubject}
-                  />
-                  <RichTextEditor
-                    placeholder="Scrivi il corpo della mail…"
-                    value={emailBody}
-                    onChange={setEmailBody}
-                  />
-                  <div className="flex flex-col gap-1.5">
-                    <p className="text-sm font-medium">Immagine</p>
-                    <div className="relative">
-                      <label
-                        className="flex items-center justify-center w-full h-40 rounded-lg border-2 border-dashed border-default-200 hover:border-default-400 transition-colors cursor-pointer overflow-hidden bg-default-50"
-                        htmlFor="image-upload"
+                        Deseleziona
+                      </Button>
+                      <Button
+                        className="flex-1 font-semibold"
+                        color="primary"
+                        size="sm"
+                        onPress={() => switchTab("individuale")}
                       >
-                        {imageUploading ? (
-                          <span className="text-xs text-default-400">
-                            Caricamento…
-                          </span>
-                        ) : imagePublicUrl ? (
-                          <img
-                            alt="Anteprima"
-                            className="w-full h-full object-cover"
-                            src={imagePublicUrl}
-                          />
-                        ) : (
-                          <span className="text-default-400 text-2xl leading-none">
-                            +
-                          </span>
-                        )}
-                      </label>
-                      {imagePublicUrl && (
-                        <button
-                          aria-label="Rimuovi immagine"
-                          className="absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                          type="button"
-                          onClick={() => setImagePublicUrl("")}
-                        >
-                          <svg
-                            fill="none"
-                            height="12"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeWidth="2"
-                            viewBox="0 0 12 12"
-                            width="12"
-                          >
-                            <line x1="1" x2="11" y1="1" y2="11" />
-                            <line x1="11" x2="1" y1="1" y2="11" />
-                          </svg>
-                        </button>
-                      )}
+                        Scrivi
+                      </Button>
+                      <Button
+                        className="flex-1"
+                        color="danger"
+                        isDisabled={unsubscribableSelected.length === 0}
+                        size="sm"
+                        variant="flat"
+                        onPress={handleUnsubscribeSelected}
+                      >
+                        Disiscrivi
+                      </Button>
                     </div>
-                    <input
-                      accept="image/*"
-                      className="hidden"
-                      id="image-upload"
-                      type="file"
-                      onChange={handleImageUpload}
-                    />
-                  </div>
-                  <div className="flex gap-3 flex-wrap">
-                    <Input
-                      className="flex-1 min-w-40"
-                      description="Lascia vuoto per non includere bottone"
-                      label="Testo bottone"
-                      labelPlacement="outside"
-                      placeholder="Es: Ascolta ora"
-                      value={ctaText}
-                      variant="bordered"
-                      onValueChange={setCtaText}
-                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-xs text-danger font-medium">
+                        Confermi la disiscrizione?
+                      </span>
+                      <div className="flex gap-2">
+                        <Button
+                          color="danger"
+                          isLoading={unsubscribeLoading}
+                          size="sm"
+                          onPress={handleUnsubscribeSelected}
+                        >
+                          Sì, disiscrivi
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="light"
+                          onPress={() => setConfirmUnsubscribe(false)}
+                        >
+                          Annulla
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Header colonne */}
+              {!subsLoading && subscribers.length > 0 && (
+                <div className="flex items-center gap-3 px-2 pb-2 border-b border-default-200 text-xs font-medium text-default-400 uppercase tracking-wide">
+                  <Checkbox
+                    isIndeterminate={someOnPageSelected}
+                    isSelected={allOnPageSelected}
+                    size="sm"
+                    onValueChange={toggleSelectAllOnPage}
+                  />
+                  <button
+                    className="flex-1 flex items-center gap-1 text-left hover:text-default-600"
+                    type="button"
+                    onClick={() => handleSort("email")}
+                  >
+                    Iscritto
+                    {sortBy === "email" && (
+                      <span>{sortDir === "asc" ? "↓" : "↑"}</span>
+                    )}
+                  </button>
+                  <button
+                    className="flex items-center gap-1 hover:text-default-600"
+                    type="button"
+                    onClick={() => handleSort("status")}
+                  >
+                    Stato
+                    {sortBy === "status" && (
+                      <span>{sortDir === "asc" ? "↓" : "↑"}</span>
+                    )}
+                  </button>
+                  <button
+                    className="hidden sm:flex items-center gap-1 w-24 shrink-0 hover:text-default-600"
+                    type="button"
+                    onClick={() => handleSort("source")}
+                  >
+                    Fonte
+                    {sortBy === "source" && (
+                      <span>{sortDir === "asc" ? "↓" : "↑"}</span>
+                    )}
+                  </button>
+                  <button
+                    className="flex items-center justify-end gap-1 w-20 shrink-0 hover:text-default-600"
+                    type="button"
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Data
+                    {sortBy === "createdAt" && (
+                      <span>{sortDir === "asc" ? "↓" : "↑"}</span>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* List */}
+              {subsLoading ? (
+                <div className="flex flex-col gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Skeleton key={i} className="rounded-lg">
+                      <div className="h-10 w-full rounded-lg bg-default-200" />
+                    </Skeleton>
+                  ))}
+                </div>
+              ) : subscribers.length === 0 ? (
+                <p className="text-default-400 text-sm py-6 text-center">
+                  Nessun iscritto trovato.
+                </p>
+              ) : (
+                <div className="flex flex-col">
+                  {subscribers.map((s) => (
+                    <div
+                      key={s.id}
+                      className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg border-b border-default-100 text-sm hover:bg-default-50 transition-colors"
+                    >
+                      <Checkbox
+                        isSelected={selectedSubscribers.some(
+                          (sel) => sel.id === s.id,
+                        )}
+                        size="sm"
+                        onValueChange={() => toggleSelectSubscriber(s)}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{s.email}</p>
+                        {(s.firstName || s.releaseSlug) && (
+                          <p className="text-xs text-default-400 truncate">
+                            {[s.firstName, s.releaseSlug]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                      <Chip
+                        color={STATUS_COLOR[s.status] ?? "default"}
+                        size="sm"
+                        variant="flat"
+                      >
+                        {STATUS_LABEL[s.status] ?? s.status}
+                      </Chip>
+                      <span className="hidden sm:inline text-xs text-default-400 w-24 shrink-0 truncate">
+                        {SOURCE_LABEL[s.source] ?? s.source}
+                      </span>
+                      <span className="text-xs text-default-400 w-20 shrink-0 text-right">
+                        {new Date(s.createdAt).toLocaleDateString("it-IT")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {!subsLoading && subscribers.length > 0 && (
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    isIconOnly
+                    aria-label="Pagina precedente"
+                    isDisabled={page <= 1}
+                    size="sm"
+                    variant="bordered"
+                    onPress={() => setPage((p) => p - 1)}
+                  >
+                    ←
+                  </Button>
+                  <span className="text-sm text-default-500 whitespace-nowrap px-1">
+                    {page} / {totalPages}
+                  </span>
+                  <Button
+                    isIconOnly
+                    aria-label="Pagina successiva"
+                    isDisabled={page >= totalPages}
+                    size="sm"
+                    variant="bordered"
+                    onPress={() => setPage((p) => p + 1)}
+                  >
+                    →
+                  </Button>
+                  <Select
+                    aria-label="Contatti per pagina"
+                    className="w-20 ml-1"
+                    selectedKeys={[String(pageSize)]}
+                    size="sm"
+                    variant="bordered"
+                    onSelectionChange={(keys) => {
+                      const value = Array.from(keys)[0];
+
+                      if (value) {
+                        setPageSize(Number(value));
+                        setPage(1);
+                      }
+                    }}
+                  >
+                    {PAGE_SIZE_OPTIONS.map((n) => (
+                      <SelectItem key={String(n)} textValue={String(n)}>
+                        {n}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </div>
+              )}
+
+              {/* Add manually */}
+              <div className="bg-default-50 border border-default-100 rounded-xl p-4 md:p-5">
+                <h2 className="text-sm font-semibold mb-4">
+                  Aggiungi manualmente
+                </h2>
+                <form
+                  className="flex flex-col items-center gap-3"
+                  onSubmit={handleAddSubscriber}
+                >
+                  <div className="flex gap-3 flex-wrap w-full">
                     <Input
                       className="flex-1 min-w-48"
-                      label="Link bottone"
+                      label="Email"
                       labelPlacement="outside"
-                      placeholder="Inserisci il link"
-                      type="url"
-                      value={ctaUrl}
+                      placeholder="nome@email.com"
+                      size="sm"
+                      type="email"
+                      value={addEmail}
                       variant="bordered"
-                      onValueChange={setCtaUrl}
+                      onValueChange={setAddEmail}
+                    />
+                    <Input
+                      className="flex-1 min-w-32"
+                      label="Nome"
+                      labelPlacement="outside"
+                      placeholder="Nome"
+                      size="sm"
+                      type="text"
+                      value={addFirstName}
+                      variant="bordered"
+                      onValueChange={setAddFirstName}
+                    />
+                    <Input
+                      label="Data consenso"
+                      labelPlacement="outside"
+                      size="sm"
+                      type="date"
+                      value={addConsentDate}
+                      variant="bordered"
+                      onValueChange={setAddConsentDate}
                     />
                   </div>
-                </div>
-
-                {/* Email preview */}
-                <div>
-                  <p className="text-xs text-default-400 mb-2">
-                    Anteprima email
-                  </p>
-                  <iframe
-                    className="w-full rounded-lg border border-default-200"
-                    srcDoc={buildBroadcastHtml(true)}
-                    style={{ height: 520 }}
-                    title="Anteprima email"
-                  />
-                </div>
-
-                {/* Send */}
-                {!confirmSend ? (
                   <Button
-                    fullWidth
                     className="font-semibold"
                     color="danger"
-                    isDisabled={!composerValid}
-                    isLoading={broadcastLoading}
+                    isLoading={addLoading}
                     size="lg"
-                    onPress={() =>
-                      handleSend(
-                        isIndividuale
-                          ? selectedSubscribers.map((s) => s.id)
-                          : undefined,
-                      )
-                    }
+                    type="submit"
                   >
-                    {isIndividuale
-                      ? `Invia a ${selectedSubscribers.length} destinatari`
-                      : "Invia a tutti"}
+                    {addLoading ? "" : "Aggiungi"}
                   </Button>
-                ) : (
-                  <div className="flex items-center gap-3 flex-wrap justify-center">
-                    <span className="text-sm text-danger font-medium">
-                      Confermi l'invio?
-                    </span>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* ── BROADCAST / INVIO SINGOLO (composer condiviso) ──────────────── */}
+          {(tab === "broadcast" || tab === "individuale") && (
+            <div className="flex flex-col gap-5">
+              {isIndividuale && selectedSubscribers.length === 0 ? (
+                <p className="text-default-400 text-sm py-6 text-center">
+                  Nessun destinatario selezionato. Vai nella tab Iscritti e
+                  seleziona almeno una persona.
+                </p>
+              ) : (
+                <>
+                  {isIndividuale && (
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="text-default-500">Destinatari:</span>
+                      {selectedSubscribers.map((s) => (
+                        <Chip
+                          key={s.id}
+                          size="sm"
+                          variant="flat"
+                          onClose={() => toggleSelectSubscriber(s)}
+                        >
+                          {s.email}
+                        </Chip>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Composer */}
+                  <div className="flex flex-col gap-4">
+                    <Input
+                      label="Oggetto email"
+                      labelPlacement="outside"
+                      placeholder="Es: Nuovo singolo in arrivo"
+                      value={subject}
+                      variant="bordered"
+                      onValueChange={setSubject}
+                    />
+                    <RichTextEditor
+                      placeholder="Scrivi il corpo della mail…"
+                      value={emailBody}
+                      onChange={setEmailBody}
+                    />
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-sm font-medium">Immagine</p>
+                      <div className="relative">
+                        <label
+                          className="flex items-center justify-center w-full h-40 rounded-lg border-2 border-dashed border-default-200 hover:border-default-400 transition-colors cursor-pointer overflow-hidden bg-default-50"
+                          htmlFor="image-upload"
+                        >
+                          {imageUploading ? (
+                            <span className="text-xs text-default-400">
+                              Caricamento…
+                            </span>
+                          ) : imagePublicUrl ? (
+                            <img
+                              alt="Anteprima"
+                              className="w-full h-full object-cover"
+                              src={imagePublicUrl}
+                            />
+                          ) : (
+                            <span className="text-default-400 text-2xl leading-none">
+                              +
+                            </span>
+                          )}
+                        </label>
+                        {imagePublicUrl && (
+                          <button
+                            aria-label="Rimuovi immagine"
+                            className="absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                            type="button"
+                            onClick={() => setImagePublicUrl("")}
+                          >
+                            <svg
+                              fill="none"
+                              height="12"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeWidth="2"
+                              viewBox="0 0 12 12"
+                              width="12"
+                            >
+                              <line x1="1" x2="11" y1="1" y2="11" />
+                              <line x1="11" x2="1" y1="1" y2="11" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                      <input
+                        accept="image/*"
+                        className="hidden"
+                        id="image-upload"
+                        type="file"
+                        onChange={handleImageUpload}
+                      />
+                    </div>
+                    <div className="flex gap-3 flex-wrap">
+                      <Input
+                        className="flex-1 min-w-40"
+                        description="Lascia vuoto per non includere bottone"
+                        label="Testo bottone"
+                        labelPlacement="outside"
+                        placeholder="Es: Ascolta ora"
+                        value={ctaText}
+                        variant="bordered"
+                        onValueChange={setCtaText}
+                      />
+                      <Input
+                        className="flex-1 min-w-48"
+                        label="Link bottone"
+                        labelPlacement="outside"
+                        placeholder="Inserisci il link"
+                        type="url"
+                        value={ctaUrl}
+                        variant="bordered"
+                        onValueChange={setCtaUrl}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email preview */}
+                  <div>
+                    <p className="text-xs text-default-400 mb-2">
+                      Anteprima email
+                    </p>
+                    <iframe
+                      className="w-full rounded-lg border border-default-200"
+                      srcDoc={buildBroadcastHtml(true)}
+                      style={{ height: 520 }}
+                      title="Anteprima email"
+                    />
+                  </div>
+
+                  {/* Send */}
+                  {!confirmSend ? (
                     <Button
+                      fullWidth
+                      className="font-semibold"
                       color="danger"
+                      isDisabled={!composerValid}
                       isLoading={broadcastLoading}
-                      size="sm"
+                      size="lg"
                       onPress={() =>
                         handleSend(
                           isIndividuale
@@ -1239,36 +1222,57 @@ export default function AdminPage() {
                         )
                       }
                     >
-                      Sì, invia
+                      {isIndividuale
+                        ? `Invia a ${selectedSubscribers.length} destinatari`
+                        : "Invia a tutti"}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="bordered"
-                      onPress={() => setConfirmSend(false)}
-                    >
-                      Annulla
-                    </Button>
-                  </div>
-                )}
+                  ) : (
+                    <div className="flex items-center gap-3 flex-wrap justify-center">
+                      <span className="text-sm text-danger font-medium">
+                        Confermi l&apos;invio?
+                      </span>
+                      <Button
+                        color="danger"
+                        isLoading={broadcastLoading}
+                        size="sm"
+                        onPress={() =>
+                          handleSend(
+                            isIndividuale
+                              ? selectedSubscribers.map((s) => s.id)
+                              : undefined,
+                          )
+                        }
+                      >
+                        Sì, invia
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="bordered"
+                        onPress={() => setConfirmSend(false)}
+                      >
+                        Annulla
+                      </Button>
+                    </div>
+                  )}
 
-                {!isIndividuale && (
-                  <p className="text-xs text-default-400 text-center">
-                    {dryCount !== null ? (
-                      <>
-                        <span className="text-success font-semibold">
-                          {dryCount}
-                        </span>{" "}
-                        iscritti riceveranno questa email
-                      </>
-                    ) : (
-                      "Calcolo destinatari…"
-                    )}
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-        )}
+                  {!isIndividuale && (
+                    <p className="text-xs text-default-400 text-center">
+                      {dryCount !== null ? (
+                        <>
+                          <span className="text-success font-semibold">
+                            {dryCount}
+                          </span>{" "}
+                          iscritti riceveranno questa email
+                        </>
+                      ) : (
+                        "Calcolo destinatari…"
+                      )}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </DefaultLayout>

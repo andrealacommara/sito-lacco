@@ -84,7 +84,8 @@ export function AboutSection({
         >
           {text.split(". ").map((sentence, i, arr) => (
             <span key={i} className="block">
-              {sentence}{i < arr.length - 1 ? "." : ""}
+              {sentence}
+              {i < arr.length - 1 ? "." : ""}
             </span>
           ))}
         </motion.p>
