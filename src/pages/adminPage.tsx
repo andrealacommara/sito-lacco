@@ -625,10 +625,19 @@ export default function AdminPage() {
         <meta content="noindex, nofollow" name="robots" />
       </Helmet>
       <div className="py-8">
+        <div className="max-w-3xl mx-auto mb-2">
+          <Button
+            color="danger"
+            size="sm"
+            variant="flat"
+            onPress={() => supabase.auth.signOut()}
+          >
+            Esci
+          </Button>
+        </div>
         <div className="bg-white/20 backdrop-blur-md border border-default-100 rounded-2xl p-6 max-w-3xl mx-auto flex flex-col gap-6">
         {/* Tab bar */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex gap-1 sm:gap-2 overflow-x-auto">
+        <div className="flex gap-1 sm:gap-2 overflow-x-auto">
             <Button
               className="font-semibold shrink-0"
               color={tab === "subscribers" ? "danger" : "default"}
@@ -660,16 +669,6 @@ export default function AdminPage() {
                 ? ` (${selectedSubscribers.length})`
                 : ""}
             </Button>
-          </div>
-          <Button
-            className="shrink-0"
-            color="danger"
-            size="sm"
-            variant="flat"
-            onPress={() => supabase.auth.signOut()}
-          >
-            Esci
-          </Button>
         </div>
 
         {/* ── SUBSCRIBERS TAB ─────────────────────────────────────────────── */}
