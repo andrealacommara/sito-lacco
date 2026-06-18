@@ -6,7 +6,7 @@ import { Helmet } from "react-helmet-async"; // SEO and meta tags for the page
 import { section1, section2 } from "@/config/sectionsAboutPage"; // Data for AboutPage sections
 import DefaultLayout from "@/layouts/default"; // Base layout including navbar and footer
 import { subtitle, title } from "@/components/primitives"; // Dynamic text styles for headings and subtitles
-import { AboutSectionWithLazy } from "@/components/aboutSectionLazy"; // Lazy-loaded with Framer Motion
+import { AboutSection } from "@/components/aboutSection";
 
 // ========================== MAIN COMPONENT: AboutPage ========================== //
 // Page structure for “Chi sono”
@@ -58,7 +58,7 @@ export default function AboutPage() {
         {/* SECTION 1 - Alternating layout */}
         <div className="flex flex-col">
           {section1.map((s, i) => (
-            <AboutSectionWithLazy key={i} {...s} reversed={i % 2 === 1} />
+            <AboutSection key={i} {...s} reversed={i % 2 === 1} />
           ))}
         </div>
 
@@ -69,7 +69,7 @@ export default function AboutPage() {
         {/* SECTION 2 - Alternating layout */}
         <div className="flex flex-col">
           {section2.map((s, i) => (
-            <AboutSectionWithLazy key={i} {...s} reversed={(i + 1) % 2 === 1} />
+            <AboutSection key={i} {...s} reversed={(i + 1) % 2 === 1} />
           ))}
         </div>
       </div>
