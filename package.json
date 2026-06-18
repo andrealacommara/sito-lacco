@@ -18,7 +18,6 @@
     "generate-email-assets": "node scripts/generate-email-assets.mjs"
   },
   "dependencies": {
-    "@emailjs/browser": "^4.4.1",
     "@heroui/react": "^2.8.5",
     "@react-aria/visually-hidden": "^3.9.1",
     "@react-hook/media-query": "^1.1.1",
