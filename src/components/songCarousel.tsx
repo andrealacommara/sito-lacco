@@ -3,7 +3,12 @@ import { Button } from "@heroui/button";
 
 import CardSongExposer from "@/components/cardSongExposer";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
-import { catalog } from "@/config/catalog";
+import { singles } from "@/config/catalog";
+
+// Singoli dal più recente al più vecchio (l'ultima uscita è la più importante).
+const orderedSingles = [...singles].sort(
+  (a, b) => b.releaseDate.getTime() - a.releaseDate.getTime(),
+);
 
 export default function SongCarousel() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -122,7 +127,7 @@ export default function SongCarousel() {
           className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full"
         >
           <div ref={startSpacerRef} className="shrink-0" />
-          {catalog.map((song) => (
+          {orderedSingles.map((song) => (
             <div
               key={song.slug}
               className="card-song shrink-0 snap-center px-2 max-w-full transition-transform hover:scale-105 active:scale-95"
@@ -131,12 +136,14 @@ export default function SongCarousel() {
                 artworkAlt={song.alt}
                 artworkSrc={song.artwork}
                 hyperfollowUrl={song.streamingLinks?.hyperfollow}
+                kind={song.kind}
                 preSaveMode={song.presaveMode}
                 releaseDate={song.releaseDate}
                 songAppleMusicLink={song.streamingLinks?.appleMusic ?? ""}
                 songDescription={song.description}
                 songSpotifyLink={song.streamingLinks?.spotify ?? ""}
                 songTitle={song.title}
+                year={song.year}
               />
             </div>
           ))}

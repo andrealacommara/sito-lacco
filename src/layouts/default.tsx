@@ -4,6 +4,7 @@
 import { Link } from "react-router-dom";
 
 import { Navbar } from "@/components/navbar";
+import { BackgroundPattern } from "@/components/backgroundPattern";
 import {
   AppleMusicIcon,
   InstagramIcon,
@@ -26,6 +27,7 @@ export default function DefaultLayout({
 }) {
   return (
     <div className="relative flex flex-col justify-between min-h-screen">
+      <BackgroundPattern />
       {/* NAVBAR - Top section */}
       <header
         className="sticky top-0 z-50 border-b border-default-100"
@@ -45,7 +47,7 @@ export default function DefaultLayout({
         role="contentinfo"
       >
         <Link
-          className="text-xs text-default-400 hover:text-default-600 transition-colors underline underline-offset-2"
+          className="text-xs text-default-500 hover:text-default-700 transition-colors underline underline-offset-2"
           to="/newsletter"
         >
           Iscriviti alla newsletter

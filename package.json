@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "node scripts/make-presskit-zip.js && node scripts/copyHtaccess.js",
+    "postbuild": "node scripts/generate-og-images.js && node scripts/make-presskit-zip.js",
     "preview": "vite preview",
     "lint": "eslint --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
@@ -14,7 +14,8 @@
     "test:env": "node scripts/checkEnv.js",
     "test:full": "npm run lint && npm run type-check && npm run build && npm run test:env && npm run test:smoke",
     "update": "npx npm-check-updates -u && npm install",
-    "test:smoke": "node scripts/smoke-test.js"
+    "test:smoke": "node scripts/smoke-test.js",
+    "generate-email-assets": "node scripts/generate-email-assets.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -49,6 +50,7 @@
     "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.5.0",
     "baseline-browser-mapping": "^2.10.9",
+    "esbuild": "^0.28.1",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",

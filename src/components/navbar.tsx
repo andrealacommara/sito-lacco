@@ -69,7 +69,7 @@ export const Navbar = () => {
                     linkStyles({
                       color: pathname === item.href ? "danger" : "foreground",
                     }),
-                    "data-[active=true]:text-primary data-[active=true]:font-medium",
+                    "data-[active=true]:text-primary data-[active=true]:font-medium text-lg",
                   )}
                   color={pathname === item.href ? "danger" : "foreground"}
                   href={item.href}
@@ -108,7 +108,7 @@ export const Navbar = () => {
               <NavbarMenuItem key={item.href}>
                 {/* Each mobile menu item */}
                 <Link
-                  className="text-xl"
+                  className="text-2xl"
                   color={pathname === item.href ? "danger" : "foreground"}
                   href={item.href}
                   onFocus={prefetch}

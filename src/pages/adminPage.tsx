@@ -469,7 +469,6 @@ export default function AdminPage() {
       ctaText: ctaText.trim() || undefined,
       ctaUrl: ctaUrl.trim() || undefined,
       unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
-      previewLogoUrl: `${window.location.origin}/logo-lacco.png`,
       preview,
     });
 
@@ -579,13 +578,15 @@ export default function AdminPage() {
           <title>Admin | Lacco</title>
           <meta content="noindex, nofollow" name="robots" />
         </Helmet>
-        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6 px-4">
-          <h1 className="text-xl font-semibold">Area admin</h1>
-          <form onSubmit={handleLogin}>
-            <Button color="danger" isLoading={loginLoading} type="submit">
-              {loginLoading ? "" : "Accedi"}
-            </Button>
-          </form>
+        <div className="flex items-center justify-center min-h-[70vh]">
+          <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl px-10 py-10 flex flex-col items-center gap-6">
+            <h1 className="text-xl font-semibold">Area admin</h1>
+            <form onSubmit={handleLogin}>
+              <Button color="danger" isLoading={loginLoading} type="submit">
+                {loginLoading ? "" : "Accedi"}
+              </Button>
+            </form>
+          </div>
         </div>
       </DefaultLayout>
     );
@@ -598,11 +599,13 @@ export default function AdminPage() {
           <title>Admin | Lacco</title>
           <meta content="noindex, nofollow" name="robots" />
         </Helmet>
-        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4 text-center px-4">
-          <p className="text-lg font-medium">Controlla la tua email</p>
-          <p className="text-default-500 text-sm">
-            Controlla la tua casella di posta.
-          </p>
+        <div className="flex items-center justify-center min-h-[70vh]">
+          <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl px-10 py-10 flex flex-col items-center gap-4 text-center">
+            <p className="text-lg font-medium">Controlla la tua email</p>
+            <p className="text-default-500 text-sm">
+              Controlla la tua casella di posta.
+            </p>
+          </div>
         </div>
       </DefaultLayout>
     );
@@ -621,7 +624,8 @@ export default function AdminPage() {
         <title>Admin | Lacco</title>
         <meta content="noindex, nofollow" name="robots" />
       </Helmet>
-      <div className="flex flex-col gap-6 py-8 max-w-3xl mx-auto px-4">
+      <div className="py-8 px-4">
+        <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl p-6 max-w-3xl mx-auto flex flex-col gap-6">
         {/* Tab bar */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
@@ -1093,26 +1097,49 @@ export default function AdminPage() {
                   />
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium">Immagine</p>
-                    <label
-                      className="flex items-center justify-center w-full h-40 rounded-lg border-2 border-dashed border-default-200 hover:border-default-400 transition-colors cursor-pointer overflow-hidden bg-default-50"
-                      htmlFor="image-upload"
-                    >
-                      {imageUploading ? (
-                        <span className="text-xs text-default-400">
-                          Caricamento…
-                        </span>
-                      ) : imagePublicUrl ? (
-                        <img
-                          alt="Anteprima"
-                          className="w-full h-full object-cover"
-                          src={imagePublicUrl}
-                        />
-                      ) : (
-                        <span className="text-default-400 text-2xl leading-none">
-                          +
-                        </span>
+                    <div className="relative">
+                      <label
+                        className="flex items-center justify-center w-full h-40 rounded-lg border-2 border-dashed border-default-200 hover:border-default-400 transition-colors cursor-pointer overflow-hidden bg-default-50"
+                        htmlFor="image-upload"
+                      >
+                        {imageUploading ? (
+                          <span className="text-xs text-default-400">
+                            Caricamento…
+                          </span>
+                        ) : imagePublicUrl ? (
+                          <img
+                            alt="Anteprima"
+                            className="w-full h-full object-cover"
+                            src={imagePublicUrl}
+                          />
+                        ) : (
+                          <span className="text-default-400 text-2xl leading-none">
+                            +
+                          </span>
+                        )}
+                      </label>
+                      {imagePublicUrl && (
+                        <button
+                          aria-label="Rimuovi immagine"
+                          className="absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                          type="button"
+                          onClick={() => setImagePublicUrl("")}
+                        >
+                          <svg
+                            fill="none"
+                            height="12"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeWidth="2"
+                            viewBox="0 0 12 12"
+                            width="12"
+                          >
+                            <line x1="1" x2="11" y1="1" y2="11" />
+                            <line x1="11" x2="1" y1="1" y2="11" />
+                          </svg>
+                        </button>
                       )}
-                    </label>
+                    </div>
                     <input
                       accept="image/*"
                       className="hidden"
@@ -1120,17 +1147,6 @@ export default function AdminPage() {
                       type="file"
                       onChange={handleImageUpload}
                     />
-                    {imagePublicUrl && (
-                      <Button
-                        className="self-start"
-                        color="danger"
-                        size="sm"
-                        variant="light"
-                        onPress={() => setImagePublicUrl("")}
-                      >
-                        Rimuovi
-                      </Button>
-                    )}
                   </div>
                   <div className="flex gap-3 flex-wrap">
                     <Input
@@ -1191,9 +1207,9 @@ export default function AdminPage() {
                       : "Invia a tutti"}
                   </Button>
                 ) : (
-                  <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex items-center gap-3 flex-wrap justify-center">
                     <span className="text-sm text-danger font-medium">
-                      Sicuro? L&apos;invio è irreversibile.
+                      Confermi l'invio?
                     </span>
                     <Button
                       color="danger"
@@ -1237,6 +1253,7 @@ export default function AdminPage() {
             )}
           </div>
         )}
+        </div>
       </div>
     </DefaultLayout>
   );
