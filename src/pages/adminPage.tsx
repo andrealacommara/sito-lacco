@@ -624,8 +624,8 @@ export default function AdminPage() {
         <title>Admin | Lacco</title>
         <meta content="noindex, nofollow" name="robots" />
       </Helmet>
-      <div className="py-8 px-4">
-        <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl p-6 max-w-3xl mx-auto flex flex-col gap-6">
+      <div className="py-8">
+        <div className="bg-white/20 backdrop-blur-md border border-default-100 rounded-2xl p-6 max-w-3xl mx-auto flex flex-col gap-6">
         {/* Tab bar */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
