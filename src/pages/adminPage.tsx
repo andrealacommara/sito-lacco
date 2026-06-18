@@ -1191,9 +1191,9 @@ export default function AdminPage() {
                       : "Invia a tutti"}
                   </Button>
                 ) : (
-                  <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex items-center gap-3 flex-wrap justify-center">
                     <span className="text-sm text-danger font-medium">
-                      Sicuro? L&apos;invio è irreversibile.
+                      Confermi l'invio?
                     </span>
                     <Button
                       color="danger"
