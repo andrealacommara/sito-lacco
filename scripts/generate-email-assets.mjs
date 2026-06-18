@@ -25,6 +25,8 @@ let logoSvg = readFileSync(join(ROOT, "src/assets/icons/logo-lacco.svg"), "utf-8
 logoSvg = logoSvg.replace(/^<\?xml[^>]+\?>\s*/m, "");
 logoSvg = logoSvg.replace(/<!DOCTYPE[^>]+>\s*/m, "");
 logoSvg = logoSvg.replace('width="100%" height="100%"', `width="${LOGO_W}" height="${LOGO_H}"`);
+// Brand red — visible on both white and dark backgrounds, no filter:invert needed in email CSS
+logoSvg = logoSvg.replace(/(<svg[^>]*>)/, '$1<style>path{fill:#F31260}</style>');
 
 const logoBuf = await sharp(Buffer.from(logoSvg)).png().toBuffer();
 
@@ -51,7 +53,7 @@ const wavePaths = waveParams.map((w) => {
       Math.sin(x * w.freq * 1.7 + 0.5) * sAmp * sf;
     d += x === 0 ? `M${x},${y.toFixed(1)}` : `L${x},${y.toFixed(1)}`;
   }
-  return `<path d="${d}" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="1.5" stroke-linecap="round"/>`;
+  return `<path d="${d}" fill="none" stroke="rgba(243,18,96,0.18)" stroke-width="1.5" stroke-linecap="round"/>`;
 }).join("");
 
 const wavesSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${wavePaths}</svg>`;

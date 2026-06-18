@@ -42,13 +42,11 @@ function baseTemplate(content: string, unsubscribeUrl?: string): string {
   .email-body p,.rte-body p,.rte-body li{color:#e5e5ea !important;}
   .footer-text{color:#8e8e93 !important;}
   .footer-link,.footer-link a{color:#8e8e93 !important;}
-  .header-img{filter:invert(1) !important;}
 }
 [data-ogsc] body,[data-ogsc] .email-outer{background-color:#111111 !important;}
 [data-ogsc] .email-card,[data-ogsc] .email-header,[data-ogsc] .email-body,[data-ogsc] .email-footer{background-color:#1c1c1e !important;}
 [data-ogsc] .email-body p,[data-ogsc] .rte-body p,[data-ogsc] .rte-body li{color:#e5e5ea !important;}
 [data-ogsc] .footer-text,[data-ogsc] .footer-link,[data-ogsc] .footer-link a{color:#8e8e93 !important;}
-[data-ogsc] .header-img{filter:invert(1) !important;}
 </style>
 </head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;color:#333333;">
