@@ -1,3 +1,5 @@
+import type { LiveEvent } from "@/config/liveEvents";
+
 import { Card } from "@heroui/card";
 import { Helmet } from "react-helmet-async";
 
@@ -6,7 +8,6 @@ import { resolveImageSource } from "@/components/smartImage";
 import DefaultLayout from "@/layouts/default";
 import { subtitle, title } from "@/components/primitives";
 import LiveEventCard from "@/components/liveEventCard";
-import type { LiveEvent } from "@/config/liveEvents";
 import { getPastLiveEvents, getUpcomingLiveEvents } from "@/config/liveEvents";
 
 function formatEventDate(date: Date): string {

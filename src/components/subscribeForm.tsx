@@ -91,10 +91,7 @@ export default function SubscribeForm({
           Benvenuto in famiglia
         </p>
       ) : (
-        <form
-          className="flex flex-col gap-3 w-full"
-          onSubmit={handleSubmit}
-        >
+        <form className="flex flex-col gap-3 w-full" onSubmit={handleSubmit}>
           {/* Honeypot nascosto */}
           <input
             aria-hidden="true"

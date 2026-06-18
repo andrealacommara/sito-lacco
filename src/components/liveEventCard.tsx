@@ -9,7 +9,17 @@ import SmartImage, { resolveImageSource } from "@/components/smartImage";
 
 function MapPinIcon() {
   return (
-    <svg className="shrink-0 opacity-60" fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+    <svg
+      className="shrink-0 opacity-60"
+      fill="none"
+      height={15}
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      width={15}
+    >
       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
       <circle cx="12" cy="10" r="3" />
     </svg>
@@ -18,7 +28,17 @@ function MapPinIcon() {
 
 function ClockIcon() {
   return (
-    <svg className="shrink-0 opacity-60" fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+    <svg
+      className="shrink-0 opacity-60"
+      fill="none"
+      height={15}
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      width={15}
+    >
       <circle cx="12" cy="12" r="10" />
       <polyline points="12 6 12 12 16 14" />
     </svg>
@@ -27,7 +47,17 @@ function ClockIcon() {
 
 function MicIcon() {
   return (
-    <svg className="shrink-0 opacity-60" fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+    <svg
+      className="shrink-0 opacity-60"
+      fill="none"
+      height={15}
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      width={15}
+    >
       <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
       <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
       <line x1="12" x2="12" y1="19" y2="22" />
@@ -37,7 +67,17 @@ function MicIcon() {
 
 function TicketIcon() {
   return (
-    <svg className="shrink-0 opacity-60" fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+    <svg
+      className="shrink-0 opacity-60"
+      fill="none"
+      height={15}
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      width={15}
+    >
       <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
       <line x1="9" x2="9" y1="6" y2="18" />
     </svg>
@@ -67,9 +107,9 @@ export default function LiveEventCard({ event }: Props) {
           isBlurred
           priority
           alt={`Locandina di ${event.title}`}
-          width={350}
           src={artwork}
           style={{ aspectRatio: "1/1", objectFit: "cover" }}
+          width={350}
         />
       </div>
 

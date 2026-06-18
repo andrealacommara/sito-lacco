@@ -9,10 +9,7 @@
 const _base = import.meta.env.PROD ? "https://lacco.it" : "";
 const HEADER_IMG = `<img class="header-img" src="${_base}/header-email.png" width="520" height="128" alt="Lacco" style="display:block;width:100%;height:auto;border:0;">`;
 
-function baseTemplate(
-  content: string,
-  unsubscribeUrl?: string,
-): string {
+function baseTemplate(content: string, unsubscribeUrl?: string): string {
   const unsubFooter = unsubscribeUrl
     ? `<p class="footer-link" style="margin:12px 0 0;font-size:11px;color:#555;">
         <a href="${unsubscribeUrl}" style="color:#555;text-decoration:underline;">
@@ -68,7 +65,7 @@ function baseTemplate(
       <tr>
         <td class="email-footer" bgcolor="#ffffff" style="padding:16px 32px 24px;border-top:1px solid #e4e4e7;text-align:center;background:#ffffff;">
           <p class="footer-text" style="margin:0;font-size:12px;color:#555;line-height:1.5;">
-            Hai ricevuto questa email perché iscritto alla newsletter di Lacco.
+            Hai ricevuto questa email perché sei iscritto alla newsletter di Lacco.
           </p>
           ${unsubFooter}
         </td>
@@ -78,30 +75,6 @@ function baseTemplate(
 </table>
 </body>
 </html>`;
-}
-
-export function welcomeEmailHtml(
-  firstName: string | undefined,
-  unsubscribeUrl: string,
-): string {
-  const name = firstName?.trim();
-  const greeting = name
-    ? `<p style="margin:0 0 16px;font-size:16px;color:#111;line-height:1.6;">Ciao ${name}!</p>`
-    : "";
-
-  return baseTemplate(
-    `
-    ${greeting}
-    <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
-      Benvenuto in famiglia!<br/>
-      Sarai la prima persona a sapere delle novità di Lacco — nuove uscite, anteprime e aggiornamenti arriveranno direttamente qui.
-    </p>
-    <p style="margin:0;font-size:13px;color:#888;">
-      Se non hai fatto tu questa richiesta, puoi ignorare questa email.
-    </p>
-  `,
-    unsubscribeUrl,
-  );
 }
 
 export function broadcastEmailHtml(opts: {
