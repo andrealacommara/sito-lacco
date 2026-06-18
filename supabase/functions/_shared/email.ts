@@ -157,6 +157,35 @@ export function welcomeEmailHtml(
   );
 }
 
+export function magicLinkEmailHtml(actionLink: string): string {
+  return baseTemplate(`
+    <p style="margin:0 0 24px;font-size:16px;color:#333;line-height:1.6;">
+      Clicca il pulsante qui sotto per accedere all'area admin di Lacco.<br/>
+      Il link scade tra 1 ora.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td align="center">
+          <table cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="background:#F31260;border-radius:8px;">
+                <a href="${actionLink}"
+                   style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;
+                          color:#fff;text-decoration:none;letter-spacing:0.02em;">
+                  Accedi
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:0;font-size:12px;color:#888;line-height:1.5;">
+      Se non hai richiesto tu questo accesso, ignora questa email.
+    </p>
+  `);
+}
+
 // ── Resend helpers ──────────────────────────────────────────────────────────
 
 export async function sendWelcomeEmail(

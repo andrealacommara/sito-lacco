@@ -7,6 +7,7 @@ import type {
   AdminUnsubscribeResponse,
   BroadcastBody,
   BroadcastResponse,
+  SendMagicLinkResponse,
 } from "@/types/api";
 
 import { useState, useEffect, useCallback } from "react";
@@ -30,7 +31,6 @@ type FilterStatus = "" | "confirmed" | "unsubscribed" | "bounced";
 type SortBy = "email" | "status" | "source" | "createdAt";
 type SortDir = "asc" | "desc";
 
-const ADMIN_EMAIL = "management@lacco.it";
 
 const STATUS_LABEL: Record<string, string> = {
   confirmed: "iscritto",
@@ -371,16 +371,26 @@ export default function AdminPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: ADMIN_EMAIL,
-      options: { emailRedirectTo: `${window.location.origin}/admin` },
-    });
 
-    setLoginLoading(false);
-    if (error) {
-      addToast({ title: error.message, color: "danger" });
-    } else {
-      setView("check-email");
+    try {
+      const res = await fetch(`${EF_BASE}/send-magic-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          redirectTo: `${window.location.origin}/admin`,
+        }),
+      });
+      const data: SendMagicLinkResponse = await res.json();
+
+      if (!data.ok) {
+        addToast({ title: data.message ?? "Errore nell'invio", color: "danger" });
+      } else {
+        setView("check-email");
+      }
+    } catch {
+      addToast({ title: "Errore di rete", color: "danger" });
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -462,12 +472,19 @@ export default function AdminPage() {
     e.target.value = "";
   };
 
+  const normalizeUrl = (url: string) => {
+    const u = url.trim();
+    if (!u) return u;
+    if (/^[a-z]+:\/\//i.test(u)) return u;
+    return /^www\./i.test(u) ? `https://${u}` : `https://www.${u}`;
+  };
+
   const buildBroadcastHtml = (preview = false) =>
     broadcastEmailHtml({
       body: emailBody || "Corpo dell'email…",
       imageUrl: imagePublicUrl || undefined,
       ctaText: ctaText.trim() || undefined,
-      ctaUrl: ctaUrl.trim() || undefined,
+      ctaUrl: normalizeUrl(ctaUrl) || undefined,
       unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
       preview,
     });
@@ -1162,7 +1179,7 @@ export default function AdminPage() {
                       className="flex-1 min-w-48"
                       label="Link bottone"
                       labelPlacement="outside"
-                      placeholder="https://lacco.it/…"
+                      placeholder="Inserisci il link"
                       type="url"
                       value={ctaUrl}
                       variant="bordered"

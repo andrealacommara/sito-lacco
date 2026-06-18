@@ -110,7 +110,9 @@ export default function RichTextEditor({
     if (linkUrl.trim()) {
       let href = linkUrl.trim();
 
-      if (!/^[a-z]+:\/\//i.test(href)) href = `https://${href}`;
+      if (!/^[a-z]+:\/\//i.test(href)) {
+        href = /^www\./i.test(href) ? `https://${href}` : `https://www.${href}`;
+      }
       editor.chain().focus().setLink({ href }).run();
     } else {
       editor.chain().focus().unsetLink().run();
