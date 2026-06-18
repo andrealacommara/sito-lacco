@@ -1,6 +1,6 @@
-// Generates logo-email.png and waves-email.png for use in email templates.
-// SVG inline is stripped by Gmail — these PNGs are hosted on lacco.it and
-// referenced via <img> tags instead.
+// Generates header-email.png for use in email templates.
+// SVG inline is stripped by Gmail — this PNG is hosted on lacco.it and
+// referenced via a single <img> tag.
 //
 // Run once (or after changing logo/waves): npm run generate-email-assets
 // Commit the output in public/ — it deploys with the normal build.
@@ -11,23 +11,26 @@ import { dirname, join } from "path";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// ── Logo PNG (2× retina: 282×160, displayed at 141×80 CSS px) ──────────────
-const LOGO_W = 282;
-const LOGO_H = 160;
+// ── Dimensions ──────────────────────────────────────────────────────────────
+// Display size matches email header: 520×128 CSS px
+// 2× retina canvas for crispness
+const DISP_W = 520, DISP_H = 128;
+const RETINA_W = DISP_W * 2, RETINA_H = DISP_H * 2; // 1040×256
 
+// Logo at retina: 282×160 (displayed at 141×80)
+const LOGO_W = 282, LOGO_H = 160;
+
+// ── Logo ────────────────────────────────────────────────────────────────────
 let logoSvg = readFileSync(join(ROOT, "src/assets/icons/logo-lacco.svg"), "utf-8");
 logoSvg = logoSvg.replace(/^<\?xml[^>]+\?>\s*/m, "");
 logoSvg = logoSvg.replace(/<!DOCTYPE[^>]+>\s*/m, "");
 logoSvg = logoSvg.replace('width="100%" height="100%"', `width="${LOGO_W}" height="${LOGO_H}"`);
 
-await sharp(Buffer.from(logoSvg))
-  .png()
-  .toFile(join(ROOT, "public/logo-email.png"));
-console.log(`✓ public/logo-email.png (${LOGO_W}×${LOGO_H})`);
+const logoBuf = await sharp(Buffer.from(logoSvg)).png().toBuffer();
 
-// ── Waves PNG (520×128, matches email header height) ───────────────────────
-// Mirrors generateWavesSvg() in email templates — keep params in sync.
-const W = 520, H = 128, T = 80;
+// ── Waves ───────────────────────────────────────────────────────────────────
+// Generated at display size (520×128), then resized to retina by sharp.
+const W = DISP_W, H = DISP_H, T = 80;
 const AMP_SCALE = (H / 900) * 2.8;
 const waveParams = [
   { baseY: 0.10, amp: 22, freq: 0.007, phase: 0.0, speed: 0.014 },
@@ -53,7 +56,17 @@ const wavePaths = waveParams.map((w) => {
 
 const wavesSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${wavePaths}</svg>`;
 
-await sharp(Buffer.from(wavesSvg))
+const wavesBuf = await sharp(Buffer.from(wavesSvg))
+  .resize(RETINA_W, RETINA_H)
   .png()
-  .toFile(join(ROOT, "public/waves-email.png"));
-console.log(`✓ public/waves-email.png (${W}×${H})`);
+  .toBuffer();
+
+// ── Composite: logo centered on waves ───────────────────────────────────────
+const left = Math.round((RETINA_W - LOGO_W) / 2); // (1040-282)/2 = 379
+const top = Math.round((RETINA_H - LOGO_H) / 2);  // (256-160)/2 = 48
+
+await sharp(wavesBuf)
+  .composite([{ input: logoBuf, left, top }])
+  .toFile(join(ROOT, "public/header-email.png"));
+
+console.log(`✓ public/header-email.png (${RETINA_W}×${RETINA_H}, displayed at ${DISP_W}×${DISP_H})`);
