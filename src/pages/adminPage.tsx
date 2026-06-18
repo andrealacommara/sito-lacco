@@ -469,7 +469,6 @@ export default function AdminPage() {
       ctaText: ctaText.trim() || undefined,
       ctaUrl: ctaUrl.trim() || undefined,
       unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
-      previewLogoUrl: `${window.location.origin}/logo-lacco.png`,
       preview,
     });
 
