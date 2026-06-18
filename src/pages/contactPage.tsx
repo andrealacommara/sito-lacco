@@ -3,7 +3,6 @@
 
 import { useState } from "react"; // React hook for local state management
 import { Helmet } from "react-helmet-async"; // SEO and meta tags
-import emailjs from "@emailjs/browser"; // Client-side email sending via EmailJS
 import { Form } from "@heroui/form"; // HeroUI form component
 import { Input, Textarea } from "@heroui/input"; // Input + Textarea controls
 import { Button } from "@heroui/button"; // Button component
@@ -32,29 +31,9 @@ export default function ContactPage() {
     setFormData({ ...formData, [field]: "" });
   };
 
-  // ========================== EMAILJS CONFIG ========================== //
-  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-  const isEmailConfigured = Boolean(serviceId && templateId && publicKey);
-
   // ========================== SEND EMAIL FUNCTION ========================== //
   const sendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!isEmailConfigured) {
-      addToast({
-        title: "Servizio non disponibile.",
-        description:
-          "Il modulo non è configurato correttamente. Riprova più tardi.",
-        timeout: 5000,
-        color: "warning",
-        variant: "flat",
-        radius: "lg",
-      });
-
-      return;
-    }
 
     const trimmedName = formData.name.trim();
     const trimmedEmail = formData.email.trim();
@@ -100,7 +79,20 @@ export default function ContactPage() {
     }
     setLoading(true);
     try {
-      await emailjs.send(serviceId, templateId, formData, publicKey);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-contact-email`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: trimmedName,
+            email: trimmedEmail,
+            message: trimmedMessage,
+          }),
+        },
+      );
+
+      if (!res.ok) throw new Error(await res.text());
 
       addToast({
         title: "Messaggio inviato con successo!",
