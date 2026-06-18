@@ -578,13 +578,15 @@ export default function AdminPage() {
           <title>Admin | Lacco</title>
           <meta content="noindex, nofollow" name="robots" />
         </Helmet>
-        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6 px-4">
-          <h1 className="text-xl font-semibold">Area admin</h1>
-          <form onSubmit={handleLogin}>
-            <Button color="danger" isLoading={loginLoading} type="submit">
-              {loginLoading ? "" : "Accedi"}
-            </Button>
-          </form>
+        <div className="flex items-center justify-center min-h-[70vh]">
+          <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl px-10 py-10 flex flex-col items-center gap-6">
+            <h1 className="text-xl font-semibold">Area admin</h1>
+            <form onSubmit={handleLogin}>
+              <Button color="danger" isLoading={loginLoading} type="submit">
+                {loginLoading ? "" : "Accedi"}
+              </Button>
+            </form>
+          </div>
         </div>
       </DefaultLayout>
     );
@@ -597,11 +599,13 @@ export default function AdminPage() {
           <title>Admin | Lacco</title>
           <meta content="noindex, nofollow" name="robots" />
         </Helmet>
-        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4 text-center px-4">
-          <p className="text-lg font-medium">Controlla la tua email</p>
-          <p className="text-default-500 text-sm">
-            Controlla la tua casella di posta.
-          </p>
+        <div className="flex items-center justify-center min-h-[70vh]">
+          <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl px-10 py-10 flex flex-col items-center gap-4 text-center">
+            <p className="text-lg font-medium">Controlla la tua email</p>
+            <p className="text-default-500 text-sm">
+              Controlla la tua casella di posta.
+            </p>
+          </div>
         </div>
       </DefaultLayout>
     );
@@ -620,7 +624,8 @@ export default function AdminPage() {
         <title>Admin | Lacco</title>
         <meta content="noindex, nofollow" name="robots" />
       </Helmet>
-      <div className="flex flex-col gap-6 py-8 max-w-3xl mx-auto px-4">
+      <div className="py-8 px-4">
+        <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl p-6 max-w-3xl mx-auto flex flex-col gap-6">
         {/* Tab bar */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
@@ -1248,6 +1253,7 @@ export default function AdminPage() {
             )}
           </div>
         )}
+        </div>
       </div>
     </DefaultLayout>
   );
