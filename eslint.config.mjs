@@ -5,7 +5,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import react from "eslint-plugin-react";
 import unusedImports from "eslint-plugin-unused-imports";
-import _import from "eslint-plugin-import";
+import _import from "eslint-plugin-import-x";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-plugin-prettier";
@@ -58,7 +58,7 @@ export default defineConfig([
     plugins: {
       react: fixupPluginRules(react),
       "unused-imports": unusedImports,
-      import: fixupPluginRules(_import),
+      import: _import,
       "@typescript-eslint": typescriptEslint,
       "jsx-a11y": fixupPluginRules(jsxA11Y),
       prettier: fixupPluginRules(prettier),
