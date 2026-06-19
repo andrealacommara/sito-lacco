@@ -68,7 +68,6 @@
     "vite-imagetools": "^10.0.0",
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-sitemap": "^0.8.2",
-    "vite-plugin-svgr": "^4.5.0",
-    "vite-tsconfig-paths": "^6.1.1"
+    "vite-plugin-svgr": "^4.5.0"
   }
 }

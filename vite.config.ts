@@ -5,7 +5,6 @@ import path from "path";
 
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import svgr from "vite-plugin-svgr";
 import VitePluginSitemap from "vite-plugin-sitemap";
@@ -91,9 +90,6 @@ export default defineConfig(async () => {
         generateRobotsTxt: false, // Prevents the plugin from probing dist/ for robots.txt
       }),
 
-      // Resolves path aliases defined in tsconfig.json
-      tsconfigPaths(),
-
       // TailwindCSS integration
       tailwindcss(),
 
@@ -111,6 +107,10 @@ export default defineConfig(async () => {
           }),
       }),
     ],
+
+    resolve: {
+      tsconfigPaths: true,
+    },
 
     build: {
       rollupOptions: {
