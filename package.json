@@ -18,7 +18,7 @@
     "generate-email-assets": "node scripts/generate-email-assets.mjs"
   },
   "dependencies": {
-    "@heroui/react": "^2.8.5",
+    "@heroui/react": "^3.2.1",
     "@react-aria/visually-hidden": "^3.9.1",
     "@react-hook/media-query": "^1.1.1",
     "@supabase/supabase-js": "^2.108.2",
