@@ -113,8 +113,18 @@ export default defineConfig(async () => {
     },
 
     build: {
-      rollupOptions: {
+      chunkSizeWarningLimit: 650,
+      rolldownOptions: {
+        checks: {
+          pluginTimings: false,
+        },
         output: {
+          codeSplitting: {
+            groups: [
+              { name: "react", test: /node_modules\/(react|react-dom)/, priority: 20 },
+              { name: "heroui", test: /node_modules\/@heroui/, priority: 10 },
+            ],
+          },
           // Add hash only to JS and CSS — keep images and OG assets with fixed names
           entryFileNames: `assets/[name]-[hash].js`,
           chunkFileNames: `assets/[name]-[hash].js`,
