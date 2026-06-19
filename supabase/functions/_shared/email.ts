@@ -12,25 +12,34 @@ const HEADER_IMG = `<img class="header-img" src="https://lacco.it/header-email.p
 
 function baseTemplate(
   content: string,
-  opts?: { unsubscribeUrl?: string; transactional?: boolean; customFooterContent?: string },
+  opts?: {
+    unsubscribeUrl?: string;
+    transactional?: boolean;
+    customFooterContent?: string;
+  },
 ): string {
   const signature = opts?.transactional
     ? ""
     : `<p class="email-text" style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong style="color:#F31260;">Lacco</strong></p>`;
 
-  const footerContent = opts?.customFooterContent
-    ?? (opts?.transactional
+  const footerContent =
+    opts?.customFooterContent ??
+    (opts?.transactional
       ? `<p class="footer-text" style="margin:0;font-size:12px;color:#555;line-height:1.5;">
             Se non hai richiesto tu questo accesso, ignora questa email.
           </p>`
       : `<p class="footer-text" style="margin:0;font-size:12px;color:#555;line-height:1.5;">
             Hai ricevuto questa email perché sei iscritto alla newsletter di Lacco.
           </p>
-          ${opts?.unsubscribeUrl ? `<p class="footer-link" style="margin:12px 0 0;font-size:11px;color:#555;">
+          ${
+            opts?.unsubscribeUrl
+              ? `<p class="footer-link" style="margin:12px 0 0;font-size:11px;color:#555;">
             <a href="${opts.unsubscribeUrl}" style="color:#555;text-decoration:underline;">
               Disiscriviti dalla newsletter
             </a>
-          </p>` : ""}`);
+          </p>`
+              : ""
+          }`);
 
   return `<!DOCTYPE html>
 <html lang="it" style="color-scheme:light dark;">
@@ -242,6 +251,7 @@ export async function sendContactEmail(
   message: string,
 ): Promise<void> {
   const adminEmail = Deno.env.get("ADMIN_EMAIL") ?? "management@lacco.it";
+
   await resendSend({
     to: adminEmail,
     replyTo: email,

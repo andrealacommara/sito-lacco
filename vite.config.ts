@@ -1,7 +1,5 @@
 // ========================== MAIN IMPORTS ========================== //
 // Node helpers plus the Vite plugins required to build the SPA.
-import type { PreRenderedAsset } from "rollup";
-
 import fs from "fs";
 import path from "path";
 
@@ -117,16 +115,10 @@ export default defineConfig(async () => {
     build: {
       rollupOptions: {
         output: {
-          // Splits main bundles for better caching and performance
-          manualChunks: {
-            react: ["react", "react-dom"],
-            heroui: ["@heroui/react"],
-          },
-
           // Add hash only to JS and CSS — keep images and OG assets with fixed names
           entryFileNames: `assets/[name]-[hash].js`,
           chunkFileNames: `assets/[name]-[hash].js`,
-          assetFileNames: (assetInfo: PreRenderedAsset) => {
+          assetFileNames: (assetInfo) => {
             const fileName = assetInfo.names[0] ?? "";
 
             // Files that must NOT be hashed

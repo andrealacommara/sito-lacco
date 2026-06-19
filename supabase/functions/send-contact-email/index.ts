@@ -11,7 +11,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders(origin) });
   }
   if (req.method !== "POST") {
-    return jsonResponse({ ok: false, message: "Method not allowed" }, 405, origin);
+    return jsonResponse(
+      { ok: false, message: "Method not allowed" },
+      405,
+      origin,
+    );
   }
 
   let body: Record<string, unknown>;
@@ -27,20 +31,37 @@ Deno.serve(async (req) => {
   const message = typeof body.message === "string" ? body.message.trim() : "";
 
   if (!name) {
-    return jsonResponse({ ok: false, message: "Nome obbligatorio" }, 400, origin);
+    return jsonResponse(
+      { ok: false, message: "Nome obbligatorio" },
+      400,
+      origin,
+    );
   }
   if (!email || !EMAIL_REGEX.test(email)) {
-    return jsonResponse({ ok: false, message: "Email non valida" }, 400, origin);
+    return jsonResponse(
+      { ok: false, message: "Email non valida" },
+      400,
+      origin,
+    );
   }
   if (message.length < MIN_MESSAGE_LENGTH) {
-    return jsonResponse({ ok: false, message: "Messaggio troppo breve" }, 400, origin);
+    return jsonResponse(
+      { ok: false, message: "Messaggio troppo breve" },
+      400,
+      origin,
+    );
   }
 
   try {
     await sendContactEmail(name, email, message);
   } catch (err) {
     console.error("Resend error:", err);
-    return jsonResponse({ ok: false, message: "Errore nell'invio dell'email" }, 500, origin);
+
+    return jsonResponse(
+      { ok: false, message: "Errore nell'invio dell'email" },
+      500,
+      origin,
+    );
   }
 
   return jsonResponse({ ok: true }, 200, origin);

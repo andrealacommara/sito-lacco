@@ -219,7 +219,9 @@ export default function SmartImage({
       alt={alt}
       as="img"
       className={`w-full h-auto ${className || ""}`}
-      classNames={isBlurred ? { blurredImg: "transform-[translateZ(0)]" } : undefined}
+      classNames={
+        isBlurred ? { blurredImg: "transform-[translateZ(0)]" } : undefined
+      }
       decoding="async"
       fetchPriority={priority ? "high" : "auto"}
       height={height}
