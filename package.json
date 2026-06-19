@@ -63,7 +63,7 @@
     "postcss": "^8.5.9",
     "prettier": "^3.8.4",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "vite": "^8.0.16",
     "vite-imagetools": "^10.0.1",
     "vite-plugin-html": "^3.2.2",
