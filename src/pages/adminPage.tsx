@@ -600,7 +600,7 @@ export default function AdminPage() {
           <meta content="noindex, nofollow" name="robots" />
         </Helmet>
         <div className="flex items-center justify-center min-h-[70vh]">
-          <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl px-10 py-10 flex flex-col items-center gap-6">
+          <div className="flex flex-col items-center gap-6">
             <h1 className="text-xl font-semibold">Area admin</h1>
             <form onSubmit={handleLogin}>
               <Button color="danger" isLoading={loginLoading} type="submit">
@@ -621,10 +621,10 @@ export default function AdminPage() {
           <meta content="noindex, nofollow" name="robots" />
         </Helmet>
         <div className="flex items-center justify-center min-h-[70vh]">
-          <div className="bg-background/60 backdrop-blur-md border border-default-100 rounded-2xl px-10 py-10 flex flex-col items-center gap-4 text-center">
+          <div className="flex flex-col items-center gap-4 text-center">
             <p className="text-lg font-medium">Controlla la tua email</p>
             <p className="text-default-500 text-sm">
-              Controlla la tua casella di posta.
+              Ti abbiamo inviato un link valido per 1 ora.
             </p>
           </div>
         </div>
@@ -656,7 +656,7 @@ export default function AdminPage() {
             Esci
           </Button>
         </div>
-        <div className="bg-white/20 backdrop-blur-md border border-default-100 rounded-2xl p-6 max-w-3xl mx-auto flex flex-col gap-6">
+        <div className="p-6 max-w-3xl mx-auto flex flex-col gap-6">
           {/* Tab bar */}
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
             <Button
@@ -740,7 +740,7 @@ export default function AdminPage() {
                   </svg>
                 }
                 value={searchInput}
-                variant="bordered"
+                variant="flat"
                 onClear={() => setSearchInput("")}
                 onValueChange={setSearchInput}
               />
@@ -752,7 +752,7 @@ export default function AdminPage() {
                   className="w-40"
                   selectedKeys={[filterStatus || "all"]}
                   size="sm"
-                  variant="bordered"
+                  variant="flat"
                   onSelectionChange={(keys) => {
                     const value = Array.from(keys)[0] as string | undefined;
 
@@ -828,7 +828,7 @@ export default function AdminPage() {
                         color="danger"
                         isDisabled={unsubscribableSelected.length === 0}
                         size="sm"
-                        variant="flat"
+                        variant="solid"
                         onPress={handleUnsubscribeSelected}
                       >
                         Disiscrivi
@@ -850,7 +850,7 @@ export default function AdminPage() {
                         </Button>
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="bordered"
                           onPress={() => setConfirmUnsubscribe(false)}
                         >
                           Annulla
@@ -976,7 +976,7 @@ export default function AdminPage() {
                     aria-label="Pagina precedente"
                     isDisabled={page <= 1}
                     size="sm"
-                    variant="bordered"
+                    variant="solid"
                     onPress={() => setPage((p) => p - 1)}
                   >
                     ←
@@ -989,7 +989,7 @@ export default function AdminPage() {
                     aria-label="Pagina successiva"
                     isDisabled={page >= totalPages}
                     size="sm"
-                    variant="bordered"
+                    variant="solid"
                     onPress={() => setPage((p) => p + 1)}
                   >
                     →
@@ -999,7 +999,7 @@ export default function AdminPage() {
                     className="w-20 ml-1"
                     selectedKeys={[String(pageSize)]}
                     size="sm"
-                    variant="bordered"
+                    variant="flat"
                     onSelectionChange={(keys) => {
                       const value = Array.from(keys)[0];
 
@@ -1107,12 +1107,13 @@ export default function AdminPage() {
                       labelPlacement="outside"
                       placeholder="Es: Nuovo singolo in arrivo"
                       value={subject}
-                      variant="bordered"
+                      variant="flat"
                       onValueChange={setSubject}
                     />
                     <RichTextEditor
                       placeholder="Scrivi il corpo della mail…"
                       value={emailBody}
+                      variant="flat"
                       onChange={setEmailBody}
                     />
                     <div className="flex flex-col gap-1.5">
@@ -1176,7 +1177,7 @@ export default function AdminPage() {
                         labelPlacement="outside"
                         placeholder="Es: Ascolta ora"
                         value={ctaText}
-                        variant="bordered"
+                        variant="flat"
                         onValueChange={setCtaText}
                       />
                       <Input
@@ -1184,9 +1185,9 @@ export default function AdminPage() {
                         label="Link bottone"
                         labelPlacement="outside"
                         placeholder="Inserisci il link"
-                        type="url"
+                        type="text"
                         value={ctaUrl}
-                        variant="bordered"
+                        variant="flat"
                         onValueChange={setCtaUrl}
                       />
                     </div>
