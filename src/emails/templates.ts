@@ -24,11 +24,15 @@ function baseTemplate(
     : `<p class="footer-text" style="margin:0;font-size:12px;color:#555;line-height:1.5;">
             Hai ricevuto questa email perché sei iscritto alla newsletter di Lacco.
           </p>
-          ${opts?.unsubscribeUrl ? `<p class="footer-link" style="margin:12px 0 0;font-size:11px;color:#555;">
+          ${
+            opts?.unsubscribeUrl
+              ? `<p class="footer-link" style="margin:12px 0 0;font-size:11px;color:#555;">
             <a href="${opts.unsubscribeUrl}" style="color:#555;text-decoration:underline;">
               Disiscriviti dalla newsletter
             </a>
-          </p>` : ""}`;
+          </p>`
+              : ""
+          }`;
 
   return `<!DOCTYPE html>
 <html lang="it" style="color-scheme:light dark;">

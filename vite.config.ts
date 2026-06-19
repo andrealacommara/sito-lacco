@@ -1,13 +1,10 @@
 // ========================== MAIN IMPORTS ========================== //
 // Node helpers plus the Vite plugins required to build the SPA.
-import type { PreRenderedAsset } from "rollup";
-
 import fs from "fs";
 import path from "path";
 
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import svgr from "vite-plugin-svgr";
 import VitePluginSitemap from "vite-plugin-sitemap";
@@ -93,9 +90,6 @@ export default defineConfig(async () => {
         generateRobotsTxt: false, // Prevents the plugin from probing dist/ for robots.txt
       }),
 
-      // Resolves path aliases defined in tsconfig.json
-      tsconfigPaths(),
-
       // TailwindCSS integration
       tailwindcss(),
 
@@ -114,19 +108,27 @@ export default defineConfig(async () => {
       }),
     ],
 
-    build: {
-      rollupOptions: {
-        output: {
-          // Splits main bundles for better caching and performance
-          manualChunks: {
-            react: ["react", "react-dom"],
-            heroui: ["@heroui/react"],
-          },
+    resolve: {
+      tsconfigPaths: true,
+    },
 
+    build: {
+      chunkSizeWarningLimit: 650,
+      rolldownOptions: {
+        checks: {
+          pluginTimings: false,
+        },
+        output: {
+          codeSplitting: {
+            groups: [
+              { name: "react", test: /node_modules\/(react|react-dom)/, priority: 20 },
+              { name: "heroui", test: /node_modules\/@heroui/, priority: 10 },
+            ],
+          },
           // Add hash only to JS and CSS — keep images and OG assets with fixed names
           entryFileNames: `assets/[name]-[hash].js`,
           chunkFileNames: `assets/[name]-[hash].js`,
-          assetFileNames: (assetInfo: PreRenderedAsset) => {
+          assetFileNames: (assetInfo) => {
             const fileName = assetInfo.names[0] ?? "";
 
             // Files that must NOT be hashed
