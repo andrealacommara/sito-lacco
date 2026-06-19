@@ -7,6 +7,7 @@ import { HeroUIProvider } from "@heroui/system"; // HeroUI global provider (comp
 import { ToastProvider } from "@heroui/toast"; // Toast system provider for global notifications
 import { useHref, useNavigate } from "react-router-dom"; // React Router hooks for navigation and URL resolution
 
+
 // ========================== MODULE EXTENSION ========================== //
 /**
  * Extends the @react-types/shared module to define

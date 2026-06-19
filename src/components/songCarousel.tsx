@@ -124,13 +124,13 @@ export default function SongCarousel() {
 
         <div
           ref={scrollContainerRef}
-          className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full"
+          className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full touch-pan-x"
         >
           <div ref={startSpacerRef} className="shrink-0" />
           {orderedSingles.map((song) => (
             <div
               key={song.slug}
-              className="card-song shrink-0 snap-center px-2 max-w-full transition-transform hover:scale-105 active:scale-95"
+              className="card-song shrink-0 snap-center px-2 w-[min(280px,80vw)] transition-transform hover:scale-105 active:scale-95"
             >
               <CardSongExposer
                 artworkAlt={song.alt}
