@@ -1,7 +1,7 @@
 import type { ImageLikeImport } from "@/components/smartImage";
 
 import tempoPersoLIVEPoster from "@/assets/images/liveEvents/tempoPersoLIVEPoster.avif";
-// import INTOTHELACCOVERSEPoster from "@/assets/images/liveEvents/INTOTHELACCOVERSEPoster.avif";
+import INTOTHELACCOVERSEPoster from "@/assets/images/liveEvents/INTOTHELACCOVERSEPoster.avif";
 
 export type LiveEvent = {
   slug: string;
@@ -18,19 +18,19 @@ export type LiveEvent = {
 };
 
 export const liveEvents: LiveEvent[] = [
-  // {
-  //   slug: "torino-11-luglio-2026",
-  //   title: "INTO THE LACCOVERSE",
-  //   date: new Date("2026-07-11T21:00:00"),
-  //   doorsTime: "20:00",
-  //   venue: "CPG Torino",
-  //   address: "Strada delle Cacce, 36, 10135 Torino (TO)",
-  //   city: "Torino",
-  //   ticketUrl: "https://www.mailticket.it/evento/53852/lacco",
-  //   poster: INTOTHELACCOVERSEPoster,
-  //   price: "€10 + prevendita (€15 in cassa)",
-  //   lineup: ["SCA", "Tommiottocento"],
-  // },
+  {
+    slug: "torino-11-luglio-2026",
+    title: "INTO THE LACCOVERSE",
+    date: new Date("2026-07-11T21:00:00"),
+    doorsTime: "20:00",
+    venue: "CPG Torino",
+    address: "Strada delle Cacce, 36, 10135 Torino (TO)",
+    city: "Torino",
+    ticketUrl: "https://www.mailticket.it/evento/53852/lacco",
+    poster: INTOTHELACCOVERSEPoster,
+    price: "€10 + prevendita (€15 in cassa)",
+    lineup: ["SCA", "tommiottocento"],
+  },
   {
     slug: "torino-30-gennaio-2026",
     title: "Tempo perso LIVE",
