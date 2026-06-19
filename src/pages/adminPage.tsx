@@ -99,6 +99,9 @@ export default function AdminPage() {
   const [dryCount, setDryCount] = useState<number | null>(null);
   const [broadcastLoading, setBroadcastLoading] = useState(false);
   const [confirmSend, setConfirmSend] = useState(false);
+  const [siteDark, setSiteDark] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
 
   // ── Auth ────────────────────────────────────────────────────────────────────
 
@@ -118,6 +121,16 @@ export default function AdminPage() {
     });
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const obs = new MutationObserver(() =>
+      setSiteDark(document.documentElement.classList.contains("dark")),
+    );
+
+    obs.observe(document.documentElement, { attributeFilter: ["class"] });
+
+    return () => obs.disconnect();
   }, []);
 
   // ── Stats ───────────────────────────────────────────────────────────────────
@@ -483,7 +496,7 @@ export default function AdminPage() {
     return /^www\./i.test(u) ? `https://${u}` : `https://www.${u}`;
   };
 
-  const buildBroadcastHtml = (preview = false) =>
+  const buildBroadcastHtml = (preview = false, forceDark = false) =>
     broadcastEmailHtml({
       body: emailBody || "Corpo dell'email…",
       imageUrl: imagePublicUrl || undefined,
@@ -491,6 +504,7 @@ export default function AdminPage() {
       ctaUrl: normalizeUrl(ctaUrl) || undefined,
       unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
       preview,
+      forceDark,
     });
 
   const handleDryRun = async () => {
@@ -1200,7 +1214,7 @@ export default function AdminPage() {
                     </p>
                     <iframe
                       className="w-full rounded-lg border border-default-200"
-                      srcDoc={buildBroadcastHtml(true)}
+                      srcDoc={buildBroadcastHtml(true, siteDark)}
                       style={{ height: 520 }}
                       title="Anteprima email"
                     />

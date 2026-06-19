@@ -10,7 +10,7 @@ const HEADER_IMG = `<img class="header-img" src="https://lacco.it/header-email.p
 
 function baseTemplate(
   content: string,
-  opts?: { unsubscribeUrl?: string; transactional?: boolean },
+  opts?: { unsubscribeUrl?: string; transactional?: boolean; forceDark?: boolean },
 ): string {
   const signature = opts?.transactional
     ? ""
@@ -56,6 +56,13 @@ function baseTemplate(
   .footer-text{color:#8e8e93 !important;}
   .footer-link,.footer-link a{color:#8e8e93 !important;}
 }
+${opts?.forceDark ? `body,.email-outer{background-color:#111111 !important;color:#e5e5ea !important;}
+.email-card{background-color:#1c1c1e !important;border-color:#2c2c2e !important;}
+.email-header,.email-body{background-color:#1c1c1e !important;}
+.email-footer{background-color:#1c1c1e !important;border-top-color:#2c2c2e !important;}
+.email-body p,.rte-body p,.rte-body li{color:#e5e5ea !important;}
+.footer-text{color:#8e8e93 !important;}
+.footer-link,.footer-link a{color:#8e8e93 !important;}` : ""}
 [data-ogsc] body,[data-ogsc] .email-outer{background-color:#111111 !important;}
 [data-ogsc] .email-card,[data-ogsc] .email-header,[data-ogsc] .email-body,[data-ogsc] .email-footer{background-color:#1c1c1e !important;}
 [data-ogsc] .email-body p,[data-ogsc] .rte-body p,[data-ogsc] .rte-body li{color:#e5e5ea !important;}
@@ -96,6 +103,7 @@ export function broadcastEmailHtml(opts: {
   ctaUrl?: string;
   unsubscribeUrl: string;
   preview?: boolean;
+  forceDark?: boolean;
 }): string {
   const bodyHtml = opts.body;
 
@@ -137,6 +145,6 @@ export function broadcastEmailHtml(opts: {
 
   return baseTemplate(
     `${greeting}<div class="rte-body" style="font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</div>${imageSection}${ctaSection}`,
-    { unsubscribeUrl: opts.unsubscribeUrl },
+    { unsubscribeUrl: opts.unsubscribeUrl, forceDark: opts.forceDark },
   );
 }
