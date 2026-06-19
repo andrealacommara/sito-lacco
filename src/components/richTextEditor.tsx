@@ -17,6 +17,7 @@ type Props = {
   value: string;
   onChange: (html: string) => void;
   placeholder?: string;
+  variant?: "bordered" | "flat";
 };
 
 type ToolbarButtonProps = {
@@ -55,6 +56,7 @@ export default function RichTextEditor({
   value,
   onChange,
   placeholder,
+  variant = "bordered",
 }: Props) {
   // Track whether the latest change came from inside the editor to avoid
   // calling setContent on every keystroke (which would lose the cursor).
@@ -140,9 +142,17 @@ export default function RichTextEditor({
 
       <div className="flex flex-col gap-0">
         <span className="text-sm font-medium mb-1.5">Testo email</span>
-        <div className="rounded-xl border-2 border-default-200 hover:border-default-400 focus-within:border-default-foreground transition-colors">
+        <div
+          className={
+            variant === "flat"
+              ? "rounded-xl bg-default-100 hover:bg-default-200 focus-within:bg-default-100 transition-colors"
+              : "rounded-xl border-2 border-default-200 hover:border-default-400 focus-within:border-default-foreground transition-colors"
+          }
+        >
           {/* Toolbar */}
-          <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-default-200">
+          <div
+            className={`flex items-center gap-0.5 px-2 py-1.5 border-b ${variant === "flat" ? "border-default-200/60" : "border-default-200"}`}
+          >
             <ToolbarButton
               active={editor.isActive("bold")}
               title="Grassetto"

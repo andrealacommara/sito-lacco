@@ -164,7 +164,7 @@ export function welcomeEmailHtml(
     `
     ${greeting}
     <p style="margin:0;font-size:16px;color:#333;line-height:1.6;">
-      Benvenuto in famiglia!<br/>
+      Ti dò il benvenuto in famiglia!<br/>
       Sarai la prima persona a sapere delle novità di Lacco — nuove uscite, anteprime e aggiornamenti arriveranno direttamente qui.
     </p>
   `,
