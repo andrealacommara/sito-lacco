@@ -1,10 +1,18 @@
 import type { SubscribeBody, SubscribeResponse } from "@/types/api";
 
 import { useState, useId } from "react";
-import { Input } from "@heroui/input";
-import { Button } from "@heroui/button";
-import { Checkbox } from "@heroui/checkbox";
-import { addToast } from "@heroui/toast";
+import {
+  TextField,
+  Label,
+  Input,
+  Button,
+  Checkbox,
+  CheckboxControl,
+  CheckboxIndicator,
+  CheckboxContent,
+  Spinner,
+  toast,
+} from "@heroui/react";
 
 import { EF_BASE } from "@/lib/supabase";
 
@@ -41,7 +49,7 @@ export default function SubscribeForm({
     const err = validate();
 
     if (err) {
-      addToast({ title: err, color: "danger" });
+      toast.danger(err);
 
       return;
     }
@@ -64,18 +72,12 @@ export default function SubscribeForm({
 
       if (data.ok) {
         setDone(true);
-        addToast({
-          title: "Ti abbiamo inviato un benvenuto!",
-          color: "success",
-        });
+        toast.success("Ti abbiamo inviato un benvenuto!");
       } else {
-        addToast({
-          title: data.message ?? "Errore. Riprova.",
-          color: "danger",
-        });
+        toast.danger(data.message ?? "Errore. Riprova.");
       }
     } catch {
-      addToast({ title: "Errore di rete. Riprova.", color: "danger" });
+      toast.danger("Errore di rete. Riprova.");
     } finally {
       setLoading(false);
     }
@@ -105,65 +107,75 @@ export default function SubscribeForm({
           />
 
           {!compact && (
-            <Input
-              autoComplete="given-name"
-              label="Nome"
-              labelPlacement="outside"
-              placeholder="Inserisci il tuo nome"
+            <TextField
+              className="flex flex-col gap-1.5"
               type="text"
               value={firstName}
-              onValueChange={setFirstName}
-            />
+              onChange={setFirstName}
+            >
+              <Label>Nome</Label>
+              <Input
+                autoComplete="given-name"
+                placeholder="Inserisci il tuo nome"
+              />
+            </TextField>
           )}
 
           {compact ? (
             <div className="flex gap-2">
-              <Input
-                autoComplete="email"
+              <TextField
                 className="flex-1"
-                placeholder="La tua email"
                 type="email"
                 value={email}
-                variant="bordered"
-                onValueChange={setEmail}
-              />
+                onChange={setEmail}
+              >
+                <Input autoComplete="email" placeholder="La tua email" />
+              </TextField>
               <Button
                 aria-label="Iscriviti"
-                color="danger"
-                isLoading={loading}
+                isDisabled={loading}
                 type="submit"
+                variant="danger"
               >
-                {loading ? "" : "Iscriviti"}
+                {loading ? <Spinner size="sm" /> : "Iscriviti"}
               </Button>
             </div>
           ) : (
-            <Input
+            <TextField
               isRequired
-              autoComplete="email"
-              label="Email"
-              labelPlacement="outside"
-              placeholder="Inserisci la tua email"
+              className="flex flex-col gap-1.5"
               type="email"
               value={email}
-              onValueChange={setEmail}
-            />
+              onChange={setEmail}
+            >
+              <Label>Email</Label>
+              <Input
+                autoComplete="email"
+                placeholder="Inserisci la tua email"
+              />
+            </TextField>
           )}
 
-          <Checkbox isSelected={consent} size="sm" onValueChange={setConsent}>
-            <span className="text-xs text-default-500">
-              Accetto di ricevere aggiornamenti sulle uscite di Lacco.
-            </span>
+          <Checkbox isSelected={consent} onChange={setConsent}>
+            <CheckboxControl>
+              <CheckboxIndicator />
+            </CheckboxControl>
+            <CheckboxContent>
+              <span className="text-xs text-default-500">
+                Accetto di ricevere aggiornamenti sulle uscite di Lacco.
+              </span>
+            </CheckboxContent>
           </Checkbox>
 
           {!compact && (
             <>
               <Button
                 fullWidth
-                color="danger"
-                isLoading={loading}
+                isDisabled={loading}
                 type="submit"
+                variant="danger"
               >
-                {loading ? "" : "Avvisami"}
+                {loading ? <Spinner size="sm" /> : "Avvisami"}
               </Button>
               <p className="text-center text-xs text-default-400">
                 <a

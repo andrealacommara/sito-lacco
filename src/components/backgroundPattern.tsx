@@ -53,7 +53,8 @@ export function BackgroundPattern() {
 
       ctx.clearRect(0, 0, w, h);
 
-      const isDark = document.documentElement.classList.contains("dark");
+      const isDark =
+        document.documentElement.getAttribute("data-theme") === "dark";
       const rgb = isDark ? "255,255,255" : "0,0,0";
       const alpha = isDark ? 0.12 : 0.08;
 

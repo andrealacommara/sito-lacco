@@ -1,10 +1,8 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import style functions, layout, and custom components for the “PressKit” page.
 import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
-import { Skeleton } from "@heroui/skeleton"; // Loading placeholder
+import { Skeleton, Card, Button } from "@heroui/react"; // HeroUI v3 components
 import { useState } from "react"; // React hook for local state management
-import { Card } from "@heroui/card"; // UI component for container
-import { Button } from "@heroui/button";
 
 import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
 import {
@@ -418,7 +416,7 @@ export default function PressKitPage() {
             {/* DOWNLOAD ZIP */}
             <div className="flex justify-center p-4">
               <a download href="/presskit-files/HQ/photos.zip">
-                <Button className="px-6" color="danger" variant="solid">
+                <Button className="px-6" variant="danger">
                   Scarica tutte le foto e gli artwork (.zip)
                 </Button>
               </a>
@@ -459,12 +457,12 @@ export default function PressKitPage() {
             {/* DOWNLOAD BUTTONS */}
             <div className="flex flex-wrap gap-4 justify-center">
               <a download href={logoLaccoSVG}>
-                <Button className="px-6" color="danger">
+                <Button className="px-6" variant="danger">
                   Scarica SVG
                 </Button>
               </a>
               <a download href={logoLaccoPNG}>
-                <Button className="px-6" color="danger">
+                <Button className="px-6" variant="danger">
                   Scarica PNG
                 </Button>
               </a>

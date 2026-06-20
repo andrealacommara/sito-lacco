@@ -1,6 +1,6 @@
 import type { LiveEvent } from "@/config/liveEvents";
 
-import { Card } from "@heroui/card";
+import { Card } from "@heroui/react";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 
@@ -55,7 +55,6 @@ function SpotlightFixture({ className }: { className?: string }) {
     </svg>
   );
 }
-
 
 function formatEventDate(date: Date): string {
   return date.toLocaleDateString("it-IT", {

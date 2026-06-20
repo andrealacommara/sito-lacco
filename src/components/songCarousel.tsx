@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Button } from "@heroui/button";
+import { Button } from "@heroui/react";
 
 import CardSongExposer from "@/components/cardSongExposer";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
@@ -112,11 +112,10 @@ export default function SongCarousel() {
         <Button
           isIconOnly
           aria-label="Scorri a sinistra"
-          className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
+          className={`hidden md:flex rounded-full bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
             isAtStart ? "opacity-0 pointer-events-none scale-75" : "opacity-100"
           }`}
-          radius="full"
-          variant="flat"
+          variant="tertiary"
           onPress={() => scroll("left")}
         >
           <ChevronLeftIcon className="h-6 w-6 text-white" />
@@ -153,11 +152,10 @@ export default function SongCarousel() {
         <Button
           isIconOnly
           aria-label="Scorri a destra"
-          className={`hidden md:flex bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
+          className={`hidden md:flex rounded-full bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
             isAtEnd ? "opacity-0 pointer-events-none scale-75" : "opacity-100"
           }`}
-          radius="full"
-          variant="flat"
+          variant="tertiary"
           onPress={() => scroll("right")}
         >
           <ChevronRightIcon className="h-6 w-6 text-white" />

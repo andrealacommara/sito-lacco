@@ -2,17 +2,20 @@
 // Import core libraries and UI components for building the song card.
 // Includes HeroUI components for layout, badges, buttons, modals, skeletons, and links,
 // as well as React hooks for state management and media query detection.
-import { Button } from "@heroui/button";
-import { Card } from "@heroui/card";
 import {
+  Button,
+  Card,
   Modal,
+  ModalBackdrop,
+  ModalContainer,
+  ModalDialog,
   ModalBody,
-  ModalContent,
   ModalFooter,
   ModalHeader,
-} from "@heroui/modal";
-import { Skeleton } from "@heroui/skeleton";
-import { useDisclosure } from "@heroui/use-disclosure";
+  ModalHeading,
+  Skeleton,
+  useOverlayState,
+} from "@heroui/react";
 import { useEffect, useState } from "react"; // React hooks for local state and side effects
 
 import { AppleMusicIcon, SpotifyIcon } from "./icons"; // Custom Spotify icon component
@@ -56,7 +59,7 @@ export default function CardSongExposer({
   year,
 }: CardSongExposerProps) {
   const [isLoaded, setIsLoaded] = useState(false); // Tracks artwork image loading state
-  const { isOpen, onOpen, onClose } = useDisclosure(); // Manages modal open/close state
+  const modal = useOverlayState(); // Manages modal open/close state
 
   // Safety fallback: prevents an infinite skeleton on browsers that don't fire image events reliably.
   useEffect(() => {
@@ -68,18 +71,23 @@ export default function CardSongExposer({
   }, [isLoaded]);
 
   const handleOpen = () => {
-    onOpen(); // Wrapper function to open modal
+    modal.open(); // Wrapper function to open modal
   };
 
   return (
     <div>
       {/* Main clickable card */}
       <Card
-        isPressable
-        className="group flex flex-col gap-4 pb-5 pt-5 px-5 bg-white transition-colors duration-300 hover:bg-danger w-full shadow-lg rounded-3xl border border-default-100"
-        radius="lg"
-        shadow="md"
-        onPress={() => handleOpen()}
+        className="group flex flex-col gap-4 pb-5 pt-5 px-5 bg-white transition-colors duration-300 hover:bg-danger w-full shadow-lg rounded-3xl border border-default-100 cursor-pointer"
+        role="button"
+        tabIndex={0}
+        onClick={() => handleOpen()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleOpen();
+          }
+        }}
       >
         {/* Skeleton placeholder displayed until artwork image loads */}
         {!isLoaded && (
@@ -127,27 +135,21 @@ export default function CardSongExposer({
       </Card>
 
       {/* Modal displaying song details and Spotify link */}
-      <Modal
-        backdrop="blur"
-        classNames={{
-          wrapper:
-            "flex items-center justify-center m-0! px-4 sm:px-6 w-full max-w-none",
-        }}
-        isOpen={isOpen}
-        placement="center"
-        onClose={onClose}
-      >
-        <ModalContent className="bg-white text-black dark:bg-white! dark:text-black! p-4 rounded-2xl shadow-xl max-w-120 mx-auto">
-          {() => (
-            <>
+      <Modal state={modal}>
+        <ModalBackdrop isDismissable variant="blur">
+          <ModalContainer
+            className="flex items-center justify-center m-0! px-4 sm:px-6 w-full max-w-none"
+            placement="center"
+          >
+            <ModalDialog className="bg-white text-black dark:bg-white! dark:text-black! p-4 rounded-2xl shadow-xl max-w-120 mx-auto">
               {/* Modal header: tag + titolo del brano */}
               <ModalHeader className="flex flex-col items-center gap-1.5 pb-1 pt-2">
                 <span className="inline-flex items-center rounded-full bg-danger/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-danger">
                   {kind} · {year}
                 </span>
-                <h2 className="text-balance text-center font-display text-2xl md:text-3xl font-bold tracking-tight text-black">
+                <ModalHeading className="text-balance text-center font-display text-2xl md:text-3xl font-bold tracking-tight text-black">
                   {songTitle}
-                </h2>
+                </ModalHeading>
                 <span className="h-0.5 w-10 rounded-full bg-danger/30" />
               </ModalHeader>
 
@@ -162,7 +164,7 @@ export default function CardSongExposer({
               <ModalFooter className="flex flex-col">
                 {!preSaveMode && (
                   <div className="text-center">
-                    <text className="text-neutral-500 text-small">
+                    <text className="text-neutral-500 text-sm">
                       Ascolta ora il brano
                     </text>
                   </div>
@@ -182,8 +184,8 @@ export default function CardSongExposer({
                         <Button
                           fullWidth
                           aria-label="Vai al brano su Spotify"
-                          className="min-w-0"
-                          color="success"
+                          className="min-w-0 bg-success text-white hover:bg-success/90"
+                          variant="primary"
                           onPress={() =>
                             window.open(
                               songSpotifyLink,
@@ -203,7 +205,7 @@ export default function CardSongExposer({
                           fullWidth
                           aria-label="Vai al brano su Apple Music"
                           className="min-w-0"
-                          color="danger"
+                          variant="danger"
                           onPress={() =>
                             window.open(
                               songAppleMusicLink,
@@ -220,9 +222,9 @@ export default function CardSongExposer({
                   )}
                 </div>
               </ModalFooter>
-            </>
-          )}
-        </ModalContent>
+            </ModalDialog>
+          </ModalContainer>
+        </ModalBackdrop>
       </Modal>
     </div>
   );

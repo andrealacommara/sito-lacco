@@ -1,7 +1,7 @@
 // ========================== MAIN IMPORTS ========================== //
 // Import layout, UI components, and assets used to build the homepage.
 
-import { Card } from "@heroui/card"; // UI component for container
+import { Card } from "@heroui/react"; // UI component for container
 import { Helmet } from "react-helmet-async"; // Helmet for SEO and meta tags
 
 import DefaultLayout from "@/layouts/default"; // General site layout (navbar + footer)

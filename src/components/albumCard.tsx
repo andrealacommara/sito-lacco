@@ -1,8 +1,7 @@
 import type { Album } from "@/config/catalog";
 
-import { Link } from "react-router-dom";
-import { Button } from "@heroui/button";
-import { Card } from "@heroui/card";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Card } from "@heroui/react";
 
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
@@ -37,11 +36,12 @@ type Props = {
 };
 
 export default function AlbumCard({ album }: Props) {
+  const navigate = useNavigate();
   const albumPath = `/${album.slug}`;
   const paragraphs = album.description.split("\n").filter(Boolean);
 
   return (
-    <Card className="relative overflow-hidden flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl">
+    <Card className="relative overflow-hidden flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-4 mx-auto w-full max-w-4xl">
       {/* Blurred artwork backdrop */}
       <img
         alt=""
@@ -51,7 +51,6 @@ export default function AlbumCard({ album }: Props) {
       />
       <div className="absolute inset-0 bg-black/55" />
 
-      {/* Cover + CTA tracklist (centrato sotto l'artwork) */}
       <div className="relative shrink-0 flex flex-col items-center gap-4">
         <Link
           aria-label={`Apri la pagina di ${album.title}`}
@@ -70,12 +69,11 @@ export default function AlbumCard({ album }: Props) {
         {!album.presaveMode && (
           <Button
             fullWidth
-            as={Link}
-            className="font-semibold tracking-wide text-white"
-            color="danger"
+            aria-label={`Scopri la tracklist di ${album.title}`}
+            className="rounded-xl font-semibold tracking-wide text-white border border-white/10 bg-black/35 backdrop-blur-md shadow-lg shadow-black/30 transition-all duration-300 hover:bg-primary/25 hover:border-primary/50 hover:shadow-xl [&>svg]:text-primary"
             size="lg"
-            to={albumPath}
-            variant="light"
+            variant="ghost"
+            onPress={() => navigate(albumPath)}
           >
             <TracklistIcon />
             Scopri la tracklist
@@ -143,8 +141,8 @@ export default function AlbumCard({ album }: Props) {
                   <Button
                     fullWidth
                     aria-label={`Ascolta ${album.title} su Spotify`}
-                    className="min-w-0"
-                    color="success"
+                    className="min-w-0 bg-success text-white hover:bg-success/90"
+                    variant="primary"
                     onPress={() =>
                       window.open(
                         album.streamingLinks?.spotify,
@@ -164,7 +162,7 @@ export default function AlbumCard({ album }: Props) {
                     fullWidth
                     aria-label={`Ascolta ${album.title} su Apple Music`}
                     className="min-w-0"
-                    color="danger"
+                    variant="danger"
                     onPress={() =>
                       window.open(
                         album.streamingLinks?.appleMusic,

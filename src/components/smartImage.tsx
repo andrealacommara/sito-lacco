@@ -1,6 +1,5 @@
 // ========================== MAIN IMPORTS ========================== //
 import { useEffect, useRef, type CSSProperties } from "react";
-import { Image } from "@heroui/image";
 
 // ===================== SMART IMAGE COMPONENT ====================== //
 export type ImageLikeImport =
@@ -121,30 +120,16 @@ export function resolveImageSource(src: ImageLikeImport): string {
 /**
  * SmartImage component
  *
- * Wraps HeroUI Image with lazy/eager loading and async decoding.
+ * Renders a native `<img>` with lazy/eager loading and async decoding.
  * Resolves image imports with format fallbacks (avif → webp → jpeg).
  *
- * === Mobile production fix ===
+ * Load/error are tracked via native listeners attached directly on the
+ * DOM `<img>` via ref (handles the browser-cache "already complete" case too).
  *
- * ROOT CAUSE: HeroUI Image internally creates an off-DOM `new Image()`
- * element to preload the image and track its loading status. When the
- * native `loading` attribute is "lazy", mobile Safari / WebKit never
- * starts loading that hidden Image because it's not in the DOM — the
- * browser considers it "never near the viewport". Desktop Chrome is more
- * lenient and loads it anyway.
+ * When `isBlurred` is set, a subtle blurred copy is rendered behind the
+ * artwork to recreate HeroUI v2's soft-glow effect.
  *
- * FIX: Passing `as="img"` sets HeroUI's internal flag
- * `shouldBypassImageLoad = true`, which skips the off-DOM Image()
- * preload entirely. The actual `<img>` in the DOM handles its own
- * native lazy-loading correctly (browsers evaluate viewport distance
- * for in-DOM elements).
- *
- * Because HeroUI's onLoad/onError callbacks are attached to the
- * (now-skipped) preload Image, they never fire. We compensate with
- * native event listeners attached directly to the DOM `<img>` via ref.
- *
- * The `new URL(src, import.meta.url)` wrapper was also removed — Vite
- * already resolves imported assets to correct absolute paths.
+ * (HeroUI v3 dropped the Image component, so this no longer wraps it.)
  */
 export default function SmartImage({
   src,
@@ -164,9 +149,8 @@ export default function SmartImage({
   const imgRef = useRef<HTMLImageElement>(null);
 
   // ── Native load / error listeners ──────────────────────────────────
-  // HeroUI's onLoad/onError are NOT fired when as="img" is set
-  // (shouldBypassImageLoad = true skips the internal Image() preload).
-  // We attach listeners directly on the real DOM <img> via ref.
+  // Attach load/error listeners directly on the real DOM <img> via ref,
+  // so onLoad/onError fire reliably (also handles the cached/complete case).
   useEffect(() => {
     const img = imgRef.current;
 
@@ -213,27 +197,43 @@ export default function SmartImage({
     };
   }, [priority, resolvedSrc]);
 
-  return (
-    <Image
+  const img = (
+    <img
       ref={imgRef}
       alt={alt}
-      as="img"
-      className={`w-full h-auto ${className || ""}`}
-      classNames={
-        isBlurred ? { blurredImg: "transform-[translateZ(0)]" } : undefined
-      }
+      className={`h-auto ${(className || "").includes("rounded") ? "" : "rounded-[14px] "}${isBlurred ? "relative z-10 " : ""}${className || ""}`}
       decoding="async"
       fetchPriority={priority ? "high" : "auto"}
       height={height}
-      isBlurred={isBlurred}
       loading={priority ? "eager" : "lazy"}
       sizes={responsiveSizes}
       src={resolvedSrc}
       style={{
         display: "block",
+        // Come HeroUI v2: l'immagine assume la `width` indicata, capata al contenitore.
+        width: width ? `${width}px` : "100%",
+        maxWidth: "100%",
         ...style,
       }}
       width={width}
     />
+  );
+
+  if (!isBlurred) return img;
+
+  // Soft glow behind the artwork — replica l'effetto isBlurred di HeroUI v2
+  // (blurredImg: scale-105 blur-lg saturate-150 opacity-30).
+  return (
+    <span className="relative inline-block max-w-full align-top">
+      <img
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 z-0 h-full w-full scale-105 rounded-[14px] object-cover opacity-30 blur-lg saturate-150"
+        decoding="async"
+        loading={priority ? "eager" : "lazy"}
+        src={resolvedSrc}
+      />
+      {img}
+    </span>
   );
 }

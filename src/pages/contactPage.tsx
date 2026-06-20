@@ -3,10 +3,16 @@
 
 import { useState } from "react"; // React hook for local state management
 import { Helmet } from "react-helmet-async"; // SEO and meta tags
-import { Form } from "@heroui/form"; // HeroUI form component
-import { Input, Textarea } from "@heroui/input"; // Input + Textarea controls
-import { Button } from "@heroui/button"; // Button component
-import { addToast } from "@heroui/toast"; // Toast helper
+import {
+  Form,
+  TextField,
+  Label,
+  Input,
+  TextArea,
+  Button,
+  Spinner,
+  toast,
+} from "@heroui/react"; // HeroUI v3 components
 
 import DefaultLayout from "@/layouts/default"; // Main site layout (Navbar + Footer)
 import { title } from "@/components/primitives"; // Predefined typography style for page titles
@@ -40,39 +46,27 @@ export default function ContactPage() {
     const trimmedMessage = formData.message.trim();
 
     if (!trimmedName) {
-      addToast({
-        title: "Nome obbligatorio.",
+      toast.warning("Nome obbligatorio.", {
         description: "Inserisci il tuo nome prima di inviare.",
         timeout: 5000,
-        color: "warning",
-        variant: "flat",
-        radius: "lg",
       });
 
       return;
     }
 
     if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      addToast({
-        title: "Email non valida.",
+      toast.warning("Email non valida.", {
         description: "Inserisci un indirizzo email valido.",
         timeout: 5000,
-        color: "warning",
-        variant: "flat",
-        radius: "lg",
       });
 
       return;
     }
 
     if (trimmedMessage.length < MIN_MESSAGE_LENGTH) {
-      addToast({
-        title: "Messaggio troppo breve.",
+      toast.warning("Messaggio troppo breve.", {
         description: "Scrivi almeno un paio di frasi prima di inviare.",
         timeout: 5000,
-        color: "warning",
-        variant: "flat",
-        radius: "lg",
       });
 
       return;
@@ -94,13 +88,9 @@ export default function ContactPage() {
 
       if (!res.ok) throw new Error(await res.text());
 
-      addToast({
-        title: "Messaggio inviato con successo!",
+      toast.success("Messaggio inviato con successo!", {
         description: "Riceverai una risposta al più presto.",
         timeout: 5000,
-        color: "success",
-        variant: "flat",
-        radius: "lg",
       });
 
       formReset("all");
@@ -108,14 +98,10 @@ export default function ContactPage() {
       if (import.meta.env.DEV) {
         console.error("error: ", error);
       }
-      addToast({
-        title: "Errore durante l'invio del messaggio.",
+      toast.danger("Errore durante l'invio del messaggio.", {
         description:
           "Si è verificato un errore. Per favore, riprova più tardi.",
         timeout: 5000,
-        color: "danger",
-        variant: "flat",
-        radius: "lg",
       });
     } finally {
       setLoading(false);
@@ -162,53 +148,48 @@ export default function ContactPage() {
             onSubmit={sendEmail}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
-              <Input
+              <TextField
                 isRequired
-                label="Nome"
-                labelPlacement="outside"
+                className="flex flex-col gap-1.5"
                 name="name"
-                placeholder="Inserisci il tuo nome"
+                type="text"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                onClear={() => formReset("name")}
-              />
-              <Input
+                onChange={(value) => setFormData({ ...formData, name: value })}
+              >
+                <Label>Nome</Label>
+                <Input placeholder="Inserisci il tuo nome" />
+              </TextField>
+              <TextField
                 isRequired
-                label="Email"
-                labelPlacement="outside"
+                className="flex flex-col gap-1.5"
                 name="email"
-                placeholder="Inserisci la tua email"
                 type="email"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                onClear={() => formReset("email")}
-              />
+                onChange={(value) => setFormData({ ...formData, email: value })}
+              >
+                <Label>Email</Label>
+                <Input placeholder="Inserisci la tua email" />
+              </TextField>
             </div>
 
-            <Textarea
+            <TextField
               isRequired
-              label="Messaggio"
-              minRows={5}
-              placeholder="Inserisci il tuo messaggio qui"
+              className="flex flex-col gap-1.5"
               value={formData.message}
-              onChange={(e) =>
-                setFormData({ ...formData, message: e.target.value })
-              }
-              onClear={() => formReset("message")}
-            />
+              onChange={(value) => setFormData({ ...formData, message: value })}
+            >
+              <Label>Messaggio</Label>
+              <TextArea placeholder="Inserisci il tuo messaggio qui" rows={5} />
+            </TextField>
 
             <div className="flex w-full justify-center">
               <Button
                 className="w-full sm:w-auto"
-                color="primary"
-                isLoading={isLoading}
+                isDisabled={isLoading}
                 type="submit"
+                variant="primary"
               >
-                {isLoading ? "Invio..." : "Invia"}
+                {isLoading ? <Spinner size="sm" /> : "Invia"}
               </Button>
             </div>
           </Form>
