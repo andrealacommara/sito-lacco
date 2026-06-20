@@ -3,8 +3,7 @@ import type { Single, Album } from "@/config/catalog";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
+import { Button, Card, CardContent } from "@heroui/react";
 
 import {
   getAlbumForSong,
@@ -127,8 +126,11 @@ function AlbumBadge({ songSlug }: { songSlug: string }) {
 function PresaveSection({ release }: SectionProps) {
   return (
     <main className="flex flex-col items-center flex-1 px-6 py-8">
-      <Card className="bg-white shadow-2xl shadow-black/40 w-full max-w-md overflow-hidden">
-        <CardBody className="flex flex-col items-center gap-6 text-center p-8">
+      <Card
+        className="bg-white shadow-2xl shadow-black/40 w-full max-w-md overflow-hidden"
+        data-theme="light"
+      >
+        <CardContent className="flex flex-col items-center gap-6 text-center p-8">
           {/* Cover */}
           <motion.div
             {...fadeUp(0)}
@@ -186,7 +188,7 @@ function PresaveSection({ release }: SectionProps) {
               <SubscribeForm releaseSlug={release.slug} source="presave_form" />
             </div>
           </motion.div>
-        </CardBody>
+        </CardContent>
       </Card>
     </main>
   );
@@ -196,8 +198,11 @@ function LiveSection({ release }: SectionProps) {
   return (
     <div className="flex flex-col gap-4 px-6 py-8">
       {/* Hero card */}
-      <Card className="bg-white shadow-2xl shadow-black/40 mx-auto w-full max-w-md overflow-hidden">
-        <CardBody className="flex flex-col items-center gap-6 text-center p-8">
+      <Card
+        className="bg-white shadow-2xl shadow-black/40 mx-auto w-full max-w-md overflow-hidden"
+        data-theme="light"
+      >
+        <CardContent className="flex flex-col items-center gap-6 text-center p-8">
           <motion.div
             {...fadeUp(0)}
             className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden shadow-2xl shadow-black/60"
@@ -231,9 +236,9 @@ function LiveSection({ release }: SectionProps) {
               <Button
                 fullWidth
                 aria-label={`Ascolta su Spotify`}
-                className="font-semibold"
-                color="success"
+                className="font-semibold bg-success text-white hover:bg-success/90"
                 size="lg"
+                variant="primary"
                 onPress={() =>
                   window.open(
                     release.streamingLinks?.spotify,
@@ -251,9 +256,8 @@ function LiveSection({ release }: SectionProps) {
                 fullWidth
                 aria-label={`Ascolta su Apple Music`}
                 className="font-semibold"
-                color="danger"
                 size="lg"
-                variant="flat"
+                variant="danger"
                 onPress={() =>
                   window.open(
                     release.streamingLinks?.appleMusic,
@@ -271,9 +275,9 @@ function LiveSection({ release }: SectionProps) {
                 <Button
                   fullWidth
                   aria-label="Ascolta ora"
-                  className="font-semibold"
-                  color="success"
+                  className="font-semibold bg-success text-white hover:bg-success/90"
                   size="lg"
+                  variant="primary"
                   onPress={() =>
                     window.open(
                       release.streamingLinks?.hyperfollow,
@@ -287,7 +291,7 @@ function LiveSection({ release }: SectionProps) {
                 </Button>
               )}
           </motion.div>
-        </CardBody>
+        </CardContent>
       </Card>
 
       {/* Carousel */}
@@ -307,8 +311,11 @@ function AlbumSection({ album }: { album: Album }) {
   return (
     <div className="flex flex-col gap-4 px-6 py-8">
       {/* Hero card */}
-      <Card className="bg-white shadow-2xl shadow-black/40 mx-auto w-full max-w-md overflow-hidden">
-        <CardBody className="flex flex-col items-center gap-6 text-center p-8">
+      <Card
+        className="bg-white shadow-2xl shadow-black/40 mx-auto w-full max-w-md overflow-hidden"
+        data-theme="light"
+      >
+        <CardContent className="flex flex-col items-center gap-6 text-center p-8">
           <motion.div
             {...fadeUp(0)}
             className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden shadow-2xl shadow-black/60"
@@ -341,9 +348,9 @@ function AlbumSection({ album }: { album: Album }) {
               <Button
                 fullWidth
                 aria-label="Ascolta su Spotify"
-                className="font-semibold"
-                color="success"
+                className="font-semibold bg-success text-white hover:bg-success/90"
                 size="lg"
+                variant="primary"
                 onPress={() =>
                   window.open(
                     album.streamingLinks?.spotify,
@@ -361,9 +368,8 @@ function AlbumSection({ album }: { album: Album }) {
                 fullWidth
                 aria-label="Ascolta su Apple Music"
                 className="font-semibold"
-                color="danger"
                 size="lg"
-                variant="flat"
+                variant="danger"
                 onPress={() =>
                   window.open(
                     album.streamingLinks?.appleMusic,
@@ -404,7 +410,7 @@ function AlbumSection({ album }: { album: Album }) {
               </ol>
             </motion.div>
           )}
-        </CardBody>
+        </CardContent>
       </Card>
     </div>
   );
@@ -413,8 +419,11 @@ function AlbumSection({ album }: { album: Album }) {
 function AlbumPresaveSection({ album }: { album: Album }) {
   return (
     <main className="flex flex-col items-center flex-1 px-6 py-8">
-      <Card className="bg-white shadow-2xl shadow-black/40 w-full max-w-md overflow-hidden">
-        <CardBody className="flex flex-col items-center gap-6 text-center p-8">
+      <Card
+        className="bg-white shadow-2xl shadow-black/40 w-full max-w-md overflow-hidden"
+        data-theme="light"
+      >
+        <CardContent className="flex flex-col items-center gap-6 text-center p-8">
           {/* Cover */}
           <motion.div
             {...fadeUp(0)}
@@ -474,7 +483,7 @@ function AlbumPresaveSection({ album }: { album: Album }) {
               <SubscribeForm releaseSlug={album.slug} source="presave_form" />
             </div>
           </motion.div>
-        </CardBody>
+        </CardContent>
       </Card>
     </main>
   );

@@ -1,7 +1,7 @@
 import type { Single } from "@/config/catalog";
 
 import { Link } from "react-router-dom";
-import { Card } from "@heroui/card";
+import { Card } from "@heroui/react";
 
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
@@ -17,7 +17,7 @@ export default function SongCard({ single }: Props) {
   const releasePath = `/${single.slug}`;
 
   return (
-    <Card className="flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl">
+    <Card className="relative overflow-hidden flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl">
       {/* Blurred artwork backdrop — fixed dark scrim keeps text readable regardless of cover colors */}
       <img
         alt=""

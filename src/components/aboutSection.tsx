@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Card } from "@heroui/card";
+import { Card } from "@heroui/react";
 
 import SmartImage, {
   resolveImageSource,
@@ -78,7 +78,7 @@ export function AboutSection({
 
         <motion.p
           animate={inView ? { opacity: 1, x: 0 } : {}}
-          className="relative text-large md:text-2xl text-white/90 leading-relaxed text-left"
+          className="relative text-lg md:text-2xl text-white/90 leading-relaxed text-left"
           initial={{ opacity: 0, x: reversed ? -80 : 80 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >

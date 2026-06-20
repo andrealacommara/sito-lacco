@@ -9,15 +9,30 @@ import type {
   BroadcastResponse,
   SendMagicLinkResponse,
 } from "@/types/api";
+import type { Key } from "react";
 
 import { useState, useEffect, useCallback } from "react";
-import { Input } from "@heroui/input";
-import { Button } from "@heroui/button";
-import { Checkbox } from "@heroui/checkbox";
-import { Chip } from "@heroui/chip";
-import { Select, SelectItem } from "@heroui/select";
-import { Skeleton } from "@heroui/skeleton";
-import { addToast } from "@heroui/toast";
+import {
+  TextField,
+  Label,
+  Input,
+  Description,
+  Button,
+  Checkbox,
+  CheckboxControl,
+  CheckboxIndicator,
+  Chip,
+  Skeleton,
+  Spinner,
+  toast,
+  SelectRoot,
+  SelectTrigger,
+  SelectValue,
+  SelectIndicator,
+  SelectPopover,
+  ListBox,
+  ListBoxItem,
+} from "@heroui/react";
 import { Helmet } from "react-helmet-async";
 
 import RichTextEditor from "@/components/richTextEditor";
@@ -99,8 +114,8 @@ export default function AdminPage() {
   const [dryCount, setDryCount] = useState<number | null>(null);
   const [broadcastLoading, setBroadcastLoading] = useState(false);
   const [confirmSend, setConfirmSend] = useState(false);
-  const [siteDark, setSiteDark] = useState(() =>
-    document.documentElement.classList.contains("dark"),
+  const [siteDark, setSiteDark] = useState(
+    () => document.documentElement.getAttribute("data-theme") === "dark",
   );
 
   // ── Auth ────────────────────────────────────────────────────────────────────
@@ -125,10 +140,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     const obs = new MutationObserver(() =>
-      setSiteDark(document.documentElement.classList.contains("dark")),
+      setSiteDark(
+        document.documentElement.getAttribute("data-theme") === "dark",
+      ),
     );
 
-    obs.observe(document.documentElement, { attributeFilter: ["class"] });
+    obs.observe(document.documentElement, { attributeFilter: ["data-theme"] });
 
     return () => obs.disconnect();
   }, []);
@@ -188,7 +205,7 @@ export default function AdminPage() {
         setSubscribers(data.subscribers ?? []);
         setTotal(data.total ?? 0);
       } catch {
-        addToast({ title: "Errore nel caricamento iscritti", color: "danger" });
+        toast.danger("Errore nel caricamento iscritti");
       } finally {
         setSubsLoading(false);
       }
@@ -300,10 +317,9 @@ export default function AdminPage() {
       const data = (await res.json()) as AdminSyncResendResponse;
 
       if (data.ok) {
-        addToast({
-          title: `Sincronizzato: ${data.updated ?? 0} aggiornati su ${data.checked ?? 0} contatti Resend`,
-          color: "success",
-        });
+        toast.success(
+          `Sincronizzato: ${data.updated ?? 0} aggiornati su ${data.checked ?? 0} contatti Resend`,
+        );
         await fetchSubscribers(
           session,
           page,
@@ -315,13 +331,10 @@ export default function AdminPage() {
         );
         await fetchStats(session);
       } else {
-        addToast({
-          title: data.error ?? "Errore sincronizzazione",
-          color: "danger",
-        });
+        toast.danger(data.error ?? "Errore sincronizzazione");
       }
     } catch {
-      addToast({ title: "Errore di rete", color: "danger" });
+      toast.danger("Errore di rete");
     } finally {
       setSyncLoading(false);
     }
@@ -350,10 +363,7 @@ export default function AdminPage() {
       const data = (await res.json()) as AdminUnsubscribeResponse;
 
       if (data.ok) {
-        addToast({
-          title: `Disiscritti ${data.updated ?? 0} iscritti`,
-          color: "success",
-        });
+        toast.success(`Disiscritti ${data.updated ?? 0} iscritti`);
         setSelectedSubscribers([]);
         await fetchSubscribers(
           session,
@@ -366,13 +376,10 @@ export default function AdminPage() {
         );
         await fetchStats(session);
       } else {
-        addToast({
-          title: data.error ?? "Errore durante la disiscrizione",
-          color: "danger",
-        });
+        toast.danger(data.error ?? "Errore durante la disiscrizione");
       }
     } catch {
-      addToast({ title: "Errore di rete", color: "danger" });
+      toast.danger("Errore di rete");
     } finally {
       setUnsubscribeLoading(false);
     }
@@ -395,15 +402,12 @@ export default function AdminPage() {
       const data: SendMagicLinkResponse = await res.json();
 
       if (!data.ok) {
-        addToast({
-          title: data.message ?? "Errore nell'invio",
-          color: "danger",
-        });
+        toast.danger(data.message ?? "Errore nell'invio");
       } else {
         setView("check-email");
       }
     } catch {
-      addToast({ title: "Errore di rete", color: "danger" });
+      toast.danger("Errore di rete");
     } finally {
       setLoginLoading(false);
     }
@@ -416,7 +420,7 @@ export default function AdminPage() {
       !addEmail.trim() ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(addEmail.trim())
     ) {
-      addToast({ title: "Email non valida", color: "danger" });
+      toast.danger("Email non valida");
 
       return;
     }
@@ -437,7 +441,7 @@ export default function AdminPage() {
       const data = await res.json();
 
       if (data.ok) {
-        addToast({ title: "Iscritto aggiunto", color: "success" });
+        toast.success("Iscritto aggiunto");
         setAddEmail("");
         setAddFirstName("");
         await fetchSubscribers(
@@ -451,13 +455,10 @@ export default function AdminPage() {
         );
         await fetchStats(session);
       } else {
-        addToast({
-          title: data.error ?? "Errore durante l'aggiunta",
-          color: "danger",
-        });
+        toast.danger(data.error ?? "Errore durante l'aggiunta");
       }
     } catch {
-      addToast({ title: "Errore di rete", color: "danger" });
+      toast.danger("Errore di rete");
     } finally {
       setAddLoading(false);
     }
@@ -475,7 +476,7 @@ export default function AdminPage() {
       .upload(path, file, { upsert: false });
 
     if (error) {
-      addToast({ title: "Errore upload immagine", color: "danger" });
+      toast.danger("Errore upload immagine");
     } else {
       const { data } = supabase.storage
         .from("broadcast-images")
@@ -528,7 +529,7 @@ export default function AdminPage() {
 
       setDryCount(data.recipientCount ?? 0);
     } catch {
-      addToast({ title: "Errore dry run", color: "danger" });
+      toast.danger("Errore dry run");
     } finally {
       setBroadcastLoading(false);
     }
@@ -545,10 +546,7 @@ export default function AdminPage() {
 
   const handleSend = async (recipientIds?: string[]) => {
     if (!subject.trim() || !emailBody.replace(/<[^>]*>/g, "").trim()) {
-      addToast({
-        title: "Compila oggetto e testo della mail",
-        color: "danger",
-      });
+      toast.danger("Compila oggetto e testo della mail");
 
       return;
     }
@@ -581,12 +579,11 @@ export default function AdminPage() {
           ? ` (${data.syncUpdated} contatti riallineati con Resend prima dell'invio)`
           : "";
 
-        addToast({
-          title: recipientIds
+        toast.success(
+          recipientIds
             ? `Inviato a ${data.sent ?? 0} destinatari`
             : `Inviato a ${data.recipientCount ?? 0} iscritti${syncNote}`,
-          color: "success",
-        });
+        );
         setSubject("");
         setEmailBody("");
         setImagePublicUrl("");
@@ -595,10 +592,10 @@ export default function AdminPage() {
         setDryCount(null);
         if (recipientIds) setSelectedSubscribers([]);
       } else {
-        addToast({ title: data.error ?? "Errore invio", color: "danger" });
+        toast.danger(data.error ?? "Errore invio");
       }
     } catch {
-      addToast({ title: "Errore di rete", color: "danger" });
+      toast.danger("Errore di rete");
     } finally {
       setBroadcastLoading(false);
     }
@@ -617,8 +614,8 @@ export default function AdminPage() {
           <div className="flex flex-col items-center gap-6">
             <h1 className="text-xl font-semibold">Area admin</h1>
             <form onSubmit={handleLogin}>
-              <Button color="danger" isLoading={loginLoading} type="submit">
-                {loginLoading ? "" : "Accedi"}
+              <Button isDisabled={loginLoading} type="submit" variant="danger">
+                {loginLoading ? <Spinner size="sm" /> : "Accedi"}
               </Button>
             </form>
           </div>
@@ -662,9 +659,8 @@ export default function AdminPage() {
       <div className="py-8">
         <div className="max-w-3xl mx-auto mb-2 flex justify-end">
           <Button
-            color="danger"
             size="sm"
-            variant="flat"
+            variant="danger-soft"
             onPress={() => supabase.auth.signOut()}
           >
             Esci
@@ -675,27 +671,24 @@ export default function AdminPage() {
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
             <Button
               className="font-semibold shrink-0"
-              color={tab === "subscribers" ? "danger" : "default"}
               size="sm"
-              variant={tab === "subscribers" ? "solid" : "bordered"}
+              variant={tab === "subscribers" ? "danger" : "outline"}
               onPress={() => switchTab("subscribers")}
             >
               Iscritti
             </Button>
             <Button
               className="font-semibold shrink-0"
-              color={tab === "broadcast" ? "danger" : "default"}
               size="sm"
-              variant={tab === "broadcast" ? "solid" : "bordered"}
+              variant={tab === "broadcast" ? "danger" : "outline"}
               onPress={() => switchTab("broadcast")}
             >
               Broadcast
             </Button>
             <Button
               className="font-semibold shrink-0"
-              color={tab === "individuale" ? "danger" : "default"}
               size="sm"
-              variant={tab === "individuale" ? "solid" : "bordered"}
+              variant={tab === "individuale" ? "danger" : "outline"}
               onPress={() => switchTab("individuale")}
             >
               <span className="hidden sm:inline">Invio singolo</span>
@@ -734,14 +727,15 @@ export default function AdminPage() {
               </div>
 
               {/* Search */}
-              <Input
-                isClearable
+              <TextField
+                aria-label="Cerca per email o nome"
                 className="w-full"
-                placeholder="Cerca per email o nome…"
-                size="sm"
-                startContent={
+                value={searchInput}
+                onChange={setSearchInput}
+              >
+                <div className="relative flex items-center">
                   <svg
-                    className="text-default-400"
+                    className="absolute left-2 text-default-400 pointer-events-none"
                     fill="none"
                     height="16"
                     stroke="currentColor"
@@ -752,42 +746,62 @@ export default function AdminPage() {
                     <circle cx="11" cy="11" r="7" />
                     <line x1="21" x2="16.65" y1="21" y2="16.65" />
                   </svg>
-                }
-                value={searchInput}
-                variant="flat"
-                onClear={() => setSearchInput("")}
-                onValueChange={setSearchInput}
-              />
+                  <Input
+                    className="w-full pl-8 pr-8"
+                    placeholder="Cerca per email o nome…"
+                  />
+                  {searchInput && (
+                    <button
+                      aria-label="Cancella ricerca"
+                      className="absolute right-2 flex items-center justify-center text-default-400 hover:text-default-600"
+                      type="button"
+                      onClick={() => setSearchInput("")}
+                    >
+                      <svg
+                        fill="none"
+                        height="14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="14"
+                      >
+                        <line x1="18" x2="6" y1="6" y2="18" />
+                        <line x1="6" x2="18" y1="6" y2="18" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </TextField>
 
               {/* Status filter + azioni */}
               <div className="flex items-center justify-between gap-2">
-                <Select
+                <AdminSelect
                   aria-label="Filtra per stato"
                   className="w-40"
-                  selectedKeys={[filterStatus || "all"]}
-                  size="sm"
-                  variant="flat"
-                  onSelectionChange={(keys) => {
-                    const value = Array.from(keys)[0] as string | undefined;
+                  options={[
+                    { key: "all", label: "Tutti" },
+                    { key: "confirmed", label: "Confermati" },
+                    { key: "unsubscribed", label: "Disiscritti" },
+                    { key: "bounced", label: "Rimbalzati" },
+                  ]}
+                  selectedKey={filterStatus || "all"}
+                  onSelectionChange={(key) => {
+                    const value = key == null ? undefined : String(key);
 
                     setFilterStatus(
                       (value === "all" ? "" : (value ?? "")) as FilterStatus,
                     );
                     setPage(1);
                   }}
-                >
-                  <SelectItem key="all">Tutti</SelectItem>
-                  <SelectItem key="confirmed">Confermati</SelectItem>
-                  <SelectItem key="unsubscribed">Disiscritti</SelectItem>
-                  <SelectItem key="bounced">Rimbalzati</SelectItem>
-                </Select>
+                />
                 <Button
-                  color="secondary"
-                  isLoading={syncLoading}
+                  isDisabled={syncLoading}
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   onPress={handleSyncResend}
                 >
+                  {syncLoading && <Spinner size="sm" />}
                   {!syncLoading && (
                     <>
                       Ricarica
@@ -822,27 +836,25 @@ export default function AdminPage() {
                     <div className="flex gap-2">
                       <Button
                         className="flex-1"
-                        color="default"
                         size="sm"
-                        variant="flat"
+                        variant="secondary"
                         onPress={() => setSelectedSubscribers([])}
                       >
                         Deseleziona
                       </Button>
                       <Button
                         className="flex-1 font-semibold"
-                        color="primary"
                         size="sm"
+                        variant="primary"
                         onPress={() => switchTab("individuale")}
                       >
                         Scrivi
                       </Button>
                       <Button
                         className="flex-1"
-                        color="danger"
                         isDisabled={unsubscribableSelected.length === 0}
                         size="sm"
-                        variant="solid"
+                        variant="danger"
                         onPress={handleUnsubscribeSelected}
                       >
                         Disiscrivi
@@ -855,16 +867,20 @@ export default function AdminPage() {
                       </span>
                       <div className="flex gap-2">
                         <Button
-                          color="danger"
-                          isLoading={unsubscribeLoading}
+                          isDisabled={unsubscribeLoading}
                           size="sm"
+                          variant="danger"
                           onPress={handleUnsubscribeSelected}
                         >
-                          Sì, disiscrivi
+                          {unsubscribeLoading ? (
+                            <Spinner size="sm" />
+                          ) : (
+                            "Sì, disiscrivi"
+                          )}
                         </Button>
                         <Button
                           size="sm"
-                          variant="bordered"
+                          variant="outline"
                           onPress={() => setConfirmUnsubscribe(false)}
                         >
                           Annulla
@@ -878,12 +894,22 @@ export default function AdminPage() {
               {/* Header colonne */}
               {!subsLoading && subscribers.length > 0 && (
                 <div className="flex items-center gap-3 px-2 pb-2 border-b border-default-200 text-xs font-medium text-default-400 uppercase tracking-wide">
-                  <Checkbox
-                    isIndeterminate={someOnPageSelected}
-                    isSelected={allOnPageSelected}
-                    size="sm"
-                    onValueChange={toggleSelectAllOnPage}
-                  />
+                  <button
+                    aria-label="Seleziona tutti gli iscritti in pagina"
+                    className="cursor-pointer"
+                    type="button"
+                    onClick={toggleSelectAllOnPage}
+                  >
+                    <Checkbox
+                      className="pointer-events-none"
+                      isIndeterminate={someOnPageSelected}
+                      isSelected={allOnPageSelected}
+                    >
+                      <CheckboxControl>
+                        <CheckboxIndicator />
+                      </CheckboxControl>
+                    </Checkbox>
+                  </button>
                   <button
                     className="flex-1 flex items-center gap-1 text-left hover:text-default-600"
                     type="button"
@@ -945,15 +971,30 @@ export default function AdminPage() {
                   {subscribers.map((s) => (
                     <div
                       key={s.id}
-                      className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg border-b border-default-100 text-sm hover:bg-default-50 transition-colors"
+                      aria-pressed={selectedSubscribers.some(
+                        (sel) => sel.id === s.id,
+                      )}
+                      className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg border-b border-default-100 text-sm hover:bg-default-50 transition-colors cursor-pointer select-none"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => toggleSelectSubscriber(s)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toggleSelectSubscriber(s);
+                        }
+                      }}
                     >
                       <Checkbox
+                        className="pointer-events-none"
                         isSelected={selectedSubscribers.some(
                           (sel) => sel.id === s.id,
                         )}
-                        size="sm"
-                        onValueChange={() => toggleSelectSubscriber(s)}
-                      />
+                      >
+                        <CheckboxControl>
+                          <CheckboxIndicator />
+                        </CheckboxControl>
+                      </Checkbox>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{s.email}</p>
                         {(s.firstName || s.releaseSlug) && (
@@ -967,7 +1008,7 @@ export default function AdminPage() {
                       <Chip
                         color={STATUS_COLOR[s.status] ?? "default"}
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                       >
                         {STATUS_LABEL[s.status] ?? s.status}
                       </Chip>
@@ -990,7 +1031,7 @@ export default function AdminPage() {
                     aria-label="Pagina precedente"
                     isDisabled={page <= 1}
                     size="sm"
-                    variant="solid"
+                    variant="secondary"
                     onPress={() => setPage((p) => p - 1)}
                   >
                     ←
@@ -1003,32 +1044,26 @@ export default function AdminPage() {
                     aria-label="Pagina successiva"
                     isDisabled={page >= totalPages}
                     size="sm"
-                    variant="solid"
+                    variant="secondary"
                     onPress={() => setPage((p) => p + 1)}
                   >
                     →
                   </Button>
-                  <Select
+                  <AdminSelect
                     aria-label="Contatti per pagina"
                     className="w-20 ml-1"
-                    selectedKeys={[String(pageSize)]}
-                    size="sm"
-                    variant="flat"
-                    onSelectionChange={(keys) => {
-                      const value = Array.from(keys)[0];
-
-                      if (value) {
-                        setPageSize(Number(value));
+                    options={PAGE_SIZE_OPTIONS.map((n) => ({
+                      key: String(n),
+                      label: String(n),
+                    }))}
+                    selectedKey={String(pageSize)}
+                    onSelectionChange={(key) => {
+                      if (key != null) {
+                        setPageSize(Number(key));
                         setPage(1);
                       }
                     }}
-                  >
-                    {PAGE_SIZE_OPTIONS.map((n) => (
-                      <SelectItem key={String(n)} textValue={String(n)}>
-                        {n}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                  />
                 </div>
               )}
 
@@ -1042,46 +1077,42 @@ export default function AdminPage() {
                   onSubmit={handleAddSubscriber}
                 >
                   <div className="flex gap-3 flex-wrap w-full">
-                    <Input
-                      className="flex-1 min-w-48"
-                      label="Email"
-                      labelPlacement="outside"
-                      placeholder="nome@email.com"
-                      size="sm"
+                    <TextField
+                      className="flex-1 min-w-48 flex flex-col gap-1.5"
                       type="email"
                       value={addEmail}
-                      variant="bordered"
-                      onValueChange={setAddEmail}
-                    />
-                    <Input
-                      className="flex-1 min-w-32"
-                      label="Nome"
-                      labelPlacement="outside"
-                      placeholder="Nome"
-                      size="sm"
+                      onChange={setAddEmail}
+                    >
+                      <Label>Email</Label>
+                      <Input placeholder="nome@email.com" />
+                    </TextField>
+                    <TextField
+                      className="flex-1 min-w-32 flex flex-col gap-1.5"
                       type="text"
                       value={addFirstName}
-                      variant="bordered"
-                      onValueChange={setAddFirstName}
-                    />
-                    <Input
-                      label="Data consenso"
-                      labelPlacement="outside"
-                      size="sm"
+                      onChange={setAddFirstName}
+                    >
+                      <Label>Nome</Label>
+                      <Input placeholder="Nome" />
+                    </TextField>
+                    <TextField
+                      className="w-full md:w-auto flex flex-col gap-1.5"
                       type="date"
                       value={addConsentDate}
-                      variant="bordered"
-                      onValueChange={setAddConsentDate}
-                    />
+                      onChange={setAddConsentDate}
+                    >
+                      <Label>Data consenso</Label>
+                      <Input className="w-full" />
+                    </TextField>
                   </div>
                   <Button
                     className="font-semibold"
-                    color="danger"
-                    isLoading={addLoading}
+                    isDisabled={addLoading}
                     size="lg"
                     type="submit"
+                    variant="danger"
                   >
-                    {addLoading ? "" : "Aggiungi"}
+                    {addLoading ? <Spinner size="sm" /> : "Aggiungi"}
                   </Button>
                 </form>
               </div>
@@ -1102,13 +1133,29 @@ export default function AdminPage() {
                     <div className="flex flex-wrap items-center gap-2 text-sm">
                       <span className="text-default-500">Destinatari:</span>
                       {selectedSubscribers.map((s) => (
-                        <Chip
-                          key={s.id}
-                          size="sm"
-                          variant="flat"
-                          onClose={() => toggleSelectSubscriber(s)}
-                        >
-                          {s.email}
+                        <Chip key={s.id} size="sm" variant="soft">
+                          <span className="inline-flex items-center gap-1">
+                            {s.email}
+                            <button
+                              aria-label={`Rimuovi ${s.email}`}
+                              className="inline-flex items-center justify-center opacity-60 hover:opacity-100"
+                              type="button"
+                              onClick={() => toggleSelectSubscriber(s)}
+                            >
+                              <svg
+                                fill="none"
+                                height="12"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                width="12"
+                              >
+                                <line x1="18" x2="6" y1="6" y2="18" />
+                                <line x1="6" x2="18" y1="6" y2="18" />
+                              </svg>
+                            </button>
+                          </span>
                         </Chip>
                       ))}
                     </div>
@@ -1116,14 +1163,14 @@ export default function AdminPage() {
 
                   {/* Composer */}
                   <div className="flex flex-col gap-4">
-                    <Input
-                      label="Oggetto email"
-                      labelPlacement="outside"
-                      placeholder="Es: Nuovo singolo in arrivo"
+                    <TextField
+                      className="flex flex-col gap-1.5"
                       value={subject}
-                      variant="flat"
-                      onValueChange={setSubject}
-                    />
+                      onChange={setSubject}
+                    >
+                      <Label>Oggetto email</Label>
+                      <Input placeholder="Es: Nuovo singolo in arrivo" />
+                    </TextField>
                     <RichTextEditor
                       placeholder="Scrivi il corpo della mail…"
                       value={emailBody}
@@ -1184,26 +1231,26 @@ export default function AdminPage() {
                       />
                     </div>
                     <div className="flex gap-3 flex-wrap">
-                      <Input
-                        className="flex-1 min-w-40"
-                        description="Lascia vuoto per non includere bottone"
-                        label="Testo bottone"
-                        labelPlacement="outside"
-                        placeholder="Es: Ascolta ora"
+                      <TextField
+                        className="flex-1 min-w-40 flex flex-col gap-1.5"
                         value={ctaText}
-                        variant="flat"
-                        onValueChange={setCtaText}
-                      />
-                      <Input
-                        className="flex-1 min-w-48"
-                        label="Link bottone"
-                        labelPlacement="outside"
-                        placeholder="Inserisci il link"
+                        onChange={setCtaText}
+                      >
+                        <Label>Testo bottone</Label>
+                        <Input placeholder="Es: Ascolta ora" />
+                        <Description>
+                          Lascia vuoto per non includere bottone
+                        </Description>
+                      </TextField>
+                      <TextField
+                        className="flex-1 min-w-48 flex flex-col gap-1.5"
                         type="text"
                         value={ctaUrl}
-                        variant="flat"
-                        onValueChange={setCtaUrl}
-                      />
+                        onChange={setCtaUrl}
+                      >
+                        <Label>Link bottone</Label>
+                        <Input placeholder="Inserisci il link" />
+                      </TextField>
                     </div>
                   </div>
 
@@ -1225,10 +1272,9 @@ export default function AdminPage() {
                     <Button
                       fullWidth
                       className="font-semibold"
-                      color="danger"
-                      isDisabled={!composerValid}
-                      isLoading={broadcastLoading}
+                      isDisabled={!composerValid || broadcastLoading}
                       size="lg"
+                      variant="danger"
                       onPress={() =>
                         handleSend(
                           isIndividuale
@@ -1237,9 +1283,13 @@ export default function AdminPage() {
                         )
                       }
                     >
-                      {isIndividuale
-                        ? `Invia a ${selectedSubscribers.length} destinatari`
-                        : "Invia a tutti"}
+                      {broadcastLoading ? (
+                        <Spinner size="sm" />
+                      ) : isIndividuale ? (
+                        `Invia a ${selectedSubscribers.length} destinatari`
+                      ) : (
+                        "Invia a tutti"
+                      )}
                     </Button>
                   ) : (
                     <div className="flex items-center gap-3 flex-wrap justify-center">
@@ -1247,9 +1297,9 @@ export default function AdminPage() {
                         Confermi l&apos;invio?
                       </span>
                       <Button
-                        color="danger"
-                        isLoading={broadcastLoading}
+                        isDisabled={broadcastLoading}
                         size="sm"
+                        variant="danger"
                         onPress={() =>
                           handleSend(
                             isIndividuale
@@ -1258,11 +1308,11 @@ export default function AdminPage() {
                           )
                         }
                       >
-                        Sì, invia
+                        {broadcastLoading ? <Spinner size="sm" /> : "Sì, invia"}
                       </Button>
                       <Button
                         size="sm"
-                        variant="bordered"
+                        variant="outline"
                         onPress={() => setConfirmSend(false)}
                       >
                         Annulla
@@ -1320,5 +1370,45 @@ function StatCard({
         {value ?? "–"}
       </span>
     </div>
+  );
+}
+
+// Select v3 (react-aria compound): SelectRoot/Trigger/Value/Indicator/Popover +
+// ListBox/ListBoxItem. Wrapper che preserva il comportamento del vecchio
+// <Select selectedKeys onSelectionChange><SelectItem/></Select> di HeroUI v2.
+function AdminSelect({
+  options,
+  selectedKey,
+  onSelectionChange,
+  className,
+  "aria-label": ariaLabel,
+}: {
+  options: { key: string; label: string }[];
+  selectedKey: string;
+  onSelectionChange: (key: Key | null) => void;
+  className?: string;
+  "aria-label"?: string;
+}) {
+  return (
+    <SelectRoot
+      aria-label={ariaLabel}
+      className={className}
+      selectedKey={selectedKey}
+      onSelectionChange={onSelectionChange}
+    >
+      <SelectTrigger>
+        <SelectValue />
+        <SelectIndicator />
+      </SelectTrigger>
+      <SelectPopover>
+        <ListBox>
+          {options.map((o) => (
+            <ListBoxItem key={o.key} id={o.key} textValue={o.label}>
+              {o.label}
+            </ListBoxItem>
+          ))}
+        </ListBox>
+      </SelectPopover>
+    </SelectRoot>
   );
 }

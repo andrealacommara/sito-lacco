@@ -1,8 +1,7 @@
 // ========================== MAIN IMPORTS ========================== //
 // Core React hooks alongside the HeroUI primitives used by the player card.
 import { useEffect, useRef, useState } from "react";
-import { Card } from "@heroui/card"; // Card container for the iframe
-import { Skeleton } from "@heroui/skeleton"; // Loading placeholder for smoother UX
+import { Card, Skeleton } from "@heroui/react"; // Card container for the iframe + loading placeholder
 
 // ========================== PROPS INTERFACE ========================== //
 // Parameters accepted by the `SpotifyPlayer` component.

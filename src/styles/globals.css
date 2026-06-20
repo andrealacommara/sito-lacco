@@ -1,16 +1,97 @@
-@import "tailwindcss";
+/* HeroUI v3 styles: porta Tailwind v4 + base/theme/components/utilities/variants */
+@import "@heroui/styles";
 
+/* Dark mode pilotato da data-theme (impostato da ThemeSwitch su <html>).
+   Allinea le utility Tailwind `dark:` al meccanismo theming di HeroUI v3. */
+@custom-variant dark ([data-theme="dark"] &);
+
+/* ============================================================
+   Theme tokens: font + compat scale colore HeroUI v2 (parità visiva)
+   v3 rimuove la scala numerica `default-50..900` e `primary`: le
+   ricreiamo identiche a v2 così tutte le classi esistenti restano valide.
+   ============================================================ */
+@theme {
+  --font-display: "Playfair Display", serif;
+
+  /* Scala `default` v2 (zinc) — valori LIGHT (override dark più sotto) */
+  --color-default-50: #fafafa;
+  --color-default-100: #f4f4f5;
+  --color-default-200: #e4e4e7;
+  --color-default-300: #d4d4d8;
+  --color-default-400: #a1a1aa;
+  --color-default-500: #71717a;
+  --color-default-600: #52525b;
+  --color-default-700: #3f3f46;
+  --color-default-800: #27272a;
+  --color-default-900: #18181b;
+
+  /* `primary` v2 = blue #006FEE (uguale in light e dark) */
+  --color-primary: #006fee;
+  --color-primary-foreground: #ffffff;
+}
+
+/* Valori LIGHT espliciti anche su [data-theme="light"], così lo scoping
+   annidato (es. card bianca forzata light dentro pagina dark) ripristina
+   correttamente la scala invece di ereditare i valori dark dall'antenato. */
+:root,
+[data-theme="light"] {
+  --color-default-50: #fafafa;
+  --color-default-100: #f4f4f5;
+  --color-default-200: #e4e4e7;
+  --color-default-300: #d4d4d8;
+  --color-default-400: #a1a1aa;
+  --color-default-500: #71717a;
+  --color-default-600: #52525b;
+  --color-default-700: #3f3f46;
+  --color-default-800: #27272a;
+  --color-default-900: #18181b;
+}
+
+/* Scala `default` v2 invertita in dark mode (swapColorValues di HeroUI v2) */
+[data-theme="dark"] {
+  --color-default-50: #18181b;
+  --color-default-100: #27272a;
+  --color-default-200: #3f3f46;
+  --color-default-300: #52525b;
+  --color-default-400: #a1a1aa;
+  --color-default-500: #71717a;
+  --color-default-600: #d4d4d8;
+  --color-default-700: #e4e4e7;
+  --color-default-800: #f4f4f5;
+  --color-default-900: #fafafa;
+}
+
+/* ============================================================
+   Override DANGER = rosso brand del sito (hue 339).
+   Il danger di default v3 è arancio-rosso (hue ~25): va sovrascritto
+   o l'intera identità rossa del sito cambierebbe. Valori storici
+   (WCAG-AA su testo piccolo) preservati; hover/soft derivati a tono.
+   ============================================================ */
+:root,
+[data-theme="light"] {
+  --danger: hsl(339 86.54% 40.78%);
+  --danger-foreground: hsl(0 0% 100%);
+  --danger-hover: hsl(339 86.54% 34%);
+  --danger-soft: hsl(339 80% 95%);
+  --danger-soft-foreground: hsl(339 86.54% 40.78%);
+  --danger-soft-hover: hsl(339 78% 90%);
+}
+
+[data-theme="dark"] {
+  --danger: hsl(339.2 90.36% 51.18%);
+  --danger-foreground: hsl(0 0% 100%);
+  --danger-hover: hsl(339.2 90% 58%);
+  --danger-soft: hsl(339 55% 18%);
+  --danger-soft-foreground: hsl(339.2 90% 72%);
+  --danger-soft-hover: hsl(339 55% 24%);
+}
+
+/* ============================================================
+   Base globali e animazioni custom (invariate da v2)
+   ============================================================ */
 :root {
   overflow-y: auto;
   scrollbar-gutter: stable;
-  /* Darker danger shade — passes WCAG AA (≥4.5:1) for small text on white */
-  --heroui-danger: 339 86.54% 40.78%;
-  --heroui-danger-foreground: 0 0% 100%;
-}
-
-/* Keep original bright red in dark mode (dark cards have enough contrast) */
-.dark {
-  --heroui-danger: 339.2 90.36% 51.18%;
 }
 
 @keyframes fadeInUp {
@@ -28,8 +109,90 @@
   to   { opacity: 1; }
 }
 
-.hidden.group-data-\[has-helper\=true\]\:flex.p-1.relative.flex-col.gap-1\.5 {
-  text-align: left;
+/* ============================================================
+   Toast: aspetto coerente col sito (card-like: angoli morbidi,
+   ombra profonda, bordo sottile). I colori (danger = rosso brand)
+   arrivano già dai token. Solo migliorativo.
+   ============================================================ */
+.toast {
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 18px 40px -16px rgb(0 0 0 / 0.45);
 }
 
-@config "../../tailwind.config.js";
+.toast__title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   Aggiustamenti di parità con HeroUI v2
+   ============================================================ */
+
+/* `scrollbar-hide`: in v2 arrivava da un plugin Tailwind (ora rimosso in v3).
+   La ridefiniamo per nascondere lo scrollbar del carosello (musicPage). */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* IMPORTANTE: questi override stanno in @layer components così le utility Tailwind
+   nelle className (es. rounded-3xl, bg-white, p-8, gap-6, h-11) continuano a VINCERE
+   su di essi. (Regole non-layered batterebbero anche le className → layout rotto.) */
+@layer components {
+  /* Card: v3 usa raggio fino a 32px e bg `surface` (grigio chiaro). v2 usava
+     rounded-large (14px) e content1 (#fff / #18181b). Riallineiamo SOLO bg e raggio
+     di base; padding/gap restano quelli delle className (NON li tocchiamo). */
+  .card {
+    border-radius: 14px;
+  }
+  .card--default {
+    background-color: var(--card-content1);
+  }
+
+  /* Button: v3 rimpicciolisce su desktop (md:h-9) e forza le icone a 16px; v2 era h-10
+     con icone a dimensione naturale (createIcon size=29). Ripristiniamo l'altezza e
+     lasciamo le icone alla loro dimensione naturale (le className tipo h-6/w-6 vincono). */
+  .button {
+    height: 2.5rem; /* h-10 anche su desktop (annulla md:h-9) */
+  }
+  .button--lg {
+    height: 2.75rem; /* h-11 anche su desktop */
+  }
+  .button--sm {
+    height: 2.25rem; /* h-9 anche su desktop */
+  }
+  .button svg:not([data-slot="spinner"] svg, [data-slot="link-icon"] svg) {
+    width: auto;
+    height: auto;
+  }
+
+  /* Label dei form sempre allineate a sinistra (dentro le card centrate `text-center`
+     ereditavano il centramento). */
+  .label {
+    text-align: left;
+  }
+}
+
+/* Token content1 v2 (bg delle Card) — theme-aware */
+:root,
+[data-theme="light"] {
+  --card-content1: #ffffff;
+}
+[data-theme="dark"] {
+  --card-content1: #18181b;
+}
+
+/* Sfondo pagina esplicito: in v3 il <body> è trasparente e in dark mostra il canvas
+   grigio del browser (color-scheme), troppo chiaro. Lo fissiamo sul token e in dark
+   lo portiamo a nero come la versione online. Le Card (#18181b) restano leggermente
+   più chiare → buon contrasto. */
+body {
+  background-color: var(--background);
+}
+[data-theme="dark"] {
+  --background: #000000;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "@heroui/button";
+import { Button } from "@heroui/react";
 
 import { SpotifyIcon } from "@/components/icons";
 import { hasReleased } from "@/components/countdown";
@@ -42,9 +42,9 @@ export default function PresaveButton({ hyperfollowUrl, releaseDate }: Props) {
     return (
       <Button
         aria-label="Ascoltala su Spotify"
-        className="font-semibold px-8"
-        color="success"
+        className="font-semibold px-8 bg-success text-white hover:bg-success/90"
         size="lg"
+        variant="primary"
         onPress={() => openCenteredPopup(hyperfollowUrl, hyperfollowUrl)}
       >
         <SpotifyIcon />
@@ -57,9 +57,9 @@ export default function PresaveButton({ hyperfollowUrl, releaseDate }: Props) {
     return (
       <Button
         isDisabled
-        className="font-semibold px-8"
-        color="success"
+        className="font-semibold px-8 bg-success text-white hover:bg-success/90"
         size="lg"
+        variant="primary"
       >
         <SpotifyIcon />
         Pre-salvato ✓
@@ -70,9 +70,9 @@ export default function PresaveButton({ hyperfollowUrl, releaseDate }: Props) {
   return (
     <Button
       aria-label="Pre-save su Spotify"
-      className="font-semibold px-8"
-      color="success"
+      className="font-semibold px-8 bg-success text-white hover:bg-success/90"
       size="lg"
+      variant="primary"
       onPress={() => {
         openCenteredPopup(hyperfollowUrl, hyperfollowUrl);
         setSaved(true);

@@ -1,6 +1,6 @@
 // ========================== MAIN IMPORTS ========================== //
 // HeroUI card plus shared icon and image utilities.
-import { Card } from "@heroui/card";
+import { Card } from "@heroui/react";
 
 import { SpotifyIcon, AppleMusicIcon } from "@/components/icons"; // Platform icons
 import {
