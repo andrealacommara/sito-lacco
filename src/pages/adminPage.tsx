@@ -614,7 +614,12 @@ export default function AdminPage() {
           <div className="flex flex-col items-center gap-6">
             <h1 className="text-xl font-semibold">Area admin</h1>
             <form onSubmit={handleLogin}>
-              <Button isDisabled={loginLoading} type="submit" variant="danger">
+              <Button
+                className="rounded-xl"
+                isDisabled={loginLoading}
+                type="submit"
+                variant="danger"
+              >
                 {loginLoading ? <Spinner size="sm" /> : "Accedi"}
               </Button>
             </form>
@@ -659,6 +664,7 @@ export default function AdminPage() {
       <div className="py-8">
         <div className="max-w-3xl mx-auto mb-2 flex justify-end">
           <Button
+            className="rounded-xl"
             size="sm"
             variant="danger-soft"
             onPress={() => supabase.auth.signOut()}
@@ -670,7 +676,7 @@ export default function AdminPage() {
           {/* Tab bar */}
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
             <Button
-              className="font-semibold shrink-0"
+              className="rounded-xl font-semibold shrink-0"
               size="sm"
               variant={tab === "subscribers" ? "danger" : "outline"}
               onPress={() => switchTab("subscribers")}
@@ -678,7 +684,7 @@ export default function AdminPage() {
               Iscritti
             </Button>
             <Button
-              className="font-semibold shrink-0"
+              className="rounded-xl font-semibold shrink-0"
               size="sm"
               variant={tab === "broadcast" ? "danger" : "outline"}
               onPress={() => switchTab("broadcast")}
@@ -686,7 +692,7 @@ export default function AdminPage() {
               Broadcast
             </Button>
             <Button
-              className="font-semibold shrink-0"
+              className="rounded-xl font-semibold shrink-0"
               size="sm"
               variant={tab === "individuale" ? "danger" : "outline"}
               onPress={() => switchTab("individuale")}
@@ -796,6 +802,7 @@ export default function AdminPage() {
                   }}
                 />
                 <Button
+                  className="rounded-xl"
                   isDisabled={syncLoading}
                   size="sm"
                   variant="secondary"
@@ -835,7 +842,7 @@ export default function AdminPage() {
                   {!confirmUnsubscribe ? (
                     <div className="flex gap-2">
                       <Button
-                        className="flex-1"
+                        className="flex-1 rounded-xl"
                         size="sm"
                         variant="secondary"
                         onPress={() => setSelectedSubscribers([])}
@@ -843,7 +850,7 @@ export default function AdminPage() {
                         Deseleziona
                       </Button>
                       <Button
-                        className="flex-1 font-semibold"
+                        className="flex-1 rounded-xl font-semibold"
                         size="sm"
                         variant="primary"
                         onPress={() => switchTab("individuale")}
@@ -851,7 +858,7 @@ export default function AdminPage() {
                         Scrivi
                       </Button>
                       <Button
-                        className="flex-1"
+                        className="flex-1 rounded-xl"
                         isDisabled={unsubscribableSelected.length === 0}
                         size="sm"
                         variant="danger"
@@ -867,6 +874,7 @@ export default function AdminPage() {
                       </span>
                       <div className="flex gap-2">
                         <Button
+                          className="rounded-xl"
                           isDisabled={unsubscribeLoading}
                           size="sm"
                           variant="danger"
@@ -879,6 +887,7 @@ export default function AdminPage() {
                           )}
                         </Button>
                         <Button
+                          className="rounded-xl"
                           size="sm"
                           variant="outline"
                           onPress={() => setConfirmUnsubscribe(false)}
@@ -896,7 +905,7 @@ export default function AdminPage() {
                 <div className="flex items-center gap-3 px-2 pb-2 border-b border-default-200 text-xs font-medium text-default-400 uppercase tracking-wide">
                   <button
                     aria-label="Seleziona tutti gli iscritti in pagina"
-                    className="cursor-pointer"
+                    className="rounded-xl cursor-pointer"
                     type="button"
                     onClick={toggleSelectAllOnPage}
                   >
@@ -911,7 +920,7 @@ export default function AdminPage() {
                     </Checkbox>
                   </button>
                   <button
-                    className="flex-1 flex items-center gap-1 text-left hover:text-default-600"
+                    className="rounded-xl flex-1 flex items-center gap-1 text-left hover:text-default-600"
                     type="button"
                     onClick={() => handleSort("email")}
                   >
@@ -921,7 +930,7 @@ export default function AdminPage() {
                     )}
                   </button>
                   <button
-                    className="flex items-center gap-1 hover:text-default-600"
+                    className="rounded-xl flex items-center gap-1 hover:text-default-600"
                     type="button"
                     onClick={() => handleSort("status")}
                   >
@@ -931,7 +940,7 @@ export default function AdminPage() {
                     )}
                   </button>
                   <button
-                    className="hidden sm:flex items-center gap-1 w-24 shrink-0 hover:text-default-600"
+                    className="rounded-xlhidden sm:flex items-center gap-1 w-24 shrink-0 hover:text-default-600"
                     type="button"
                     onClick={() => handleSort("source")}
                   >
@@ -941,7 +950,7 @@ export default function AdminPage() {
                     )}
                   </button>
                   <button
-                    className="flex items-center justify-end gap-1 w-20 shrink-0 hover:text-default-600"
+                    className="rounded-xl flex items-center justify-end gap-1 w-20 shrink-0 hover:text-default-600"
                     type="button"
                     onClick={() => handleSort("createdAt")}
                   >
@@ -974,7 +983,7 @@ export default function AdminPage() {
                       aria-pressed={selectedSubscribers.some(
                         (sel) => sel.id === s.id,
                       )}
-                      className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg border-b border-default-100 text-sm hover:bg-default-50 transition-colors cursor-pointer select-none"
+                      className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-xl border-b border-default-100 text-sm hover:bg-default-50 transition-colors cursor-pointer select-none"
                       role="button"
                       tabIndex={0}
                       onClick={() => toggleSelectSubscriber(s)}
@@ -1029,6 +1038,7 @@ export default function AdminPage() {
                   <Button
                     isIconOnly
                     aria-label="Pagina precedente"
+                    className="rounded-xl"
                     isDisabled={page <= 1}
                     size="sm"
                     variant="secondary"
@@ -1042,6 +1052,7 @@ export default function AdminPage() {
                   <Button
                     isIconOnly
                     aria-label="Pagina successiva"
+                    className="rounded-xl"
                     isDisabled={page >= totalPages}
                     size="sm"
                     variant="secondary"
@@ -1106,7 +1117,7 @@ export default function AdminPage() {
                     </TextField>
                   </div>
                   <Button
-                    className="font-semibold"
+                    className="rounded-xl font-semibold"
                     isDisabled={addLoading}
                     size="lg"
                     type="submit"
@@ -1138,7 +1149,7 @@ export default function AdminPage() {
                             {s.email}
                             <button
                               aria-label={`Rimuovi ${s.email}`}
-                              className="inline-flex items-center justify-center opacity-60 hover:opacity-100"
+                              className="rounded-xl inline-flex items-center justify-center opacity-60 hover:opacity-100"
                               type="button"
                               onClick={() => toggleSelectSubscriber(s)}
                             >
@@ -1271,7 +1282,7 @@ export default function AdminPage() {
                   {!confirmSend ? (
                     <Button
                       fullWidth
-                      className="font-semibold"
+                      className="rounded-xl font-semibold"
                       isDisabled={!composerValid || broadcastLoading}
                       size="lg"
                       variant="danger"
@@ -1297,6 +1308,7 @@ export default function AdminPage() {
                         Confermi l&apos;invio?
                       </span>
                       <Button
+                        className="rounded-xl"
                         isDisabled={broadcastLoading}
                         size="sm"
                         variant="danger"
@@ -1311,6 +1323,7 @@ export default function AdminPage() {
                         {broadcastLoading ? <Spinner size="sm" /> : "Sì, invia"}
                       </Button>
                       <Button
+                        className="rounded-xl"
                         size="sm"
                         variant="outline"
                         onPress={() => setConfirmSend(false)}

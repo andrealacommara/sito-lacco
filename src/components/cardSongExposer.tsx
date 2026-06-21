@@ -184,7 +184,7 @@ export default function CardSongExposer({
                         <Button
                           fullWidth
                           aria-label="Vai al brano su Spotify"
-                          className="min-w-0 bg-success text-white hover:bg-success/90"
+                          className="rounded-xl min-w-0 bg-success text-white hover:bg-success/90"
                           variant="primary"
                           onPress={() =>
                             window.open(
@@ -204,7 +204,7 @@ export default function CardSongExposer({
                         <Button
                           fullWidth
                           aria-label="Vai al brano su Apple Music"
-                          className="min-w-0"
+                          className="rounded-xl min-w-0"
                           variant="danger"
                           onPress={() =>
                             window.open(

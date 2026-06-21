@@ -96,11 +96,16 @@ export default defineConfig(async () => {
       // Import SVG files as React components
       svgr(),
 
-      // Process only AVIF imports through imagetools so we can generate
-      // compatible fallbacks (webp/jpeg) on older mobile browsers.
-      // PNG/JPG/SVG imports stay as plain URLs.
+      // imagetools processa:
+      //  1) tutti gli import .avif (artwork, poster, press kit) → fallback webp/jpeg
+      //  2) qualunque immagine con direttive esplicite (?w=, ?format=…), così la
+      //     gallery dei live può caricare JPEG pesanti ma servire una versione
+      //     leggera e multi-formato.
+      // Gli import `?url` sono esclusi: servono l'originale intatto (download).
+      // PNG/JPG senza direttive restano URL semplici.
       imagetools({
-        include: /^[^?]+\.avif(\?.*)?$/,
+        include: [/^[^?]+\.avif(\?.*)?$/, /[?&](w|h|format|quality)=/],
+        exclude: /[?&]url\b/,
         defaultDirectives: () =>
           new URLSearchParams({
             format: "avif;webp;jpeg",
@@ -121,7 +126,11 @@ export default defineConfig(async () => {
         output: {
           codeSplitting: {
             groups: [
-              { name: "react", test: /node_modules\/(react|react-dom)/, priority: 20 },
+              {
+                name: "react",
+                test: /node_modules\/(react|react-dom)/,
+                priority: 20,
+              },
               { name: "heroui", test: /node_modules\/@heroui/, priority: 10 },
             ],
           },

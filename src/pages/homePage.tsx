@@ -172,7 +172,7 @@ export default function HomePage() {
       <div className="flex flex-row items-center justify-center py-4 md:py-4">
         <h2 className={subtitle()}>Link</h2>
       </div>
-      <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-5xl gap-4">
+      <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-4xl gap-4">
         <button
           className="w-full md:flex-1"
           onClick={() =>
@@ -228,9 +228,9 @@ export default function HomePage() {
             )
           }
         >
-          <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+          <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white text-nowrap">
             <AppleMusicIcon />
-            Music
+            Apple Music
           </Card>
         </button>
         <button

@@ -107,18 +107,18 @@ export default function SongCarousel() {
   }, [detectCenteredCard]);
 
   return (
-    <div className="flex items-center justify-center gap-2 md:gap-4 w-full">
+    <div className="flex items-center justify-center gap-2 md:gap-4 -mx-6 w-auto md:mx-0 md:w-full">
       <div className="flex flex-row items-center gap-4 max-w-full max-h-fit">
         <Button
           isIconOnly
           aria-label="Scorri a sinistra"
-          className={`hidden md:flex rounded-full bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
+          className={`group hidden md:flex rounded-full bg-white/90 border border-default-200 shadow-lg shadow-black/5 backdrop-blur-md transition-all duration-300 hover:bg-danger hover:border-danger hover:shadow-xl hover:shadow-danger/25 hover:scale-110 active:scale-95 ${
             isAtStart ? "opacity-0 pointer-events-none scale-75" : "opacity-100"
           }`}
           variant="tertiary"
           onPress={() => scroll("left")}
         >
-          <ChevronLeftIcon className="h-6 w-6 text-white" />
+          <ChevronLeftIcon className="h-6 w-6 text-neutral-600 transition-colors duration-300 group-hover:text-white" />
         </Button>
 
         <div
@@ -152,13 +152,13 @@ export default function SongCarousel() {
         <Button
           isIconOnly
           aria-label="Scorri a destra"
-          className={`hidden md:flex rounded-full bg-default-400 hover:bg-danger shadow-md transition-all duration-300 hover:scale-110 ${
+          className={`group hidden md:flex rounded-full bg-white/90 border border-default-200 shadow-lg shadow-black/5 backdrop-blur-md transition-all duration-300 hover:bg-danger hover:border-danger hover:shadow-xl hover:shadow-danger/25 hover:scale-110 active:scale-95 ${
             isAtEnd ? "opacity-0 pointer-events-none scale-75" : "opacity-100"
           }`}
           variant="tertiary"
           onPress={() => scroll("right")}
         >
-          <ChevronRightIcon className="h-6 w-6 text-white" />
+          <ChevronRightIcon className="h-6 w-6 text-neutral-600 transition-colors duration-300 group-hover:text-white" />
         </Button>
       </div>
     </div>

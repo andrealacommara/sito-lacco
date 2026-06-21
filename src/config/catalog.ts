@@ -62,7 +62,6 @@ export const catalog: Release[] = [
     year: 2026,
     streamingLinks: {
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/bella-al-buio",
-      // spotify e appleMusic: popolare dopo uscita
     },
   },
   {

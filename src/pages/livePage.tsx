@@ -1,14 +1,10 @@
-import type { LiveEvent } from "@/config/liveEvents";
-
-import { Card } from "@heroui/react";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 
-import heroLacco from "@/assets/images/lacco/heroLacco.avif";
-import { resolveImageSource } from "@/components/smartImage";
 import DefaultLayout from "@/layouts/default";
 import { subtitle, title } from "@/components/primitives";
 import LiveEventCard from "@/components/liveEventCard";
+import LiveEventRow from "@/components/liveEventRow";
 import { getPastLiveEvents, getUpcomingLiveEvents } from "@/config/liveEvents";
 
 function MicIcon({ className }: { className?: string }) {
@@ -53,38 +49,6 @@ function SpotlightFixture({ className }: { className?: string }) {
       {/* lente luminosa */}
       <ellipse cx="24" cy="44" fill="#F31260" rx="12" ry="3.4" />
     </svg>
-  );
-}
-
-function formatEventDate(date: Date): string {
-  return date.toLocaleDateString("it-IT", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function PastEventCard({ event }: { event: LiveEvent }) {
-  const artwork = event.poster ?? heroLacco;
-
-  return (
-    <Card className="relative mx-auto w-full max-w-4xl overflow-hidden">
-      <img
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 h-full w-full scale-125 object-cover blur-2xl"
-        src={resolveImageSource(artwork)}
-      />
-      <div className="absolute inset-0 bg-black/55" />
-      <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-1 p-4 md:p-5 m-3 rounded-2xl border border-white/10 bg-black/35 backdrop-blur-md">
-        <span className="font-bold text-white text-lg md:text-xl">
-          {event.title}
-        </span>
-        <span className="text-white/60 text-sm">
-          {formatEventDate(event.date)} · {event.venue}
-        </span>
-      </div>
-    </Card>
   );
 }
 
@@ -186,9 +150,9 @@ export default function LivePage() {
           <div className="flex flex-row items-center justify-center py-4 md:py-4">
             <h2 className={subtitle()}>Live passati</h2>
           </div>
-          <div className="flex flex-col gap-2 mx-auto w-full max-w-4xl">
+          <div className="flex flex-col gap-3 mx-auto w-full max-w-4xl">
             {past.map((event) => (
-              <PastEventCard key={event.slug} event={event} />
+              <LiveEventRow key={event.slug} event={event} />
             ))}
           </div>
         </>

@@ -1,9 +1,11 @@
 import type { LiveEvent } from "@/config/liveEvents";
 
+import { Link } from "react-router-dom";
 import { Button, Card } from "@heroui/react";
 
 import heroLacco from "@/assets/images/lacco/heroLacco.avif";
 import Countdown from "@/components/countdown";
+import ReleaseDateBadge from "@/components/releaseDateBadge";
 import SmartImage, { resolveImageSource } from "@/components/smartImage";
 
 function MapPinIcon() {
@@ -83,27 +85,6 @@ function TicketIcon() {
   );
 }
 
-function CalendarIcon() {
-  return (
-    <svg
-      className="shrink-0 opacity-60"
-      fill="none"
-      height={15}
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-      width={15}
-    >
-      <rect height="18" rx="2" width="18" x="3" y="4" />
-      <line x1="16" x2="16" y1="2" y2="6" />
-      <line x1="8" x2="8" y1="2" y2="6" />
-      <line x1="3" x2="21" y1="10" y2="10" />
-    </svg>
-  );
-}
-
 function ExternalLinkIcon() {
   return (
     <svg
@@ -131,14 +112,7 @@ type Props = {
 
 export default function LiveEventCard({ event }: Props) {
   const artwork = event.poster ?? heroLacco;
-  const dateLabel = event.date.toLocaleDateString("it-IT", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const dateLabelCapitalized =
-    dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1);
+  const eventPath = `/live/${event.slug}`;
 
   return (
     <Card className="relative overflow-hidden flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl">
@@ -150,7 +124,11 @@ export default function LiveEventCard({ event }: Props) {
       />
       <div className="absolute inset-0 bg-black/55" />
 
-      <div className="relative shrink-0 flex items-center justify-center">
+      <Link
+        aria-label={`Apri la pagina di ${event.title}`}
+        className="relative shrink-0 md:w-[44%] md:max-w-87.5 flex items-center justify-center transition-transform hover:scale-[1.02]"
+        to={eventPath}
+      >
         <SmartImage
           isBlurred
           priority
@@ -159,26 +137,28 @@ export default function LiveEventCard({ event }: Props) {
           style={{ aspectRatio: "1/1", objectFit: "cover" }}
           width={350}
         />
-      </div>
+      </Link>
 
-      <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full md:w-xl">
+      <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full md:flex-1 md:min-w-0">
         <div className="space-y-1">
-          <h1 className="text-2xl md:text-4xl font-bold text-white tracking-tight whitespace-pre">
-            {event.title}
+          <h1 className="text-lg xs:text-xl sm:text-2xl lg:text-4xl font-bold text-white tracking-tight whitespace-pre">
+            <Link
+              className="transition-colors hover:text-danger"
+              to={eventPath}
+            >
+              {event.title}
+            </Link>
           </h1>
           <p className="text-white/70 text-sm tracking-widest font-medium">
             {event.venue} · {event.city}
           </p>
         </div>
 
-        <Countdown releaseDate={event.date} variant="dark" />
+        <ReleaseDateBadge date={event.date} variant="dark" />
+
+        <Countdown releaseDate={event.date} scaleAt="lg" variant="dark" />
 
         <div className="flex flex-col gap-2 w-full text-white/70 text-sm items-center">
-          {/* Data del live — in evidenza come badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-base font-semibold text-white [&>svg]:text-danger [&>svg]:opacity-100">
-            <CalendarIcon />
-            <span>{dateLabelCapitalized}</span>
-          </div>
           {event.address && (
             <a
               className="flex items-center gap-2 max-w-full underline decoration-white/30 underline-offset-4 hover:text-danger hover:decoration-danger transition-colors"
@@ -218,7 +198,7 @@ export default function LiveEventCard({ event }: Props) {
 
         <Button
           aria-label="Acquista i biglietti"
-          className="font-semibold px-8"
+          className="rounded-xl font-semibold w-full sm:w-auto whitespace-normal sm:whitespace-nowrap text-xs xs:text-sm sm:text-base"
           size="lg"
           variant="danger"
           onPress={() =>

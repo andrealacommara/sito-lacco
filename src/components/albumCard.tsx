@@ -5,6 +5,7 @@ import { Button, Card } from "@heroui/react";
 
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
+import ReleaseDateBadge from "@/components/releaseDateBadge";
 import { AppleMusicIcon, SpotifyIcon } from "@/components/icons";
 import SmartImage, { resolveImageSource } from "@/components/smartImage";
 
@@ -41,7 +42,7 @@ export default function AlbumCard({ album }: Props) {
   const paragraphs = album.description.split("\n").filter(Boolean);
 
   return (
-    <Card className="relative overflow-hidden flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-4 mx-auto w-full max-w-4xl">
+    <Card className="relative overflow-hidden flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6 mx-auto w-full max-w-4xl">
       {/* Blurred artwork backdrop */}
       <img
         alt=""
@@ -51,7 +52,7 @@ export default function AlbumCard({ album }: Props) {
       />
       <div className="absolute inset-0 bg-black/55" />
 
-      <div className="relative shrink-0 flex flex-col items-center gap-4">
+      <div className="relative shrink-0 md:w-[44%] md:max-w-87.5 flex flex-col items-center gap-4">
         <Link
           aria-label={`Apri la pagina di ${album.title}`}
           className="flex items-center justify-center transition-transform hover:scale-[1.02]"
@@ -81,12 +82,16 @@ export default function AlbumCard({ album }: Props) {
         )}
       </div>
 
-      <div className="relative flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md flex-1">
-        <div className="space-y-1 text-center md:text-left">
+      <div
+        className={`relative flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full flex-1 min-w-0${album.presaveMode ? " items-center text-center" : ""}`}
+      >
+        <div
+          className={`space-y-1${album.presaveMode ? " text-center" : " text-center md:text-left"}`}
+        >
           <span className="text-danger uppercase tracking-[0.2em] text-xs font-bold">
             {album.kind} · {album.year}
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
             <Link
               className="hover:text-danger transition-colors"
               to={albumPath}
@@ -94,15 +99,22 @@ export default function AlbumCard({ album }: Props) {
               {album.title}
             </Link>
           </h2>
+          {album.presaveMode && (
+            <p className="text-white/70 text-sm tracking-widest font-medium">
+              {album.artist ?? "Lacco"}
+            </p>
+          )}
         </div>
 
-        <div className="text-white/80 text-sm leading-relaxed space-y-3">
-          {paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
+        {!album.presaveMode && (
+          <div className="text-white/80 text-sm leading-relaxed space-y-3">
+            {paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        )}
 
-        {album.credits && album.credits.length > 0 && (
+        {!album.presaveMode && album.credits && album.credits.length > 0 && (
           <div className="text-white/60 text-xs space-y-1">
             {album.credits.map((credit) =>
               credit.url ? (
@@ -124,7 +136,12 @@ export default function AlbumCard({ album }: Props) {
 
         {album.presaveMode ? (
           <div className="flex flex-col items-center gap-4 w-full">
-            <Countdown releaseDate={album.releaseDate} variant="dark" />
+            <ReleaseDateBadge date={album.releaseDate} variant="dark" />
+            <Countdown
+              releaseDate={album.releaseDate}
+              scaleAt="lg"
+              variant="dark"
+            />
             {album.streamingLinks?.hyperfollow && (
               <PresaveButton
                 hyperfollowUrl={album.streamingLinks.hyperfollow}
@@ -135,13 +152,13 @@ export default function AlbumCard({ album }: Props) {
         ) : (
           (album.streamingLinks?.spotify ||
             album.streamingLinks?.appleMusic) && (
-            <div className="flex flex-col md:flex-row gap-2 w-full">
+            <div className="flex flex-col lg:flex-row md:flex-row gap-2 w-full">
               {album.streamingLinks?.spotify && (
                 <div className="flex-1 min-w-0">
                   <Button
                     fullWidth
                     aria-label={`Ascolta ${album.title} su Spotify`}
-                    className="min-w-0 bg-success text-white hover:bg-success/90"
+                    className="rounded-xl min-w-0 bg-success text-white hover:bg-success/90"
                     variant="primary"
                     onPress={() =>
                       window.open(
@@ -161,7 +178,7 @@ export default function AlbumCard({ album }: Props) {
                   <Button
                     fullWidth
                     aria-label={`Ascolta ${album.title} su Apple Music`}
-                    className="min-w-0"
+                    className="rounded-xl min-w-0"
                     variant="danger"
                     onPress={() =>
                       window.open(

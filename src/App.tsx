@@ -5,6 +5,7 @@ import {
   AboutPage,
   AdminPage,
   ContactPage,
+  EventPage,
   HomePage,
   LivePage,
   MusicPage,
@@ -85,6 +86,7 @@ function App() {
 
         {/* Live */}
         <Route element={<LivePage />} path="/live" />
+        <Route element={<EventPage />} path="/live/:slug" />
 
         {/* Release pages: /:slug deve stare DOPO tutte le route specifiche */}
         <Route element={<ReleasePage />} path="/:slug" />

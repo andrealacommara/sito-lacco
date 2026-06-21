@@ -1,7 +1,7 @@
 // ========================== MAIN IMPORTS ========================== //
 // Core React hooks alongside the HeroUI primitives used by the player card.
 import { useEffect, useRef, useState } from "react";
-import { Card, Skeleton } from "@heroui/react"; // Card container for the iframe + loading placeholder
+import { Skeleton } from "@heroui/react"; // Card container for the iframe + loading placeholder
 
 // ========================== PROPS INTERFACE ========================== //
 // Parameters accepted by the `SpotifyPlayer` component.
@@ -46,10 +46,9 @@ export default function SpotifyPlayer({ srcPlayer, size }: SpotifyPlayerProps) {
   }, [isBrowser, shouldLoadPlayer]);
 
   return (
-    // Main container: a centered card with hidden overflow
-    <Card
+    <div
       ref={containerRef}
-      className="p-4 flex justify-center items-center relative overflow-hidden mx-auto w-full max-w-5xl"
+      className="flex items-center justify-center max-w-4xl w-full mx-auto"
     >
       {!shouldLoadPlayer ? (
         <div className="flex flex-col items-center gap-3 text-center py-6">
@@ -66,7 +65,7 @@ export default function SpotifyPlayer({ srcPlayer, size }: SpotifyPlayerProps) {
           </button>
         </div>
       ) : (
-        <>
+        <div className="relative w-full">
           {/* Shows a placeholder until the iframe is ready */}
           {!isLoaded && (
             <Skeleton className="absolute inset-0 rounded-lg">
@@ -90,8 +89,8 @@ export default function SpotifyPlayer({ srcPlayer, size }: SpotifyPlayerProps) {
             width="100%" // Adapts to container width
             onLoad={() => setIsLoaded(true)} // Updates state once loading is complete
           />
-        </>
+        </div>
       )}
-    </Card>
+    </div>
   );
 }
