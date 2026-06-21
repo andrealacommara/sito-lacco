@@ -133,6 +133,7 @@ export default function SubscribeForm({
               </TextField>
               <Button
                 aria-label="Iscriviti"
+                className="rounded-xl"
                 isDisabled={loading}
                 type="submit"
                 variant="danger"
@@ -171,6 +172,7 @@ export default function SubscribeForm({
             <>
               <Button
                 fullWidth
+                className="rounded-xl"
                 isDisabled={loading}
                 type="submit"
                 variant="danger"

@@ -35,7 +35,7 @@ export default function PressKitSongCard({
   const artworkSrc = resolveImageSource(artwork);
 
   return (
-    <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-6 gap-4 mx-auto  w-full max-w-5xl">
+    <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-6 gap-4 mx-auto w-full max-w-4xl rounded-2xl border border-default-100 shadow-lg transition-colors hover:border-default-200">
       <img
         alt={title}
         className="rounded-lg"
@@ -47,7 +47,7 @@ export default function PressKitSongCard({
       />
 
       <div className="flex flex-col grow">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="text-lg font-semibold font-display">{title}</h3>
         <p className="text-default-500 text-sm">
           {year} {description ? `• ${description}` : ""}
         </p>

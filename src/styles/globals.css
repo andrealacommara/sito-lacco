@@ -13,6 +13,11 @@
 @theme {
   --font-display: "Playfair Display", serif;
 
+  /* Breakpoint extra-small per i telefoni stretti (≤383px): permette di
+     rimpicciolire countdown/titoli/bottoni solo sui device più piccoli,
+     lasciando invariati i telefoni "normali" (≥390px) da `xs` in su. */
+  --breakpoint-xs: 24rem;
+
   /* Scala `default` v2 (zinc) — valori LIGHT (override dark più sotto) */
   --color-default-50: #fafafa;
   --color-default-100: #f4f4f5;

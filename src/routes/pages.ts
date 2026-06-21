@@ -18,6 +18,7 @@ export const UnsubscribePage = lazyWithPreload(
 );
 export const AdminPage = lazyWithPreload(() => import("@/pages/adminPage"));
 export const LivePage = lazyWithPreload(() => import("@/pages/livePage"));
+export const EventPage = lazyWithPreload(() => import("@/pages/eventPage"));
 export const ReleasePage = lazyWithPreload(() => import("@/pages/releasePage"));
 export const NotFoundPage = lazyWithPreload(
   () => import("@/pages/notFoundPage"),

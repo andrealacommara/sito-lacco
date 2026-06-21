@@ -42,7 +42,7 @@ export default function PresaveButton({ hyperfollowUrl, releaseDate }: Props) {
     return (
       <Button
         aria-label="Ascoltala su Spotify"
-        className="font-semibold px-8 bg-success text-white hover:bg-success/90"
+        className="rounded-xl font-semibold bg-success text-white hover:bg-success/90 w-full sm:w-auto whitespace-normal sm:whitespace-nowrap text-xs xs:text-sm sm:text-base"
         size="lg"
         variant="primary"
         onPress={() => openCenteredPopup(hyperfollowUrl, hyperfollowUrl)}
@@ -57,7 +57,7 @@ export default function PresaveButton({ hyperfollowUrl, releaseDate }: Props) {
     return (
       <Button
         isDisabled
-        className="font-semibold px-8 bg-success text-white hover:bg-success/90"
+        className="rounded-xl font-semibold bg-success text-white hover:bg-success/90 w-full sm:w-auto whitespace-normal sm:whitespace-nowrap text-xs xs:text-sm sm:text-base"
         size="lg"
         variant="primary"
       >
@@ -70,7 +70,7 @@ export default function PresaveButton({ hyperfollowUrl, releaseDate }: Props) {
   return (
     <Button
       aria-label="Pre-save su Spotify"
-      className="font-semibold px-8 bg-success text-white hover:bg-success/90"
+      className="rounded-xl font-semibold bg-success text-white hover:bg-success/90 w-full sm:w-auto whitespace-normal sm:whitespace-nowrap text-xs xs:text-sm sm:text-base"
       size="lg"
       variant="primary"
       onPress={() => {

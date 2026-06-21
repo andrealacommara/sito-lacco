@@ -5,6 +5,7 @@ import { Card } from "@heroui/react";
 
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
+import ReleaseDateBadge from "@/components/releaseDateBadge";
 import SmartImage, { resolveImageSource } from "@/components/smartImage";
 
 type Props = {
@@ -29,7 +30,7 @@ export default function SongCard({ single }: Props) {
 
       <Link
         aria-label={`Apri la pagina di ${single.title}`}
-        className="relative shrink-0 flex items-center justify-center transition-transform hover:scale-[1.02]"
+        className="relative shrink-0 md:w-[44%] md:max-w-87.5 flex items-center justify-center transition-transform hover:scale-[1.02]"
         to={releasePath}
       >
         <SmartImage
@@ -41,12 +42,12 @@ export default function SongCard({ single }: Props) {
         />
       </Link>
 
-      <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full md:w-xl">
+      <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full md:flex-1 md:min-w-0">
         <div className="space-y-1">
           <span className="text-danger uppercase tracking-[0.2em] text-xs font-bold">
             {single.kind} · {single.year}
           </span>
-          <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+          <h1 className="text-xl xs:text-2xl sm:text-3xl lg:text-5xl font-bold text-white tracking-tight">
             <Link
               className="transition-colors hover:text-danger"
               to={releasePath}
@@ -59,7 +60,13 @@ export default function SongCard({ single }: Props) {
           </p>
         </div>
 
-        <Countdown releaseDate={single.releaseDate} variant="dark" />
+        <ReleaseDateBadge date={single.releaseDate} variant="dark" />
+
+        <Countdown
+          releaseDate={single.releaseDate}
+          scaleAt="lg"
+          variant="dark"
+        />
 
         {single.streamingLinks?.hyperfollow && (
           <PresaveButton

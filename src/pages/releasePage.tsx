@@ -15,6 +15,7 @@ import { resolveImageSource } from "@/components/smartImage";
 import SmartImage from "@/components/smartImage";
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
+import ReleaseDateBadge from "@/components/releaseDateBadge";
 import SongCarousel from "@/components/songCarousel";
 import SubscribeForm from "@/components/subscribeForm";
 import { AppleMusicIcon, Logo, SpotifyIcon } from "@/components/icons";
@@ -157,14 +158,19 @@ function PresaveSection({ release }: SectionProps) {
             <AlbumBadge songSlug={release.slug} />
           </motion.div>
 
-          {/* Countdown */}
+          {/* Data di uscita */}
           <motion.div {...fadeUp(0.2)}>
+            <ReleaseDateBadge date={release.releaseDate} variant="light" />
+          </motion.div>
+
+          {/* Countdown */}
+          <motion.div {...fadeUp(0.25)}>
             <Countdown releaseDate={release.releaseDate} variant="light" />
           </motion.div>
 
           {/* CTA pre-save */}
           {release.streamingLinks?.hyperfollow && (
-            <motion.div {...fadeUp(0.3)}>
+            <motion.div {...fadeUp(0.3)} className="w-full flex justify-center">
               <PresaveButton
                 hyperfollowUrl={release.streamingLinks.hyperfollow}
                 releaseDate={release.releaseDate}
@@ -236,7 +242,7 @@ function LiveSection({ release }: SectionProps) {
               <Button
                 fullWidth
                 aria-label={`Ascolta su Spotify`}
-                className="font-semibold bg-success text-white hover:bg-success/90"
+                className="rounded-xl font-semibold bg-success text-white hover:bg-success/90"
                 size="lg"
                 variant="primary"
                 onPress={() =>
@@ -255,7 +261,7 @@ function LiveSection({ release }: SectionProps) {
               <Button
                 fullWidth
                 aria-label={`Ascolta su Apple Music`}
-                className="font-semibold"
+                className="rounded-xl font-semibold"
                 size="lg"
                 variant="danger"
                 onPress={() =>
@@ -275,7 +281,7 @@ function LiveSection({ release }: SectionProps) {
                 <Button
                   fullWidth
                   aria-label="Ascolta ora"
-                  className="font-semibold bg-success text-white hover:bg-success/90"
+                  className="rounded-xl font-semibold bg-success text-white hover:bg-success/90"
                   size="lg"
                   variant="primary"
                   onPress={() =>
@@ -348,7 +354,7 @@ function AlbumSection({ album }: { album: Album }) {
               <Button
                 fullWidth
                 aria-label="Ascolta su Spotify"
-                className="font-semibold bg-success text-white hover:bg-success/90"
+                className="rounded-xl font-semibold bg-success text-white hover:bg-success/90"
                 size="lg"
                 variant="primary"
                 onPress={() =>
@@ -367,7 +373,7 @@ function AlbumSection({ album }: { album: Album }) {
               <Button
                 fullWidth
                 aria-label="Ascolta su Apple Music"
-                className="font-semibold"
+                className="rounded-xl font-semibold"
                 size="lg"
                 variant="danger"
                 onPress={() =>
@@ -452,14 +458,19 @@ function AlbumPresaveSection({ album }: { album: Album }) {
             </p>
           </motion.div>
 
-          {/* Countdown */}
+          {/* Data di uscita */}
           <motion.div {...fadeUp(0.2)}>
+            <ReleaseDateBadge date={album.releaseDate} variant="light" />
+          </motion.div>
+
+          {/* Countdown */}
+          <motion.div {...fadeUp(0.25)}>
             <Countdown releaseDate={album.releaseDate} variant="light" />
           </motion.div>
 
           {/* CTA pre-save */}
           {album.streamingLinks?.hyperfollow && (
-            <motion.div {...fadeUp(0.3)}>
+            <motion.div {...fadeUp(0.3)} className="w-full flex justify-center">
               <PresaveButton
                 hyperfollowUrl={album.streamingLinks.hyperfollow}
                 releaseDate={album.releaseDate}

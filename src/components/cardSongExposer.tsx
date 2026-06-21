@@ -5,7 +5,6 @@
 import {
   Button,
   Card,
-  Modal,
   ModalBackdrop,
   ModalContainer,
   ModalDialog,
@@ -36,6 +35,25 @@ interface CardSongExposerProps {
   releaseDate: Date; // Release date, used to switch the pre-save CTA once the song is out
   kind: string; // Tipo di release mostrato come tag (es. "Singolo")
   year: number; // Anno di uscita mostrato accanto al tag
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      height={18}
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      width={18}
+    >
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  );
 }
 
 // ========================== COMPONENT: CardSongExposer ========================== //
@@ -135,97 +153,110 @@ export default function CardSongExposer({
       </Card>
 
       {/* Modal displaying song details and Spotify link */}
-      <Modal state={modal}>
-        <ModalBackdrop isDismissable variant="blur">
-          <ModalContainer
-            className="flex items-center justify-center m-0! px-4 sm:px-6 w-full max-w-none"
-            placement="center"
-          >
-            <ModalDialog className="bg-white text-black dark:bg-white! dark:text-black! p-4 rounded-2xl shadow-xl max-w-120 mx-auto">
-              {/* Modal header: tag + titolo del brano */}
-              <ModalHeader className="flex flex-col items-center gap-1.5 pb-1 pt-2">
-                <span className="inline-flex items-center rounded-full bg-danger/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-danger">
-                  {kind} · {year}
-                </span>
-                <ModalHeading className="text-balance text-center font-display text-2xl md:text-3xl font-bold tracking-tight text-black">
-                  {songTitle}
-                </ModalHeading>
-                <span className="h-0.5 w-10 rounded-full bg-danger/30" />
-              </ModalHeader>
+      <ModalBackdrop
+        isDismissable
+        isOpen={modal.isOpen}
+        variant="blur"
+        onOpenChange={modal.setOpen}
+      >
+        <ModalContainer
+          className="flex items-center justify-center m-0! px-4 sm:px-6 w-full max-w-none"
+          placement="center"
+        >
+          <ModalDialog className="relative bg-white text-black dark:bg-white! dark:text-black! p-4 rounded-2xl shadow-xl max-w-120 mx-auto">
+            {/* Chiudi: X in alto a destra */}
+            <button
+              aria-label="Chiudi"
+              className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full text-default-500 transition-colors hover:bg-default-100"
+              type="button"
+              onClick={() => modal.close()}
+            >
+              <CloseIcon />
+            </button>
 
-              {/* Modal body with song description */}
-              <ModalBody>
-                <p className="text-left font-medium whitespace-break-spaces">
-                  {songDescription}
-                </p>
-              </ModalBody>
+            {/* Modal header: tag + titolo del brano */}
+            <ModalHeader className="flex flex-col items-center gap-1.5 pb-1 pt-2">
+              <span className="inline-flex items-center rounded-full bg-danger/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-danger">
+                {kind} · {year}
+              </span>
+              <ModalHeading className="text-balance text-center font-display text-2xl md:text-3xl font-bold tracking-tight text-black">
+                {songTitle}
+              </ModalHeading>
+              <span className="h-0.5 w-10 rounded-full bg-danger/30" />
+            </ModalHeader>
 
-              {/* Modal footer with Spotify button */}
-              <ModalFooter className="flex flex-col">
-                {!preSaveMode && (
-                  <div className="text-center">
-                    <text className="text-neutral-500 text-sm">
-                      Ascolta ora il brano
-                    </text>
-                  </div>
-                )}
-                <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
-                  {preSaveMode ? (
-                    <div className="flex-1 min-w-0 flex justify-center">
-                      <PresaveButton
-                        hyperfollowUrl={hyperfollowUrl ?? ""}
-                        releaseDate={releaseDate}
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      {/* Spotify */}
-                      <div className="flex-1 min-w-0">
-                        <Button
-                          fullWidth
-                          aria-label="Vai al brano su Spotify"
-                          className="min-w-0 bg-success text-white hover:bg-success/90"
-                          variant="primary"
-                          onPress={() =>
-                            window.open(
-                              songSpotifyLink,
-                              "_blank",
-                              "noopener,noreferrer",
-                            )
-                          }
-                        >
-                          <SpotifyIcon />
-                          Spotify
-                        </Button>
-                      </div>
+            {/* Modal body with song description */}
+            <ModalBody>
+              <p className="text-left font-medium whitespace-break-spaces">
+                {songDescription}
+              </p>
+            </ModalBody>
 
-                      {/* Apple Music */}
-                      <div className="flex-1 min-w-0">
-                        <Button
-                          fullWidth
-                          aria-label="Vai al brano su Apple Music"
-                          className="min-w-0"
-                          variant="danger"
-                          onPress={() =>
-                            window.open(
-                              songAppleMusicLink,
-                              "_blank",
-                              "noopener,noreferrer",
-                            )
-                          }
-                        >
-                          <AppleMusicIcon />
-                          Apple Music
-                        </Button>
-                      </div>
-                    </>
-                  )}
+            {/* Modal footer with Spotify button */}
+            <ModalFooter className="flex flex-col">
+              {!preSaveMode && (
+                <div className="text-center">
+                  <p className="text-neutral-500 text-sm">
+                    Ascolta ora il brano
+                  </p>
                 </div>
-              </ModalFooter>
-            </ModalDialog>
-          </ModalContainer>
-        </ModalBackdrop>
-      </Modal>
+              )}
+              <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
+                {preSaveMode ? (
+                  <div className="flex-1 min-w-0 flex justify-center">
+                    <PresaveButton
+                      hyperfollowUrl={hyperfollowUrl ?? ""}
+                      releaseDate={releaseDate}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    {/* Spotify */}
+                    <div className="flex-1 min-w-0">
+                      <Button
+                        fullWidth
+                        aria-label="Vai al brano su Spotify"
+                        className="rounded-xl min-w-0 bg-success text-white hover:bg-success/90"
+                        variant="primary"
+                        onPress={() =>
+                          window.open(
+                            songSpotifyLink,
+                            "_blank",
+                            "noopener,noreferrer",
+                          )
+                        }
+                      >
+                        <SpotifyIcon />
+                        Spotify
+                      </Button>
+                    </div>
+
+                    {/* Apple Music */}
+                    <div className="flex-1 min-w-0">
+                      <Button
+                        fullWidth
+                        aria-label="Vai al brano su Apple Music"
+                        className="rounded-xl min-w-0"
+                        variant="danger"
+                        onPress={() =>
+                          window.open(
+                            songAppleMusicLink,
+                            "_blank",
+                            "noopener,noreferrer",
+                          )
+                        }
+                      >
+                        <AppleMusicIcon />
+                        Apple Music
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </ModalFooter>
+          </ModalDialog>
+        </ModalContainer>
+      </ModalBackdrop>
     </div>
   );
 }

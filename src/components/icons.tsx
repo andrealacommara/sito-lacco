@@ -146,7 +146,7 @@ export const ChevronLeftIcon = ({
     stroke="currentColor"
     strokeLinecap="round"
     strokeLinejoin="round"
-    strokeWidth="1.2"
+    strokeWidth="2"
     viewBox="0 0 24 24"
     width={size || width}
     {...props}
@@ -167,7 +167,7 @@ export const ChevronRightIcon = ({
     stroke="currentColor"
     strokeLinecap="round"
     strokeLinejoin="round"
-    strokeWidth="1.2"
+    strokeWidth="2"
     viewBox="0 0 24 24"
     width={size || width}
     {...props}

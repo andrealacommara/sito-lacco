@@ -34,7 +34,7 @@ export default function NewsletterPage() {
         />
         <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
       </Helmet>
-      <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 mx-auto w-full max-w-5xl px-4">
+      <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 mx-auto w-full max-w-4xl px-4">
         <div className="w-full max-w-md mx-auto text-center">
           <h1 className={title()}>Newsletter</h1>
           <p className="text-default-500 mt-3 mb-8">

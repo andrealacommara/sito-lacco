@@ -28,12 +28,16 @@ import yukuMonoArtwork from "@/assets/images/presskit/yukuMonoArtwork.avif";
 import logoLaccoSVG from "@/assets/images/presskit/logo/logo-lacco.svg";
 import logoLaccoPNG from "@/assets/images/presskit/logo/logo-lacco.png";
 
-type PressKitPhoto = (typeof pressKitPhotos)[number];
+// Shared "refined light card" token aligned with the post-HeroUI-v3 aesthetic
+// (subtle border + shadow + rounded), kept on a light background for readability.
+const cardClass =
+  "rounded-2xl border border-default-100 shadow-lg mx-auto w-full max-w-4xl";
+// Small uppercase red eyebrow label used across the site (see albumCard).
+const eyebrowClass = "text-danger uppercase tracking-[0.2em] text-xs font-bold";
 
 export default function PressKitPage() {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selected, setSelected] = useState<PressKitPhoto | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <DefaultLayout>
@@ -48,8 +52,13 @@ export default function PressKitPage() {
       </section>
       {/* ============================ HERO SECTION ============================ */}
       <section id="presskit-hero">
-        <Card className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 mx-auto  w-full max-w-5xl">
-          <div className="p-4 md:p-4 w-fit md:w-full items-center">
+        <Card
+          className={`flex flex-col md:flex-row items-center md:items-center justify-center md:justify-center p-2 md:p-4 ${cardClass}`}
+        >
+          <div
+            className="p-4 md:p-4 w-fit md:w-full items-center"
+            style={{ animation: "fadeInScale 0.7s ease-out both" }}
+          >
             {/* Visual placeholder while the image is loading */}
             {!isLoaded && (
               <Skeleton className="absolute inset-0 rounded-lg">
@@ -70,15 +79,17 @@ export default function PressKitPage() {
             />
           </div>
 
-          <div className="flex flex-col items-center text-center md:text-left md:items-start p-2 md:p-4">
+          <div
+            className="flex flex-col items-center text-center md:text-left md:items-start gap-3 p-2 md:p-4 font-display"
+            style={{ animation: "fadeInUp 0.6s ease 0.15s both" }}
+          >
+            <span className={eyebrowClass}>Press Kit ufficiale</span>
             <Logo
               aria-label="Logo ufficiale di Lacco"
               className="item-center max-w-full"
               size={250}
             />
             <p className="text-base text-default-500 md:text-lg">
-              <span className="text-danger">Press Kit ufficiale:</span>
-              <br />
               Usa il ritratto e il logotipo per articoli, interviste e materiali
               promozionali.
             </p>
@@ -88,12 +99,15 @@ export default function PressKitPage() {
       {/* ============================ BIO SECTION ============================= */}
       <section className="pt-8" id="presskit-bio">
         <div className="flex flex-col gap-4">
-          <div className="pt-6">
+          <div className="flex flex-row items-center justify-center py-4 md:py-4">
             <h2 className={subtitle()}>Biografia</h2>
           </div>
-          <Card className="p-2 md:p-4 mx-auto  w-full max-w-5xl">
+          <Card
+            className={`p-2 md:p-4 ${cardClass}`}
+            style={{ animation: "fadeInUp 0.6s ease both" }}
+          >
             <div className="p-4">
-              <h3 className="text-xl font-semibold text-danger">Full Bio</h3>
+              <h3 className={`${eyebrowClass} mb-2`}>Full Bio</h3>
               <p className="text-base leading-relaxed">
                 Lacco, nome d’arte di Andrea La Commara (Torino, ’99),
                 costruisce la sua musica intorno alle emozioni umane: le crepe,
@@ -126,9 +140,12 @@ export default function PressKitPage() {
               </p>
             </div>
           </Card>
-          <Card className="p-2 md:p-4 mx-auto  w-full max-w-5xl">
+          <Card
+            className={`p-2 md:p-4 ${cardClass}`}
+            style={{ animation: "fadeInUp 0.6s ease 0.1s both" }}
+          >
             <div className="p-4">
-              <h3 className="text-xl font-semibold text-danger">Short Bio</h3>
+              <h3 className={`${eyebrowClass} mb-2`}>Short Bio</h3>
               <p className="text-base leading-relaxed text-default-600">
                 Lacco (Torino, ’99) racconta ciò che si muove dentro e intorno
                 alle persone attraverso un R&amp;B introspettivo e narrativo.
@@ -148,13 +165,16 @@ export default function PressKitPage() {
       {/* ============================ HIGHLIGHTS ============================== */}
       <section className="pt-8" id="presskit-highlights">
         <div className="flex flex-col gap-4">
-          <div className="pt-6">
+          <div className="flex flex-row items-center justify-center py-4 md:py-4">
             <h2 className={subtitle()}>Highlights</h2>
           </div>
-          <Card className="p-2 md:p-4 mx-auto  w-full max-w-5xl">
+          <Card
+            className={`p-2 md:p-4 ${cardClass}`}
+            style={{ animation: "fadeInUp 0.6s ease both" }}
+          >
             <section className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center p-4">
               <div>
-                <div className="text-4xl font-semibold text-default-700">
+                <div className="text-4xl font-semibold font-display text-default-700">
                   <CountUp
                     duration={1000}
                     end={pressKitStats.monthlyListeners}
@@ -164,14 +184,14 @@ export default function PressKitPage() {
               </div>
 
               <div>
-                <div className="text-4xl font-semibold text-default-700">
+                <div className="text-4xl font-semibold font-display text-default-700">
                   <CountUp duration={1000} end={pressKitStats.totalStreams} />
                 </div>
                 <p className="text-default-500">Stream totali</p>
               </div>
 
               <div>
-                <div className="text-4xl font-semibold text-default-700">
+                <div className="text-4xl font-semibold font-display text-default-700">
                   <CountUp
                     duration={1000}
                     end={pressKitStats.spotifyFollowers}
@@ -181,7 +201,7 @@ export default function PressKitPage() {
               </div>
 
               <div>
-                <div className="text-4xl font-semibold text-default-700">
+                <div className="text-4xl font-semibold font-display text-default-700">
                   <CountUp
                     duration={1000}
                     end={
@@ -231,13 +251,19 @@ export default function PressKitPage() {
       {/* ============================ PROJECT SECTION ============================ */}
       <section className="pt-8" id="presskit-project">
         <div className="flex flex-col gap-4">
-          <div className="pt-6">
+          <div className="flex flex-row items-center justify-center py-4 md:py-4">
             <h2 className={subtitle()}>Il progetto artistico</h2>
           </div>
 
-          <Card className="p-6 mx-auto w-full max-w-5xl">
+          <Card
+            className={`p-6 ${cardClass}`}
+            style={{ animation: "fadeInUp 0.6s ease both" }}
+          >
             <div className="flex flex-col md:flex-row gap-8 pb-4">
-              <div className="flex flex-col items-center">
+              <div
+                className="flex flex-col items-center font-display"
+                style={{ animation: "fadeInScale 0.7s ease-out both" }}
+              >
                 <SmartImage
                   priority
                   alt="nokru mono" // Alt text for accessibility
@@ -251,7 +277,10 @@ export default function PressKitPage() {
                 />
                 <em className="text-danger pt-2">nokoru mono</em>
               </div>
-              <div className="flex flex-col items-center">
+              <div
+                className="flex flex-col items-center font-display"
+                style={{ animation: "fadeInScale 0.7s ease-out 0.1s both" }}
+              >
                 <SmartImage
                   priority
                   alt="yuku mono" // Alt text for accessibility
@@ -358,10 +387,10 @@ export default function PressKitPage() {
 
       {/* ============================ DISCOGRAPHY ============================ */}
       <section className="pt-8" id="presskit-discography">
-        <div className="pt-6 pb-4">
+        <div className="flex flex-row items-center justify-center py-4 md:py-4">
           <h2 className={subtitle()}>Discografia</h2>
         </div>
-        <div className="flex flex-col gap-4 w-full max-w-5xl mx-auto">
+        <div className="flex flex-col gap-4 w-full max-w-4xl mx-auto">
           {singles
             .filter((song) => song.presaveMode === false)
             .map((song) => (
@@ -381,11 +410,14 @@ export default function PressKitPage() {
       {/* ============================ PHOTOS ============================ */}
       <section className="pt-8" id="presskit-photos">
         <div className="flex flex-col gap-4">
-          <div className="pt-6">
+          <div className="flex flex-row items-center justify-center py-4 md:py-4">
             <h2 className={subtitle()}>Book fotografico</h2>
           </div>
 
-          <Card className="p-2 md:p-4 mx-auto w-full max-w-5xl">
+          <Card
+            className={`p-2 md:p-4 ${cardClass}`}
+            style={{ animation: "fadeInUp 0.6s ease both" }}
+          >
             <p className="text-default-500 text-sm text-center pt-4">
               Foto ufficiali utilizzabili per articoli, playlist editoriali,
               social e materiale promozionale.
@@ -397,10 +429,7 @@ export default function PressKitPage() {
                 <button
                   key={i}
                   className="block overflow-hidden rounded-lg"
-                  onClick={() => {
-                    setSelected(photo);
-                    setModalOpen(true);
-                  }}
+                  onClick={() => setOpenIndex(i)}
                 >
                   <SmartImage
                     alt={photo.alt}
@@ -414,23 +443,26 @@ export default function PressKitPage() {
             </div>
 
             {/* DOWNLOAD ZIP */}
-            <div className="flex justify-center p-4">
+            <div className="flex flex-col items-center p-4">
               <a download href="/presskit-files/HQ/photos.zip">
-                <Button className="px-6" variant="danger">
-                  Scarica tutte le foto e gli artwork (.zip)
+                <Button className="rounded-xl px-6 " variant="danger">
+                  Scarica tutto
                 </Button>
               </a>
+              <p className="text-default-500 text-xs text-center pt-4">
+                Download di tutte le foto e gli artwork in formato .zip
+              </p>
             </div>
           </Card>
 
           {/* MODAL */}
-          {selected && (
+          {openIndex !== null && (
             <PressKitPhotoModal
-              alt={selected.alt}
-              downloadUrl={selected.srcHQ}
-              isOpen={modalOpen}
-              src={selected.srcHQ}
-              onClose={() => setModalOpen(false)}
+              isOpen
+              alt={pressKitPhotos[openIndex].alt}
+              downloadUrl={pressKitPhotos[openIndex].downloadUrl}
+              src={pressKitPhotos[openIndex].src}
+              onClose={() => setOpenIndex(null)}
             />
           )}
         </div>
@@ -439,11 +471,14 @@ export default function PressKitPage() {
       {/* ============================ LOGO ============================ */}
       <section className="pt-8" id="presskit-logo">
         <div className="flex flex-col gap-4">
-          <div className="pt-6">
+          <div className="flex flex-row items-center justify-center py-4 md:py-4">
             <h2 className={subtitle()}>Logo ufficiale</h2>
           </div>
 
-          <Card className="p-6 mx-auto w-full max-w-5xl flex flex-col items-center gap-6">
+          <Card
+            className={`p-6 flex flex-col items-center gap-6 ${cardClass}`}
+            style={{ animation: "fadeInUp 0.6s ease both" }}
+          >
             <p className="text-default-600 text-base text-center">
               Download del logotipo ufficiale di Lacco in formato vettoriale e
               PNG per utilizzi editoriali, grafici e promozionali.
@@ -455,23 +490,26 @@ export default function PressKitPage() {
             </div>
 
             {/* DOWNLOAD BUTTONS */}
-            <div className="flex flex-wrap gap-4 justify-center">
-              <a download href={logoLaccoSVG}>
-                <Button className="px-6" variant="danger">
-                  Scarica SVG
-                </Button>
-              </a>
-              <a download href={logoLaccoPNG}>
-                <Button className="px-6" variant="danger">
-                  Scarica PNG
-                </Button>
-              </a>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-default-500 text-xs text-center">Download</p>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <a download href={logoLaccoSVG}>
+                  <Button className="rounded-xl px-6" variant="danger">
+                    SVG
+                  </Button>
+                </a>
+                <a download href={logoLaccoPNG}>
+                  <Button className="rounded-xl px-6" variant="danger">
+                    PNG
+                  </Button>
+                </a>
+              </div>
+              <p className="text-default-500 text-xs text-center">
+                &quot;Lacco&quot; è un marchio registrato.
+                <br />
+                Tutti i diritti sono riservati.
+              </p>
             </div>
-            <p className="text-default-500 text-xs text-center pt-4">
-              &quot;Lacco&quot; è un marchio registrato.
-              <br />
-              Tutti i diritti sono riservati.
-            </p>
           </Card>
         </div>
       </section>
@@ -479,21 +517,22 @@ export default function PressKitPage() {
       {/* ============================ CONTACTS =============================== */}
       <section className="pt-8" id="presskit-contacts">
         <div className="flex flex-col gap-4">
-          <div className="pt-6">
+          <div className="flex flex-row items-center justify-center py-4 md:py-4">
             <h2 className={subtitle()}>Contatti</h2>
           </div>
 
-          <Card className="p-6 mx-auto w-full max-w-5xl">
+          <Card
+            className={`p-6 ${cardClass}`}
+            style={{ animation: "fadeInUp 0.6s ease both" }}
+          >
             <div className="flex flex-col gap-8">
               {/* MANAGEMENT */}
               <div>
-                <h3 className="text-lg font-semibold text-danger mb-3">
-                  Management
-                </h3>
-                <p className="text-default-600 text-base">
+                <h3 className={`${eyebrowClass} mb-3`}>Management</h3>
+                <p className="text-default-600 text-base flex flex-wrap gap-1">
                   Per richieste stampa, interviste, booking e collaborazioni:
                   <a
-                    className="text-base font-medium text-default-800 hover:text-danger transition-colors ml-2"
+                    className="text-base font-medium text-default-800 hover:text-danger transition-colors"
                     href="mailto:management@lacco.it"
                   >
                     management@lacco.it
@@ -503,11 +542,11 @@ export default function PressKitPage() {
 
               {/* SOCIAL LINKS */}
               <div>
-                <h3 className="text-lg font-semibold text-danger mb-3">
-                  Social & Streaming
+                <h3 className={`${eyebrowClass} mb-3`}>
+                  Social &amp; Streaming
                 </h3>
 
-                <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-5xl gap-4">
+                <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-4xl gap-4">
                   <button
                     className="w-full md:flex-1"
                     onClick={() =>
@@ -563,9 +602,9 @@ export default function PressKitPage() {
                       )
                     }
                   >
-                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white text-nowrap">
                       <AppleMusicIcon />
-                      Music
+                      Apple Music
                     </Card>
                   </button>
                   <button

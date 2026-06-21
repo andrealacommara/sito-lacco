@@ -34,7 +34,7 @@ export default function PrivacyPage() {
         <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
       </Helmet>
 
-      <div className="flex flex-col items-center py-8 md:py-10 mx-auto w-full max-w-5xl px-4">
+      <div className="flex flex-col items-center py-8 md:py-10 mx-auto w-full max-w-4xl px-4">
         <div className="w-full max-w-2xl">
           <h1 className={`${title()} text-center block mb-10`}>
             Privacy Policy

@@ -2,7 +2,7 @@
 // Responsive navigation bar built with plain markup + Tailwind.
 // HeroUI v3 has no Navbar component, so it's hand-rolled here.
 
-import { useState } from "react"; // Local state for the mobile menu
+import { useEffect, useState } from "react"; // Local state for the mobile menu
 import { Link, useLocation } from "react-router-dom"; // Client-side routing + active route
 import clsx from "clsx"; // Conditional class names
 
@@ -18,12 +18,35 @@ export const Navbar = () => {
   const pathname = useLocation().pathname; // Track active route directly from router
   const [menuOpen, setMenuOpen] = useState(false); // Mobile menu visibility
 
+  // Blocca lo scroll della pagina mentre il menu mobile è aperto
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    // Lo scroll container è <html> (:root ha overflow-y: auto), non <body>
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+
+    root.style.overflow = "hidden";
+
+    return () => {
+      root.style.overflow = previous;
+    };
+  }, [menuOpen]);
+
   return (
     <>
-      <nav className="relative z-40 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70">
+      <nav
+        className={clsx(
+          "relative z-50",
+          // Quando il menu è aperto la navbar diventa trasparente: il blur è
+          // fornito dall'overlay del menu (una sola superficie => nessun seam)
+          !menuOpen &&
+            "bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70",
+        )}
+      >
         <div className="flex items-center px-6 h-16 w-full">
           {/* ================= BRAND / LOGO ================= */}
-          <div className="flex items-center justify-start">
+          <div className="flex flex-1 items-center justify-start">
             <Link
               className="flex items-center text-foreground transition-colors duration-300 hover:text-danger"
               title="Home"
@@ -35,7 +58,7 @@ export const Navbar = () => {
 
           {/* ================= MENU DESKTOP ================= */}
           <div className="hidden md:flex justify-center flex-1">
-            <ul className="hidden md:flex gap-4 justify-center ml-2">
+            <ul className="hidden md:flex flex-nowrap gap-4 justify-center">
               {siteConfig.navItems.map((item) => {
                 const prefetch = () => preloadRoute(item.href);
                 const active = pathname === item.href;
@@ -44,7 +67,7 @@ export const Navbar = () => {
                   <li key={item.href}>
                     <Link
                       className={clsx(
-                        "text-lg transition-colors duration-300 hover:text-danger",
+                        "whitespace-nowrap text-lg transition-colors duration-300 hover:text-danger",
                         active ? "text-danger font-medium" : "text-foreground",
                       )}
                       to={item.href}
@@ -61,7 +84,7 @@ export const Navbar = () => {
           </div>
 
           {/* ================= ACTIONS / THEME SWITCH (DESKTOP) ================= */}
-          <div className="hidden md:flex justify-end gap-2">
+          <div className="hidden md:flex flex-1 justify-end gap-2">
             <ThemeSwitch />
           </div>
 
@@ -101,8 +124,8 @@ export const Navbar = () => {
       {/* MOBILE MENU: sibling del <nav> per uscire dallo stacking context
           creato da backdrop-blur (altrimenti finirebbe dietro il contenuto) */}
       {menuOpen && (
-        <div className="md:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-background">
-          <ul className="flex flex-col items-center justify-center min-h-[80vh] gap-4 p-6">
+        <div className="md:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70">
+          <ul className="flex flex-col items-center justify-center min-h-screen gap-4 p-6 pt-16">
             {siteConfig.navMenuItems.map((item) => {
               const prefetch = () => preloadRoute(item.href);
               const active = pathname === item.href;
