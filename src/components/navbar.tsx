@@ -40,7 +40,8 @@ export const Navbar = () => {
           "relative z-50",
           // Quando il menu è aperto la navbar diventa trasparente: il blur è
           // fornito dall'overlay del menu (una sola superficie => nessun seam)
-          !menuOpen && "bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70",
+          !menuOpen &&
+            "bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70",
         )}
       >
         <div className="flex items-center px-6 h-16 w-full">

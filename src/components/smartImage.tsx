@@ -156,8 +156,50 @@ export default function SmartImage({
 
     if (!img || !resolvedSrc) return;
 
-    const handleLoad = () => onLoad?.();
-    const handleError = () => onError?.();
+    let cancelled = false;
+    const handleLoad = () => {
+      if (!cancelled) onLoad?.();
+    };
+    const handleError = () => {
+      if (!cancelled) onError?.();
+    };
+
+    const attachEvents = () => {
+      img.addEventListener("load", handleLoad);
+      img.addEventListener("error", handleError);
+    };
+    const detachEvents = () => {
+      img.removeEventListener("load", handleLoad);
+      img.removeEventListener("error", handleError);
+    };
+
+    // For priority (eager) images, wait for `decode()` so onLoad fires only
+    // once the image is fully decoded and ready to paint — this avoids the
+    // partial-paint "vertical bands" seen while sliding the gallery before an
+    // image has finished decoding. We gate on `priority` because decode()
+    // would force lazy/off-screen images to download eagerly.
+    if (priority && typeof img.decode === "function") {
+      img
+        .decode()
+        .then(handleLoad)
+        .catch(() => {
+          // decode() rejects if the src changes mid-flight (cancelled) or on a
+          // genuine error — fall back to native events to settle the state.
+          if (cancelled) return;
+
+          if (img.complete) {
+            if (img.naturalWidth > 0) handleLoad();
+            else handleError();
+          } else {
+            attachEvents();
+          }
+        });
+
+      return () => {
+        cancelled = true;
+        detachEvents();
+      };
+    }
 
     // The image may already be complete (browser cache, very fast load).
     if (img.complete) {
@@ -167,14 +209,13 @@ export default function SmartImage({
       return;
     }
 
-    img.addEventListener("load", handleLoad);
-    img.addEventListener("error", handleError);
+    attachEvents();
 
     return () => {
-      img.removeEventListener("load", handleLoad);
-      img.removeEventListener("error", handleError);
+      cancelled = true;
+      detachEvents();
     };
-  }, [resolvedSrc, onLoad, onError]);
+  }, [resolvedSrc, onLoad, onError, priority]);
 
   // ── Preload for above-the-fold images ──────────────────────────────
   useEffect(() => {

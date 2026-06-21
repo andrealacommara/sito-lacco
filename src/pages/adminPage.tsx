@@ -672,7 +672,7 @@ export default function AdminPage() {
             Esci
           </Button>
         </div>
-        <div className="p-6 max-w-3xl mx-auto flex flex-col gap-6">
+        <div className="py-6 max-w-3xl mx-auto flex flex-col gap-6">
           {/* Tab bar */}
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
             <Button
@@ -784,7 +784,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between gap-2">
                 <AdminSelect
                   aria-label="Filtra per stato"
-                  className="w-40"
+                  className="w-auto min-w-32 sm:w-40"
                   options={[
                     { key: "all", label: "Tutti" },
                     { key: "confirmed", label: "Confermati" },
@@ -940,7 +940,7 @@ export default function AdminPage() {
                     )}
                   </button>
                   <button
-                    className="rounded-xlhidden sm:flex items-center gap-1 w-24 shrink-0 hover:text-default-600"
+                    className="rounded-xl hidden sm:flex items-center gap-1 w-24 shrink-0 hover:text-default-600"
                     type="button"
                     onClick={() => handleSort("source")}
                   >
@@ -1062,7 +1062,7 @@ export default function AdminPage() {
                   </Button>
                   <AdminSelect
                     aria-label="Contatti per pagina"
-                    className="w-20 ml-1"
+                    className="w-16 sm:w-20 ml-1"
                     options={PAGE_SIZE_OPTIONS.map((n) => ({
                       key: String(n),
                       label: String(n),
@@ -1089,7 +1089,7 @@ export default function AdminPage() {
                 >
                   <div className="flex gap-3 flex-wrap w-full">
                     <TextField
-                      className="flex-1 min-w-48 flex flex-col gap-1.5"
+                      className="flex-1 min-w-0 sm:min-w-48 flex flex-col gap-1.5"
                       type="email"
                       value={addEmail}
                       onChange={setAddEmail}
@@ -1098,7 +1098,7 @@ export default function AdminPage() {
                       <Input placeholder="nome@email.com" />
                     </TextField>
                     <TextField
-                      className="flex-1 min-w-32 flex flex-col gap-1.5"
+                      className="flex-1 min-w-0 sm:min-w-32 flex flex-col gap-1.5"
                       type="text"
                       value={addFirstName}
                       onChange={setAddFirstName}
@@ -1243,7 +1243,7 @@ export default function AdminPage() {
                     </div>
                     <div className="flex gap-3 flex-wrap">
                       <TextField
-                        className="flex-1 min-w-40 flex flex-col gap-1.5"
+                        className="flex-1 min-w-0 sm:min-w-40 flex flex-col gap-1.5"
                         value={ctaText}
                         onChange={setCtaText}
                       >
@@ -1254,7 +1254,7 @@ export default function AdminPage() {
                         </Description>
                       </TextField>
                       <TextField
-                        className="flex-1 min-w-48 flex flex-col gap-1.5"
+                        className="flex-1 min-w-0 sm:min-w-48 flex flex-col gap-1.5"
                         type="text"
                         value={ctaUrl}
                         onChange={setCtaUrl}
@@ -1271,9 +1271,8 @@ export default function AdminPage() {
                       Anteprima email
                     </p>
                     <iframe
-                      className="w-full rounded-lg border border-default-200"
+                      className="w-full h-90 sm:h-130 rounded-lg border border-default-200"
                       srcDoc={buildBroadcastHtml(true, siteDark)}
-                      style={{ height: 520 }}
                       title="Anteprima email"
                     />
                   </div>

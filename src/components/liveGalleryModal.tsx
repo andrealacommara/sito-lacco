@@ -1,17 +1,15 @@
 import type { LiveEventPhoto } from "@/config/liveEvents";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Modal,
   ModalBackdrop,
   ModalContainer,
   ModalDialog,
   ModalBody,
-  useOverlayState,
 } from "@heroui/react";
 
-import SmartImage from "@/components/smartImage";
+import SmartImage, { resolveImageSource } from "@/components/smartImage";
 
 function ChevronIcon({ dir }: { dir: "left" | "right" }) {
   return (
@@ -91,7 +89,7 @@ function Slide({ photo }: { photo: LiveEventPhoto }) {
         sizes="100vw"
         src={photo.src}
         style={{
-          maxHeight: "82vh",
+          maxHeight: "100%",
           maxWidth: "100%",
           width: "auto",
           height: "auto",
@@ -107,7 +105,7 @@ function Slide({ photo }: { photo: LiveEventPhoto }) {
 }
 
 const arrowBtn =
-  "hidden sm:flex absolute top-1/2 -translate-y-1/2 z-10 h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md transition-colors hover:bg-black/70";
+  "hidden sm:flex absolute top-1/2 -translate-y-1/2 z-10 h-12 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/15 backdrop-blur-md transition hover:bg-white/20 hover:scale-105 active:scale-95";
 
 const variants = {
   enter: (dir: number) => ({ x: dir > 0 ? "100%" : "-100%", opacity: 0 }),
@@ -135,14 +133,8 @@ export default function LiveGalleryModal({
   isOpen,
   onClose,
 }: LiveGalleryModalProps) {
-  const modal = useOverlayState({
-    isOpen,
-    onOpenChange: (open) => {
-      if (!open) onClose();
-    },
-  });
-
   const count = photos.length;
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   // `page` può eccedere [0,count): l'indice reale è il modulo. `direction`
   // serve alle animazioni di entrata/uscita.
@@ -172,6 +164,66 @@ export default function LiveGalleryModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, count]);
 
+  // Pre-carica e pre-decodifica le foto adiacenti (successiva/precedente), così
+  // quando ci si arriva scorrendo sono già pronte e non si vede il render
+  // parziale ("bande verticali") durante l'animazione di slide.
+  useEffect(() => {
+    if (!isOpen || count < 2) return;
+
+    const neighbors = [
+      photos[(index + 1) % count],
+      photos[(index - 1 + count) % count],
+    ];
+
+    for (const p of neighbors) {
+      if (!p) continue;
+      const im = new Image();
+
+      im.src = resolveImageSource(p.src);
+      im.decode?.().catch(() => {});
+    }
+  }, [isOpen, index, count, photos]);
+
+  // Scroll orizzontale (trackpad o shift+rotella) per cambiare foto, oltre allo
+  // swipe touch. Un gesto = una foto: blocco fino a quando lo scroll si ferma
+  // (~150ms senza eventi) per non saltare più foto con l'inerzia del trackpad.
+  useEffect(() => {
+    if (!isOpen || count < 2) return;
+
+    const el = viewportRef.current;
+
+    if (!el) return;
+
+    let locked = false;
+    let endTimer: number | undefined;
+
+    const onWheel = (e: WheelEvent) => {
+      // Solo intento orizzontale: ignora lo scroll prevalentemente verticale.
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+
+      e.preventDefault();
+
+      window.clearTimeout(endTimer);
+      endTimer = window.setTimeout(() => {
+        locked = false;
+      }, 150);
+
+      if (locked || Math.abs(e.deltaX) < 20) return;
+
+      locked = true;
+      const dir = e.deltaX > 0 ? 1 : -1;
+
+      setPage(([p]) => [p + dir, dir]);
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      window.clearTimeout(endTimer);
+    };
+  }, [isOpen, count]);
+
   const photo = photos[index];
 
   if (!photo) return null;
@@ -179,69 +231,74 @@ export default function LiveGalleryModal({
   const paginate = (dir: number) => setPage(([p]) => [p + dir, dir]);
 
   return (
-    <Modal state={modal}>
-      <ModalBackdrop isDismissable variant="blur">
-        <ModalContainer
-          className="flex items-center justify-center w-full max-w-none px-4"
-          placement="center"
+    <ModalBackdrop
+      isDismissable
+      isOpen={isOpen}
+      variant="blur"
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <ModalContainer
+        className="flex items-center justify-center w-full max-w-none px-4"
+        placement="center"
+      >
+        <ModalDialog
+          aria-label={`Foto ${index + 1} di ${count}`}
+          className="bg-transparent shadow-none w-auto max-w-none p-0"
         >
-          <ModalDialog
-            aria-label={`Foto ${index + 1} di ${count}`}
-            className="bg-transparent shadow-none w-auto max-w-none p-0"
-          >
-            <ModalBody className="overflow-hidden p-0">
+          <ModalBody className="overflow-hidden p-0">
+            <div
+              className="relative mx-auto flex flex-col"
+              style={{ width: "min(100vw - 2rem, 56rem)", height: "90vh" }}
+            >
+              {/* Viewport dello slider */}
               <div
-                className="relative"
-                style={{ width: "min(100vw - 2rem, 1000px)" }}
+                ref={viewportRef}
+                className="relative w-full flex-1 min-h-0 overflow-hidden"
               >
-                {/* Viewport dello slider */}
-                <div
-                  className="relative w-full overflow-hidden"
-                  style={{ height: "82vh" }}
-                >
-                  <AnimatePresence custom={direction} initial={false}>
-                    <motion.div
-                      key={page}
-                      animate="center"
-                      className="absolute inset-0 flex items-center justify-center"
-                      custom={direction}
-                      drag={count > 1 ? "x" : false}
-                      dragConstraints={{ left: 0, right: 0 }}
-                      dragElastic={0.9}
-                      exit="exit"
-                      initial="enter"
-                      transition={{
-                        x: { type: "spring", stiffness: 300, damping: 30 },
-                        opacity: { duration: 0.2 },
-                      }}
-                      variants={variants}
-                      onDragEnd={(_, { offset, velocity }) => {
-                        const power = swipePower(offset.x, velocity.x);
+                <AnimatePresence custom={direction} initial={false}>
+                  <motion.div
+                    key={page}
+                    animate="center"
+                    className="absolute inset-0 flex items-center justify-center"
+                    custom={direction}
+                    drag={count > 1 ? "x" : false}
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.9}
+                    exit="exit"
+                    initial="enter"
+                    transition={{
+                      x: { type: "spring", stiffness: 300, damping: 30 },
+                      opacity: { duration: 0.2 },
+                    }}
+                    variants={variants}
+                    onDragEnd={(_, { offset, velocity }) => {
+                      const power = swipePower(offset.x, velocity.x);
 
-                        if (power < -SWIPE_THRESHOLD) paginate(1);
-                        else if (power > SWIPE_THRESHOLD) paginate(-1);
-                      }}
-                    >
-                      <Slide photo={photo} />
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
+                      if (power < -SWIPE_THRESHOLD) paginate(1);
+                      else if (power > SWIPE_THRESHOLD) paginate(-1);
+                    }}
+                  >
+                    <Slide photo={photo} />
+                  </motion.div>
+                </AnimatePresence>
 
-                {/* Chiudi */}
+                {/* Chiudi: X in alto a destra sulla foto */}
                 <button
                   aria-label="Chiudi"
-                  className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md transition-colors hover:bg-black/70"
+                  className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/15 backdrop-blur-md transition hover:bg-white/20 hover:scale-105 active:scale-95"
                   type="button"
                   onClick={onClose}
                 >
                   <CloseIcon />
                 </button>
 
-                {/* Download (foto corrente) */}
+                {/* Download: stesso stile della X, in alto a sinistra */}
                 <a
                   download
                   aria-label="Scarica la foto"
-                  className="absolute left-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md transition-colors hover:bg-black/70"
+                  className="absolute left-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/15 backdrop-blur-md transition hover:bg-white/20 hover:scale-105 active:scale-95"
                   href={photo.downloadUrl}
                 >
                   <DownloadIcon />
@@ -265,16 +322,16 @@ export default function LiveGalleryModal({
                     >
                       <ChevronIcon dir="right" />
                     </button>
-                    <span className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/55 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
+                    <span className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white ring-1 ring-white/15 backdrop-blur-md">
                       {index + 1} / {count}
                     </span>
                   </>
                 )}
               </div>
-            </ModalBody>
-          </ModalDialog>
-        </ModalContainer>
-      </ModalBackdrop>
-    </Modal>
+            </div>
+          </ModalBody>
+        </ModalDialog>
+      </ModalContainer>
+    </ModalBackdrop>
   );
 }

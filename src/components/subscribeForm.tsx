@@ -133,10 +133,10 @@ export default function SubscribeForm({
               </TextField>
               <Button
                 aria-label="Iscriviti"
+                className="rounded-xl"
                 isDisabled={loading}
                 type="submit"
                 variant="danger"
-                className="rounded-xl"
               >
                 {loading ? <Spinner size="sm" /> : "Iscriviti"}
               </Button>
@@ -172,10 +172,10 @@ export default function SubscribeForm({
             <>
               <Button
                 fullWidth
+                className="rounded-xl"
                 isDisabled={loading}
                 type="submit"
                 variant="danger"
-                className="rounded-xl"
               >
                 {loading ? <Spinner size="sm" /> : "Avvisami"}
               </Button>

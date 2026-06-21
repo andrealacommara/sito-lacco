@@ -4,7 +4,6 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import { useRef, useCallback, useState, useEffect } from "react";
 import {
-  Modal,
   ModalBackdrop,
   ModalContainer,
   ModalDialog,
@@ -16,7 +15,6 @@ import {
   TextField,
   Label,
   Input,
-  useOverlayState,
 } from "@heroui/react";
 
 type Props = {
@@ -76,6 +74,10 @@ export default function RichTextEditor({
         codeBlock: false,
         code: false,
         horizontalRule: false,
+        // StarterKit ora include link/underline: li disabilitiamo qui per
+        // configurarli esplicitamente sotto (evita "Duplicate extension names").
+        link: false,
+        underline: false,
       }),
       Underline,
       Link.configure({ openOnClick: false }),
@@ -106,13 +108,6 @@ export default function RichTextEditor({
 
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
-
-  // Controlled overlay state mirroring `linkModalOpen` so dismissing the modal
-  // (backdrop/Esc) keeps the local boolean in sync.
-  const linkModal = useOverlayState({
-    isOpen: linkModalOpen,
-    onOpenChange: setLinkModalOpen,
-  });
 
   const openLinkModal = useCallback(() => {
     if (!editor) return;
@@ -220,54 +215,56 @@ export default function RichTextEditor({
         </div>
       </div>
 
-      <Modal state={linkModal}>
-        <ModalBackdrop isDismissable>
-          <ModalContainer placement="center" size="sm">
-            <ModalDialog>
-              <ModalHeader>
-                <ModalHeading className="text-base font-semibold">
-                  {editor.isActive("link") ? "Modifica link" : "Inserisci link"}
-                </ModalHeading>
-              </ModalHeader>
-              <ModalBody>
-                <TextField
-                  className="flex flex-col gap-1.5"
-                  type="url"
-                  value={linkUrl}
-                  onChange={setLinkUrl}
+      <ModalBackdrop
+        isDismissable
+        isOpen={linkModalOpen}
+        onOpenChange={setLinkModalOpen}
+      >
+        <ModalContainer placement="center" size="sm">
+          <ModalDialog>
+            <ModalHeader>
+              <ModalHeading className="text-base font-semibold">
+                {editor.isActive("link") ? "Modifica link" : "Inserisci link"}
+              </ModalHeading>
+            </ModalHeader>
+            <ModalBody>
+              <TextField
+                className="flex flex-col gap-1.5"
+                type="url"
+                value={linkUrl}
+                onChange={setLinkUrl}
+              >
+                <Label>URL</Label>
+                <Input
+                  placeholder="https://…"
+                  onKeyDown={(e) => e.key === "Enter" && confirmLink()}
+                />
+              </TextField>
+            </ModalBody>
+            <ModalFooter className="flex justify-between">
+              {editor.isActive("link") ? (
+                <Button size="sm" variant="danger" onPress={removeLink}>
+                  Rimuovi link
+                </Button>
+              ) : (
+                <div />
+              )}
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => setLinkModalOpen(false)}
                 >
-                  <Label>URL</Label>
-                  <Input
-                    placeholder="https://…"
-                    onKeyDown={(e) => e.key === "Enter" && confirmLink()}
-                  />
-                </TextField>
-              </ModalBody>
-              <ModalFooter className="flex justify-between">
-                {editor.isActive("link") ? (
-                  <Button size="sm" variant="danger" onPress={removeLink}>
-                    Rimuovi link
-                  </Button>
-                ) : (
-                  <div />
-                )}
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onPress={() => setLinkModalOpen(false)}
-                  >
-                    Annulla
-                  </Button>
-                  <Button size="sm" variant="primary" onPress={confirmLink}>
-                    Conferma
-                  </Button>
-                </div>
-              </ModalFooter>
-            </ModalDialog>
-          </ModalContainer>
-        </ModalBackdrop>
-      </Modal>
+                  Annulla
+                </Button>
+                <Button size="sm" variant="primary" onPress={confirmLink}>
+                  Conferma
+                </Button>
+              </div>
+            </ModalFooter>
+          </ModalDialog>
+        </ModalContainer>
+      </ModalBackdrop>
     </>
   );
 }

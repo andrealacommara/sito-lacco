@@ -3,7 +3,7 @@
 import fs from "fs";
 import path from "path";
 
-import { defineConfig } from "vite";
+import { defineConfig, type Rolldown } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import svgr from "vite-plugin-svgr";
@@ -137,7 +137,7 @@ export default defineConfig(async () => {
           // Add hash only to JS and CSS — keep images and OG assets with fixed names
           entryFileNames: `assets/[name]-[hash].js`,
           chunkFileNames: `assets/[name]-[hash].js`,
-          assetFileNames: (assetInfo) => {
+          assetFileNames: (assetInfo: Rolldown.PreRenderedAsset) => {
             const fileName = assetInfo.names[0] ?? "";
 
             // Files that must NOT be hashed

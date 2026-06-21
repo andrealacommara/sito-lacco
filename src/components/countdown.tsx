@@ -90,11 +90,7 @@ export default function Countdown({
   ];
 
   return (
-    <div
-      aria-live="off"
-      className={`flex items-center ${s.gap}`}
-      role="timer"
-    >
+    <div aria-live="off" className={`flex items-center ${s.gap}`} role="timer">
       {units.map((unit, i) => (
         <div key={unit.label} className={`flex items-center ${s.gap}`}>
           <div className={`flex flex-col items-center ${s.unit}`}>
