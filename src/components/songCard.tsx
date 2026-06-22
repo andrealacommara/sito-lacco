@@ -42,7 +42,7 @@ export default function SongCard({ single }: Props) {
         />
       </Link>
 
-      <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full md:flex-1 md:min-w-0">
+      <div className="relative flex flex-col items-center gap-4 text-center rounded-2xl border border-white/10 bg-black/55 p-4 md:p-6 backdrop-blur-md w-full md:flex-1 md:min-w-0">
         <div className="space-y-1">
           <span className="text-danger uppercase tracking-[0.2em] text-xs font-bold">
             {single.kind} · {single.year}

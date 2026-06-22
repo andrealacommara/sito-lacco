@@ -71,7 +71,7 @@ export default function AlbumCard({ album }: Props) {
           <Button
             fullWidth
             aria-label={`Scopri la tracklist di ${album.title}`}
-            className="rounded-xl font-semibold tracking-wide text-white border border-white/10 bg-black/35 backdrop-blur-md shadow-lg shadow-black/30 transition-all duration-300 hover:bg-primary/25 hover:border-primary/50 hover:shadow-xl [&>svg]:text-primary"
+            className="rounded-xl font-semibold tracking-wide text-white border border-white/10 bg-black/55 backdrop-blur-md shadow-lg shadow-black/30 transition-all duration-300 hover:bg-primary/25 hover:border-primary/50 hover:shadow-xl [&>svg]:text-primary"
             size="lg"
             variant="ghost"
             onPress={() => navigate(albumPath)}
@@ -83,7 +83,7 @@ export default function AlbumCard({ album }: Props) {
       </div>
 
       <div
-        className={`relative flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 backdrop-blur-md w-full flex-1 min-w-0${album.presaveMode ? " items-center text-center" : ""}`}
+        className={`relative flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/55 p-4 md:p-6 backdrop-blur-md w-full flex-1 min-w-0${album.presaveMode ? " items-center text-center" : ""}`}
       >
         <div
           className={`space-y-1${album.presaveMode ? " text-center" : " text-center md:text-left"}`}

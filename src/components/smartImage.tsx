@@ -1,5 +1,10 @@
 // ========================== MAIN IMPORTS ========================== //
-import { useEffect, useRef, type CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  type CSSProperties,
+  type ReactElement,
+} from "react";
 
 // ===================== SMART IMAGE COMPONENT ====================== //
 export type ImageLikeImport =
@@ -118,6 +123,65 @@ export function resolveImageSource(src: ImageLikeImport): string {
 }
 
 /**
+ * Per-format URL resolver per il `<picture>`.
+ *
+ * A differenza di resolveImageSource (che sceglie UN url via canvas, detection
+ * inaffidabile su mobile e in prerender → spesso ripiega su webp/jpeg anche dove
+ * l'AVIF è supportato), qui restituiamo TUTTI i formati disponibili e lasciamo
+ * scegliere al browser tramite `<source type>` sul decode reale. `jpeg` è sempre
+ * valorizzato: è l'`<img>` di fallback universale.
+ */
+export type ResolvedSources = {
+  avif?: string;
+  webp?: string;
+  jpeg: string;
+};
+
+export function resolveImageSources(src: ImageLikeImport): ResolvedSources {
+  if (typeof src === "string") return { jpeg: src };
+
+  if (Array.isArray(src)) {
+    const avif = src.find((entry) => /\.avif($|\?)/i.test(entry));
+    const webp = src.find((entry) => /\.webp($|\?)/i.test(entry));
+    const jpeg = src.find((entry) => /\.(jpe?g)($|\?)/i.test(entry));
+
+    return { avif, webp, jpeg: jpeg ?? webp ?? avif ?? src[0] ?? "" };
+  }
+
+  const explicitSrc = typeof src.src === "string" ? src.src : undefined;
+  const imgSrc =
+    src.img &&
+    typeof src.img === "object" &&
+    typeof (src.img as { src?: unknown }).src === "string"
+      ? (src.img as { src?: string }).src
+      : undefined;
+
+  const sources =
+    src.sources && typeof src.sources === "object"
+      ? (src.sources as Record<string, string>)
+      : undefined;
+
+  const directAvif = typeof src.avif === "string" ? src.avif : undefined;
+  const directWebp = typeof src.webp === "string" ? src.webp : undefined;
+  const directJpeg =
+    typeof src.jpeg === "string"
+      ? src.jpeg
+      : typeof src.jpg === "string"
+        ? src.jpg
+        : undefined;
+
+  const avif = pickFromSrcset(sources?.avif ?? directAvif);
+  const webp = pickFromSrcset(sources?.webp ?? directWebp);
+  const jpeg = pickFromSrcset(sources?.jpeg ?? sources?.jpg ?? directJpeg);
+
+  return {
+    avif,
+    webp,
+    jpeg: imgSrc ?? explicitSrc ?? jpeg ?? webp ?? avif ?? "",
+  };
+}
+
+/**
  * SmartImage component
  *
  * Renders a native `<img>` with lazy/eager loading and async decoding.
@@ -145,7 +209,10 @@ export default function SmartImage({
   onError,
 }: SmartImageProps) {
   const responsiveSizes = sizes ?? "(max-width: 768px) 100vw, 50vw";
-  const resolvedSrc = resolveImageSource(src);
+  // Tutti i formati disponibili: il browser sceglie via `<source type>` (decode
+  // reale), non più via canvas detection. `jpeg` è l'<img> di fallback.
+  const pictureSources = resolveImageSources(src);
+  const resolvedSrc = pictureSources.jpeg;
   const imgRef = useRef<HTMLImageElement>(null);
 
   // ── Native load / error listeners ──────────────────────────────────
@@ -217,28 +284,36 @@ export default function SmartImage({
     };
   }, [resolvedSrc, onLoad, onError, priority]);
 
-  // ── Preload for above-the-fold images ──────────────────────────────
-  useEffect(() => {
-    if (!priority || !resolvedSrc) return;
+  // ── <picture>: offre avif/webp + <img> jpeg di fallback ────────────
+  // Il preload above-the-fold non è più iniettato via JS (sceglieva il formato
+  // sbagliato per via della canvas detection): l'hero finisce nell'HTML
+  // pre-renderizzato e il preload-scanner lo trova subito via `<img
+  // fetchpriority=high loading=eager>`, scegliendo l'AVIF in autonomia.
+  const withPicture = (el: ReactElement) => {
+    if (!pictureSources.avif && !pictureSources.webp) return el;
 
-    const link = document.createElement("link");
+    return (
+      <picture>
+        {pictureSources.avif && (
+          <source
+            sizes={responsiveSizes}
+            srcSet={pictureSources.avif}
+            type="image/avif"
+          />
+        )}
+        {pictureSources.webp && (
+          <source
+            sizes={responsiveSizes}
+            srcSet={pictureSources.webp}
+            type="image/webp"
+          />
+        )}
+        {el}
+      </picture>
+    );
+  };
 
-    link.rel = "preload";
-    link.as = "image";
-    link.href = resolvedSrc;
-
-    if ("fetchPriority" in link) {
-      (link as any).fetchPriority = "high";
-    }
-
-    document.head.appendChild(link);
-
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, [priority, resolvedSrc]);
-
-  const img = (
+  const img = withPicture(
     <img
       ref={imgRef}
       alt={alt}
@@ -257,23 +332,27 @@ export default function SmartImage({
         ...style,
       }}
       width={width}
-    />
+    />,
   );
 
   if (!isBlurred) return img;
 
   // Soft glow behind the artwork — replica l'effetto isBlurred di HeroUI v2
-  // (blurredImg: scale-105 blur-lg saturate-150 opacity-30).
+  // (blurredImg: scale-105 blur-lg saturate-150 opacity-30). Stesse `<source>`
+  // del layer principale → il browser riusa lo stesso file scaricato (niente
+  // doppio download).
   return (
     <span className="relative inline-block max-w-full align-top">
-      <img
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 z-0 h-full w-full scale-105 rounded-[14px] object-cover opacity-30 blur-lg saturate-150"
-        decoding="async"
-        loading={priority ? "eager" : "lazy"}
-        src={resolvedSrc}
-      />
+      {withPicture(
+        <img
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 z-0 h-full w-full scale-105 rounded-[14px] object-cover opacity-30 blur-lg saturate-150"
+          decoding="async"
+          loading={priority ? "eager" : "lazy"}
+          src={resolvedSrc}
+        />,
+      )}
       {img}
     </span>
   );

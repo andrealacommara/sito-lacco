@@ -145,7 +145,7 @@ export default function PrivacyPage() {
               </p>
             </Section>
 
-            <p className="text-xs text-default-400 pt-4 border-t border-default-200">
+            <p className="text-xs text-default-500 pt-4 border-t border-default-200">
               Ultimo aggiornamento: giugno 2026
             </p>
           </div>

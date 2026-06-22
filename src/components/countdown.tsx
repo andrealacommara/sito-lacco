@@ -100,14 +100,14 @@ export default function Countdown({
               {unit.value}
             </span>
             <span
-              className={`${s.label} font-medium tracking-widest mt-1 uppercase ${variant === "light" ? "text-gray-500" : "text-white/50"}`}
+              className={`${s.label} font-medium tracking-widest mt-1 uppercase ${variant === "light" ? "text-gray-500" : "text-white/70"}`}
             >
               {unit.label}
             </span>
           </div>
           {i < units.length - 1 && (
             <span
-              className={`${s.colon} font-bold pb-4 select-none ${variant === "light" ? "text-gray-300" : "text-white/40"}`}
+              className={`${s.colon} font-bold pb-4 select-none ${variant === "light" ? "text-gray-500" : "text-white/60"}`}
             >
               :
             </span>

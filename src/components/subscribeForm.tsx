@@ -179,7 +179,7 @@ export default function SubscribeForm({
               >
                 {loading ? <Spinner size="sm" /> : "Avvisami"}
               </Button>
-              <p className="text-center text-xs text-default-400">
+              <p className="text-center text-xs text-default-500">
                 <a
                   className="hover:underline"
                   href="/privacy"

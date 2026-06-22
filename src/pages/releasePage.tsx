@@ -254,7 +254,7 @@ function PresaveSection({ release }: SectionProps) {
           >
             <div className="flex items-center gap-3 w-full">
               <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-gray-400 text-xs tracking-wide whitespace-nowrap">
+              <span className="text-gray-500 text-xs tracking-wide whitespace-nowrap">
                 o avvisami quando esce
               </span>
               <div className="flex-1 h-px bg-gray-200" />
@@ -465,7 +465,7 @@ function AlbumSection({ album }: { album: Album }) {
               {...fadeUp(0.25)}
               className="flex flex-col w-full mt-2 text-left"
             >
-              <p className="text-gray-400 text-xs tracking-widest uppercase mb-2">
+              <p className="text-gray-500 text-xs tracking-widest uppercase mb-2">
                 Tracklist
               </p>
               <ol className="flex flex-col divide-y divide-gray-100">
@@ -475,7 +475,7 @@ function AlbumSection({ album }: { album: Album }) {
                       className="flex items-center gap-3 py-2.5 text-gray-700 hover:text-danger transition-colors"
                       to={`/${track.slug}`}
                     >
-                      <span className="text-gray-400 text-sm tabular-nums w-5 shrink-0">
+                      <span className="text-gray-500 text-sm tabular-nums w-5 shrink-0">
                         {index + 1}
                       </span>
                       <span className="font-medium">{track.title}</span>
@@ -554,7 +554,7 @@ function AlbumPresaveSection({ album }: { album: Album }) {
           >
             <div className="flex items-center gap-3 w-full">
               <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-gray-400 text-xs tracking-wide whitespace-nowrap">
+              <span className="text-gray-500 text-xs tracking-wide whitespace-nowrap">
                 o avvisami quando esce
               </span>
               <div className="flex-1 h-px bg-gray-200" />

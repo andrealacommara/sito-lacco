@@ -20,7 +20,7 @@ function baseTemplate(
 ): string {
   const signature = opts?.transactional
     ? ""
-    : `<p class="email-text" style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong style="color:#F31260;">Lacco</strong></p>`;
+    : `<p class="email-text" style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong class="email-accent" style="color:#c20e4d;">Lacco</strong></p>`;
 
   const footerContent = opts?.transactional
     ? `<p class="footer-text" style="margin:0;font-size:12px;color:#555;line-height:1.5;">
@@ -50,7 +50,8 @@ function baseTemplate(
 .email-footer{background-color:#1c1c1e !important;border-top-color:#2c2c2e !important;}
 .email-body p,.rte-body p,.rte-body li{color:#e5e5ea !important;}
 .footer-text{color:#8e8e93 !important;}
-.footer-link,.footer-link a{color:#8e8e93 !important;}`;
+.footer-link,.footer-link a{color:#8e8e93 !important;}
+.email-accent{color:#f877a4 !important;}`;
 
   // In anteprima rendiamo in modo deterministico lo schema scelto (niente reazione
   // all'OS): la media query e le regole Outlook (ogsc) servono solo all'email reale.
@@ -65,7 +66,8 @@ ${darkPaletteRules}
 [data-ogsc] body,[data-ogsc] .email-outer{background-color:#111111 !important;}
 [data-ogsc] .email-card,[data-ogsc] .email-header,[data-ogsc] .email-body,[data-ogsc] .email-footer{background-color:#1c1c1e !important;}
 [data-ogsc] .email-body p,[data-ogsc] .rte-body p,[data-ogsc] .rte-body li{color:#e5e5ea !important;}
-[data-ogsc] .footer-text,[data-ogsc] .footer-link,[data-ogsc] .footer-link a{color:#8e8e93 !important;}`;
+[data-ogsc] .footer-text,[data-ogsc] .footer-link,[data-ogsc] .footer-link a{color:#8e8e93 !important;}
+[data-ogsc] .email-accent{color:#f877a4 !important;}`;
 
   return `<!DOCTYPE html>
 <html lang="it" style="color-scheme:${colorScheme};">
@@ -140,7 +142,7 @@ export function broadcastEmailHtml(opts: {
             <td align="center">
               <table cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background:#F31260;border-radius:8px;">
+                  <td style="background:#c20e4d;border-radius:8px;">
                     <a href="${opts.ctaUrl}"
                        style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;
                               color:#fff;text-decoration:none;letter-spacing:0.02em;">
@@ -155,7 +157,7 @@ export function broadcastEmailHtml(opts: {
       : "";
 
   const greeting = opts.preview
-    ? `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao <span style="color:#F31260;">[Nome destinatario]</span>,</p>`
+    ? `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao <span class="email-accent" style="color:#c20e4d;">[Nome destinatario]</span>,</p>`
     : `<p style="margin:0 0 20px;font-size:16px;color:#111;line-height:1.6;">Ciao {{{contact.first_name|}}},</p>`;
 
   return baseTemplate(
