@@ -18,7 +18,7 @@ import DefaultLayout from "@/layouts/default"; // Main site layout (Navbar + Foo
 import { title } from "@/components/primitives"; // Predefined typography style for page titles
 
 // ========================== CONTACT PAGE COMPONENT ========================== //
-// Manages the contact form, sending messages via EmailJS, and user feedback
+// Manages the contact form, sending messages via the send-contact-email Edge Function, and user feedback
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
