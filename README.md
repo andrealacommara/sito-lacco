@@ -13,12 +13,14 @@ The website features a modern, responsive, and high-performance structure, with 
 | ---------------------- | -------------------------------------------------------------------------- |
 | **Frontend Framework** | [React 19](https://react.dev/) with [Vite](https://vitejs.dev/)           |
 | **Language**           | [TypeScript](https://www.typescriptlang.org/)                              |
-| **UI Library**         | [HeroUI](https://heroui.dev/) (based on NextUI and TailwindCSS)            |
+| **UI Library**         | [HeroUI v3](https://heroui.dev/) (on top of React Aria + TailwindCSS)      |
 | **Styling**            | [TailwindCSS v4](https://tailwindcss.com/)                                 |
 | **Animations**         | [Framer Motion](https://www.framer.com/motion/)                            |
 | **Backend / DB**       | [Supabase](https://supabase.com/) (Postgres + Edge Functions + Auth)       |
-| **Email Service**      | [EmailJS](https://www.emailjs.com/) for contact form · [Resend](https://resend.com/) for newsletter (welcome + broadcast) |
+| **Email Service**      | [Resend](https://resend.com/) — contact form, newsletter welcome + broadcast (all via Supabase Edge Functions) |
+| **Rich Text**          | [Tiptap](https://tiptap.dev/) for the admin broadcast composer             |
 | **Image Handling**     | Custom `SmartImage` component with AVIF/WebP/JPEG fallback                 |
+| **SEO**                | Static prerendering (Playwright) · per-release/event OG images · Schema.org JSON-LD · `sitemap.xml` + `llms.txt` |
 | **Build Tools**        | Vite + TailwindCSS (PostCSS) + HeroUI Theme                                |
 | **CI/CD**              | [GitHub Actions](https://github.com/features/actions) + FTPS deploy to Aruba |
 | **Node.js**            | v22+ recommended                                                            |
@@ -32,20 +34,26 @@ src/
 ├── assets/                 # Static resources and images
 │   ├── icons/
 │   └── images/
-├── components/             # Reusable UI components
-│   ├── cardSongExposer.tsx   # Song card with modal (presave + streaming links)
-│   ├── countdown.tsx         # Release countdown timer (dark/light variant)
+├── components/             # Reusable UI components (representative)
+│   ├── countdown.tsx         # Release/event countdown timer (dark/light variant)
 │   ├── icons.tsx             # SVG icons + Logo component
 │   ├── liveEventCard.tsx     # Live event card (poster, countdown, ticket CTA)
-│   ├── navbar.tsx
+│   ├── liveGalleryModal.tsx  # Past-show photo gallery modal
 │   ├── presaveButton.tsx     # DistroKid hyperfollow presave CTA
-│   ├── primitives.ts         # Typography utility classes
+│   ├── richTextEditor.tsx    # Tiptap editor for the admin broadcast composer
 │   ├── smartImage.tsx        # Optimized image with AVIF/WebP/JPEG fallback
 │   ├── songCarousel.tsx      # Horizontal snap carousel of catalog songs
+│   ├── spotifyPlayer.tsx     # On-demand Spotify embed
 │   └── subscribeForm.tsx     # Newsletter subscribe form (full + compact)
 ├── config/
-│   ├── catalog.ts             # Single source of truth: all songs + release config
-│   └── liveEvents.ts          # Live events: upcoming/past shows + ticket links
+│   ├── catalog.ts             # Single source of truth: all releases + config
+│   ├── liveEvents.data.ts     # Pure live event data (Node-loadable, no asset imports)
+│   ├── liveEvents.ts          # Live events + poster/gallery assets wired in
+│   ├── slugs.ts               # Dynamic /:slug resolver (re-exported from catalog)
+│   ├── site.ts                # Global site config (nav, social links, metadata)
+│   ├── date.ts                # Date helpers
+│   ├── sectionsAboutPage.ts   # About page content
+│   └── pressKitPhotos.ts / pressKitStats.ts  # PressKit content
 ├── emails/
 │   └── templates.ts          # HTML email templates (welcome + broadcast preview)
 ├── layouts/
@@ -55,9 +63,10 @@ src/
 ├── pages/
 │   ├── aboutPage.tsx         # "Su di me"
 │   ├── adminPage.tsx         # Admin dashboard (subscriber list + broadcast)
-│   ├── contactPage.tsx       # Contact form via EmailJS
+│   ├── contactPage.tsx       # Contact form (via send-contact-email Edge Function)
 │   ├── homePage.tsx          # Home
 │   ├── livePage.tsx          # "Live" — upcoming/past shows
+│   ├── eventPage.tsx         # Event detail page (/live/:slug — upcoming or recap)
 │   ├── musicPage.tsx         # "La mia musica" (song carousel)
 │   ├── newsletterPage.tsx    # Newsletter subscribe page
 │   ├── notFoundPage.tsx      # 404
@@ -70,7 +79,7 @@ src/
 ├── styles/
 │   └── globals.css
 ├── types/
-│   └── api.ts                # Shared API types (subscribe, broadcast, etc.)
+│   └── api.ts                # Shared API types (subscribe, broadcast, contact, etc.)
 ├── utils/
 │   ├── createIcon.tsx
 │   └── lazyWithPreload.ts
@@ -78,20 +87,30 @@ src/
 ├── main.tsx                  # Entry point
 └── provider.tsx              # HeroUI + Toast provider
 
+scripts/                      # Build-time tooling (run via postbuild)
+├── routes.mjs                # Single source of indexable routes (sitemap + prerender + llms)
+├── catalog-loader.mjs / events-loader.mjs  # Load TS config in Node via esbuild
+├── prerender.mjs             # Static HTML snapshots per route (Playwright)
+├── generate-og-images.js     # OG 1200×630 per release
+├── generate-og-events.mjs    # OG 1200×630 per live event
+├── generate-llms.mjs         # Generates dist/llms.txt from routes.mjs
+├── make-presskit-zip.js      # Bundles the downloadable press kit
+├── generate-email-assets.mjs # Email image assets
+└── smoke-test.js             # Runtime smoke test
+
 supabase/
 ├── functions/
 │   ├── _shared/              # Shared helpers (Supabase clients, email, Resend sync, validation)
 │   ├── subscribe/            # POST: add subscriber (single opt-in) + welcome email
 │   ├── unsubscribe/          # GET: unsubscribe via personal token
+│   ├── send-contact-email/   # POST: contact form submission → email via Resend
+│   ├── send-magic-link/      # POST: send admin magic-link sign-in email
 │   ├── resend-webhook/       # POST: Resend webhook (unsubscribe/bounce status sync)
 │   ├── admin-subscribers/    # GET/POST/PATCH: list, add, manually unsubscribe (admin-only)
 │   ├── admin-broadcast/      # POST: send broadcast to all confirmed subscribers or to selected ones
 │   ├── admin-sync-resend/    # POST: reconcile subscriber status with the Resend Audience
 │   └── admin-stats/          # GET: dashboard counters (confirmed, unsubscribed, bounced, new)
-└── migrations/
-    ├── 20260614000001_create_subscribers.sql
-    ├── 20260614000002_keep_alive_cron.sql
-    └── 20260616000001_remove_pending_status.sql
+└── migrations/               # SQL migrations (subscribers table, keep-alive cron, status changes)
 ```
 
 ---
@@ -100,15 +119,17 @@ supabase/
 
 - **Home:** Introduction to Lacco with an on-demand Spotify player that loads only when needed on mobile, plus a presave card (blurred artwork backdrop, countdown, DistroKid presave button) for the next upcoming release, and a live event card for the next upcoming show.
 - **Live (`/live`):** Driven by `liveEvents.ts`. Shows upcoming live dates (poster, countdown, venue/lineup details, ticket link) and an archive of past shows; displays a "new dates coming soon" message when nothing is upcoming.
+- **Event detail pages (`/live/:slug`):** Dedicated page per show. Upcoming mode shows poster, countdown, venue/address/lineup and ticket CTA; past mode turns into a recap with description and YouTube videos. Each event has its own OG image and Schema.org JSON-LD.
 - **La mia musica:** Horizontal snap carousel of singles, with descriptions and streaming links (Spotify + Apple Music) in a modal. Supports presave mode with "COMING SOON" badge.
 - **Release pages (`/:slug`):** Full-screen landing pages driven by `catalog.ts`. Two modes:
   - **Presave mode** — artwork, countdown timer, DistroKid presave button, newsletter subscribe form.
   - **Live mode** — artwork, streaming CTAs (Spotify / Apple Music), song carousel.
 - **Newsletter:** Subscribe form with name + email + consent. Single opt-in — confirmed immediately, with a welcome email sent right away. Unsubscribe link in every email, kept in sync with the Resend Audience via webhook and manual reconciliation.
 - **Admin (`/admin`):** Protected by Supabase magic link auth. Dashboard with live counters (confirmed, unsubscribed, bounced, new in last 7 days), searchable/sortable/filterable subscriber list with configurable page size, manual unsubscribe for selected subscribers, and a broadcast composer (body, optional image, optional CTA button) with live email preview — sendable to all confirmed subscribers or to individually selected ones.
-- **Contatti:** Contact form via EmailJS.
-- **PressKit:** Dedicated private page (lazy-loaded, noindex) with official media assets, extended bio, press photos, and professional contacts.
+- **Contatti:** Contact form submitted to the `send-contact-email` Supabase Edge Function, which delivers the message via Resend.
+- **PressKit:** Dedicated private page (lazy-loaded, noindex) with official media assets, extended bio, press photos, and professional contacts; the downloadable kit is zipped at build time.
 - **Privacy Policy (`/privacy`):** GDPR-compliant privacy policy in Italian.
+- **SEO & crawlers:** Each page ships per-route head tags (title, description, Open Graph, canonical) via `react-helmet-async`, plus Schema.org JSON-LD on home/release/event pages. At build time every indexable route is statically prerendered (Playwright) so crawlers see baked-in tags, and `sitemap.xml` + `llms.txt` are generated from a single source of truth (`scripts/routes.mjs`).
 - **Route preloading:** Navigation links prefetch their chunks on hover/touch for near-instant transitions.
 
 ---
@@ -133,17 +154,12 @@ npm install
 Create a `.env` file in the project root:
 
 ```bash
-# EmailJS (contact form)
-VITE_EMAILJS_SERVICE_ID="your_service_id"
-VITE_EMAILJS_TEMPLATE_ID="your_template_id"
-VITE_EMAILJS_PUBLIC_KEY="your_public_key"
-
-# Supabase (newsletter + admin)
+# Supabase (newsletter, contact form, admin)
 VITE_SUPABASE_URL="https://your-project.supabase.co"
 VITE_SUPABASE_ANON_KEY="your_anon_key"
 ```
 
-> **Note:** The Supabase Edge Functions use server-side secrets (`RESEND_API_KEY`, `service_role`) configured in the Supabase dashboard — never in `VITE_*` variables.
+> **Note:** The contact form, newsletter, and admin features all run through Supabase Edge Functions. Their server-side secrets (`RESEND_API_KEY`, `service_role`, etc.) are configured in the Supabase dashboard — never in `VITE_*` variables.
 
 ### 4. Start the development server
 
@@ -161,7 +177,14 @@ The website will be available at [http://localhost:5173](http://localhost:5173)
 npm run build
 ```
 
-Optimized files will be generated in the `/dist` folder.
+Optimized files are generated in the `/dist` folder. A `postbuild` step then runs automatically:
+
+1. `generate-og-images` / `generate-og-events` — per-release and per-event OG images;
+2. `prerender` — static HTML snapshots of every indexable route (requires Chromium for Playwright);
+3. `generate-llms` — `dist/llms.txt` from the shared route source;
+4. `make-presskit-zip` — the downloadable press kit archive.
+
+`sitemap.xml` is produced during the Vite build by `vite-plugin-sitemap`, also from `scripts/routes.mjs`.
 
 ---
 
@@ -171,7 +194,7 @@ The project uses **GitHub Actions** for continuous integration and deployment:
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| **CI** | Pull requests to `main` | Runs `npm install` + `npm run build` to validate changes |
+| **CI** | Pull requests to `main` | Runs `npm run build` (incl. prerender) + runtime smoke test to validate changes |
 | **Build and Deploy** | Push to `main` | Builds and deploys to **Aruba** via FTPS |
 | **Auto-merge Dependabot** | Dependabot PRs | Merges dependency updates automatically after CI passes |
 
@@ -189,7 +212,11 @@ Branch protection on `main` requires the CI check to pass before merging.
 | `npm run lint` | Lint and auto-fix with ESLint |
 | `npm run format` | Format code with Prettier |
 | `npm run type-check` | Run TypeScript type checking |
-| `npm run test:full` | Run lint + type-check + build + env validation |
+| `npm run test:smoke` | Runtime smoke test on the built site (Playwright) |
+| `npm run test:env` | Validate required environment variables |
+| `npm run test:full` | Run lint + type-check + build + env + smoke test |
+| `npm run generate-email-assets` | Regenerate email image assets |
+| `npm run update` | Bump dependencies (npm-check-updates) and reinstall |
 
 ---
 

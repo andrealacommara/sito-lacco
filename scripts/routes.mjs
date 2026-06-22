@@ -40,3 +40,29 @@ export async function getSitemapRoutes() {
 export async function getAllRoutes() {
   return ["/", ...STATIC_ROUTES, ...(await getDynamicRoutes())];
 }
+
+// Contenuti dinamici CON metadati (titolo/data), per chi deve generare label
+// leggibili e non solo path — es. scripts/generate-llms.mjs. Stessa fonte di
+// verità delle route, così llms.txt non va mai in drift con sitemap/prerender.
+export async function getContentEntries() {
+  const { catalog } = await loadCatalog();
+  const { liveEventsData } = await loadLiveEvents();
+
+  const releases = catalog.map((release) => ({
+    url: `/${release.slug}`,
+    title: release.title,
+    kind: release.kind,
+    year: release.year,
+    date: release.releaseDate,
+  }));
+
+  const events = liveEventsData.map((event) => ({
+    url: `/live/${event.slug}`,
+    title: event.title,
+    date: event.date,
+    venue: event.venue,
+    city: event.city,
+  }));
+
+  return { releases, events };
+}

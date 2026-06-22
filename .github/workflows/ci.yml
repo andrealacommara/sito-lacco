@@ -39,9 +39,6 @@ jobs:
       - name: Build project
         run: npm run build
         env:
-          VITE_EMAILJS_SERVICE_ID: "test"
-          VITE_EMAILJS_TEMPLATE_ID: "test"
-          VITE_EMAILJS_PUBLIC_KEY: "test"
           VITE_SUPABASE_URL: "https://placeholder.supabase.co"
           VITE_SUPABASE_ANON_KEY: "placeholder"
 
