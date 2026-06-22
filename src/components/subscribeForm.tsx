@@ -156,12 +156,11 @@ export default function SubscribeForm({
               />
             </TextField>
           )}
-
           <Checkbox isSelected={consent} onChange={setConsent}>
-            <CheckboxControl>
-              <CheckboxIndicator />
-            </CheckboxControl>
             <CheckboxContent>
+              <CheckboxControl>
+                <CheckboxIndicator />
+              </CheckboxControl>
               <span className="text-xs text-default-500">
                 Accetto di ricevere aggiornamenti sulle uscite di Lacco.
               </span>
