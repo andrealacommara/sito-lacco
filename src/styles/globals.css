@@ -239,11 +239,16 @@
    grigio del browser (color-scheme), troppo chiaro. Lo fissiamo sul token e in dark
    lo portiamo a nero come la versione online. Le Card (#18181b) restano leggermente
    più chiare → buon contrasto. */
-body {
-  background-color: var(--background);
+:root,
+[data-theme="light"] {
+  --background: #ffffff;
 }
 [data-theme="dark"] {
   --background: #000000;
+}
+html,
+body {
+  background-color: var(--background);
 }
 
 /* Pagine slug immersive: data-force-theme-color viene "cotto" su <html> dal
