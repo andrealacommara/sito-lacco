@@ -1,7 +1,12 @@
 import type { LiveEventPhoto } from "@/config/liveEvents";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionValue,
+} from "framer-motion";
 import {
   ModalBackdrop,
   ModalContainer,
@@ -72,34 +77,156 @@ function DownloadIcon() {
   );
 }
 
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 3;
+
+const touchDistance = (touches: React.TouchList) =>
+  Math.hypot(
+    touches[0].clientX - touches[1].clientX,
+    touches[0].clientY - touches[1].clientY,
+  );
+
 // Singola slide: immagine centrata con loader (spinner) finché non è caricata.
-function Slide({ photo }: { photo: LiveEventPhoto }) {
+// Supporta lo zoom (rotella/doppio-click su desktop, pinch su mobile) e il pan
+// trascinando quando è zoommata. Lo stato di zoom viene riportato al modale via
+// `onZoomChange` così da disattivare swipe/paginazione mentre si esplora la foto.
+function Slide({
+  photo,
+  boundsRef,
+  onZoomChange,
+}: {
+  photo: LiveEventPhoto;
+  boundsRef: React.RefObject<HTMLDivElement | null>;
+  onZoomChange: (zoomed: boolean) => void;
+}) {
   const [loaded, setLoaded] = useState(false);
+  const [panEnabled, setPanEnabled] = useState(false);
+  const [constraints, setConstraints] = useState({
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  });
+  const scale = useMotionValue(1);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const wrapElRef = useRef<HTMLDivElement>(null);
+  const pinchStart = useRef<{ dist: number; scale: number } | null>(null);
+
+  const setScale = (next: number) => {
+    const clamped = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, next));
+    const isZoomed = clamped > 1.01;
+
+    if (isZoomed) {
+      scale.set(clamped);
+
+      // Vincoli di pan calcolati a mano: metà dell'eccedenza dell'immagine
+      // scalata rispetto al viewport, per asse. Più affidabili dei vincoli via
+      // ref (con `scale` framer misura gli assi in modo asimmetrico).
+      const el = wrapElRef.current;
+      const bounds = boundsRef.current;
+
+      if (el && bounds) {
+        const overflowX = Math.max(
+          0,
+          (el.offsetWidth * clamped - bounds.clientWidth) / 2,
+        );
+        const overflowY = Math.max(
+          0,
+          (el.offsetHeight * clamped - bounds.clientHeight) / 2,
+        );
+
+        setConstraints({
+          top: -overflowY,
+          bottom: overflowY,
+          left: -overflowX,
+          right: overflowX,
+        });
+      }
+    } else {
+      // Uscendo dallo zoom la foto torna sempre centrata a 1×, con animazione.
+      const spring = { type: "spring", stiffness: 300, damping: 30 } as const;
+
+      animate(scale, 1, spring);
+      animate(x, 0, spring);
+      animate(y, 0, spring);
+      setConstraints({ top: 0, bottom: 0, left: 0, right: 0 });
+    }
+
+    setPanEnabled(isZoomed);
+    onZoomChange(isZoomed);
+  };
+
+  const onWheel = (e: React.WheelEvent) => {
+    // Solo intento verticale: lo scroll orizzontale resta paginazione.
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    e.stopPropagation();
+    setScale(scale.get() - e.deltaY * 0.002);
+  };
+
+  const onDoubleClick = () => setScale(scale.get() > 1.01 ? 1 : 2);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      pinchStart.current = {
+        dist: touchDistance(e.touches),
+        scale: scale.get(),
+      };
+    }
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchStart.current) {
+      e.stopPropagation();
+      const ratio = touchDistance(e.touches) / pinchStart.current.dist;
+
+      setScale(pinchStart.current.scale * ratio);
+    }
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) pinchStart.current = null;
+  };
 
   return (
     <>
       {!loaded && (
         <span className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 animate-spin rounded-full border-2 border-white/25 border-t-white" />
       )}
-      <SmartImage
-        priority
-        alt={photo.alt}
-        className="pointer-events-none select-none"
-        isBlurred={false}
-        sizes="100vw"
-        src={photo.src}
-        style={{
-          maxHeight: "100%",
-          maxWidth: "100%",
-          width: "auto",
-          height: "auto",
-          objectFit: "contain",
-          borderRadius: "12px",
-          opacity: loaded ? 1 : 0,
-          transition: "opacity 0.25s ease",
-        }}
-        onLoad={() => setLoaded(true)}
-      />
+      <motion.div
+        ref={wrapElRef}
+        drag
+        className="flex items-center justify-center"
+        dragConstraints={constraints}
+        dragElastic={0.1}
+        dragListener={panEnabled}
+        style={{ scale, x, y, touchAction: "none" }}
+        onDoubleClick={onDoubleClick}
+        onTouchEnd={onTouchEnd}
+        onTouchMove={onTouchMove}
+        onTouchStart={onTouchStart}
+        onWheel={onWheel}
+      >
+        <SmartImage
+          priority
+          alt={photo.alt}
+          className="pointer-events-none select-none"
+          isBlurred={false}
+          sizes="100vw"
+          src={photo.src}
+          style={{
+            maxHeight: "90vh",
+            maxWidth: "min(100vw - 2rem, 56rem)",
+            width: "auto",
+            height: "auto",
+            objectFit: "contain",
+            borderRadius: "12px",
+            opacity: loaded ? 1 : 0,
+            transition: "opacity 0.25s ease",
+          }}
+          onLoad={() => setLoaded(true)}
+        />
+      </motion.div>
     </>
   );
 }
@@ -151,10 +278,33 @@ export default function LiveGalleryModal({
 
   const index = ((page % count) + count) % count;
 
+  // Stato di zoom della foto corrente: quando attivo disabilita swipe, rotella
+  // di paginazione e frecce, così i gesti vanno al pan dell'immagine. Il ref
+  // serve ai listener nativi (wheel/keydown) per leggere il valore aggiornato
+  // senza doversi ri-registrare ad ogni toggle.
+  const [zoomed, setZoomed] = useState(false);
+  const zoomedRef = useRef(false);
+
+  useEffect(() => {
+    zoomedRef.current = zoomed;
+  }, [zoomed]);
+
+  // Reset dello zoom al cambio foto o alla (ri)apertura del modale: si aggiusta
+  // lo stato in fase di render (stesso pattern di `prevStart`) invece di un
+  // effetto, per non innescare render a cascata.
+  const resetKey = `${index}|${isOpen}`;
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
+
+  if (resetKey !== prevResetKey) {
+    setPrevResetKey(resetKey);
+    if (zoomed) setZoomed(false);
+  }
+
   useEffect(() => {
     if (!isOpen || count < 2) return;
 
     const onKey = (e: KeyboardEvent) => {
+      if (zoomedRef.current) return;
       if (e.key === "ArrowRight") setPage(([p]) => [p + 1, 1]);
       else if (e.key === "ArrowLeft") setPage(([p]) => [p - 1, -1]);
     };
@@ -198,6 +348,8 @@ export default function LiveGalleryModal({
     let endTimer: number | undefined;
 
     const onWheel = (e: WheelEvent) => {
+      // Con la foto zoommata la rotella serve allo zoom, non alla paginazione.
+      if (zoomedRef.current) return;
       // Solo intento orizzontale: ignora lo scroll prevalentemente verticale.
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
 
@@ -263,7 +415,7 @@ export default function LiveGalleryModal({
                     animate="center"
                     className="absolute inset-0 flex items-center justify-center"
                     custom={direction}
-                    drag={count > 1 ? "x" : false}
+                    drag={count > 1 && !zoomed ? "x" : false}
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.9}
                     exit="exit"
@@ -280,7 +432,11 @@ export default function LiveGalleryModal({
                       else if (power > SWIPE_THRESHOLD) paginate(-1);
                     }}
                   >
-                    <Slide photo={photo} />
+                    <Slide
+                      boundsRef={viewportRef}
+                      photo={photo}
+                      onZoomChange={setZoomed}
+                    />
                   </motion.div>
                 </AnimatePresence>
 
