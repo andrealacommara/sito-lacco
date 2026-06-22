@@ -69,7 +69,7 @@ export default function MusicPage() {
         <SongCarousel />
 
         <div className="flex justify-center">
-          <h3 className="w-full md:w-1/2 my-2 text-default-400 block max-w-full text-center font-light text-sm">
+          <h3 className="w-full md:w-1/2 my-2 text-default-500 block max-w-full text-center font-light text-sm">
             Ogni brano è una parte di me, buon ascolto.
           </h3>
         </div>

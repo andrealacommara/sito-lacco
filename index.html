@@ -106,11 +106,11 @@
     <meta name="msapplication-config" content="/browserconfig.xml" />
 
     <!-- ========================== FONTS ========================== -->
-    <!-- Preconnect for faster DNS + TLS + connection for Google Fonts CDN -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Playfair Display: 4 weights only (400, 700, + italics). display=swap prevents render-blocking -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+    <!-- Font self-hostati (woff2 variabili, @font-face in globals.css): niente
+         richiesta render-blocking cross-origin a Google Fonts. NESSUN preload:
+         con createRoot l'LCP dipende dal mount di React, e un preload font ad alta
+         priorità ruberebbe banda al bundle JS ritardando l'LCP. I font arrivano via
+         @font-face con `display: swap` (testo subito in fallback, poi swap). -->
 
     <!-- ========================== RESOURCE HINTS ========================== -->
     <!-- Speed up third-party embeds and critical routes used across the site -->

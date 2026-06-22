@@ -119,14 +119,14 @@ export default function HomePage() {
           </span>
 
           <p
-            className="text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground leading-tight font-display"
+            className="text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground leading-tight font-hero"
             style={{ animation: "fadeInUp 0.6s ease 0.35s both" }}
           >
             Per chi sente più di quanto riesca a dire.
           </p>
 
           <p
-            className="text-base lg:text-lg text-default-500 leading-relaxed font-display"
+            className="text-base lg:text-lg text-default-500 leading-relaxed font-hero"
             style={{ animation: "fadeInUp 0.5s ease 0.5s both" }}
           >
             Lacco è un cantautore che trasforma emozioni, esperienze e frammenti

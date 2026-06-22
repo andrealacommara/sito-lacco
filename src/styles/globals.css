@@ -6,12 +6,40 @@
 @custom-variant dark ([data-theme="dark"] &);
 
 /* ============================================================
+   Font self-hostati (woff2 variabili, subset Latin). Sostituiscono il
+   <link> render-blocking di Google Fonts: stessa origin, stessa cache
+   `immutable`, nessun round-trip cross-origin nel percorso critico.
+   Playfair Display = solo hero (preloadato in index.html, area LCP).
+   Lora = resto dei contenuti. UI = sans di sistema (non toccata).
+   `font-display: swap` come prima: oggi il CLS è 0, il fallback serif
+   ravvicinato (Georgia) tiene il reflow trascurabile.
+   ============================================================ */
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 400 900; /* asse wght variabile */
+  font-display: swap;
+  src: url("/fonts/playfair-display-latin-var.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Lora";
+  font-style: normal;
+  font-weight: 400 700; /* asse wght variabile */
+  font-display: swap;
+  src: url("/fonts/lora-latin-var.woff2") format("woff2");
+}
+
+/* ============================================================
    Theme tokens: font + compat scale colore HeroUI v2 (parità visiva)
    v3 rimuove la scala numerica `default-50..900` e `primary`: le
    ricreiamo identiche a v2 così tutte le classi esistenti restano valide.
    ============================================================ */
 @theme {
-  --font-display: "Playfair Display", serif;
+  /* Hero (homepage): resta Playfair Display — utility `font-hero`. */
+  --font-hero: "Playfair Display", Georgia, serif;
+  /* Resto dei contenuti (titoli + testi): Lora — utility `font-display`. */
+  --font-display: "Lora", Georgia, "Times New Roman", serif;
 
   /* Breakpoint extra-small per i telefoni stretti (≤383px): permette di
      rimpicciolire countdown/titoli/bottoni solo sui device più piccoli,
@@ -59,7 +87,10 @@
   --color-default-200: #3f3f46;
   --color-default-300: #52525b;
   --color-default-400: #a1a1aa;
-  --color-default-500: #71717a;
+  /* default-500 in dark passa da #71717a (testo muted illeggibile: 4.35 su nero,
+     3.67 su card) a #8e8e96 → 6.46/5.45, WCAG AA. Solo testo (nessun bg/border
+     usa default-500), light invariato. */
+  --color-default-500: #8e8e96;
   --color-default-600: #d4d4d8;
   --color-default-700: #e4e4e7;
   --color-default-800: #f4f4f5;
@@ -89,6 +120,19 @@
   --danger-soft: hsl(339 55% 18%);
   --danger-soft-foreground: hsl(339.2 90% 72%);
   --danger-soft-hover: hsl(339 55% 24%);
+}
+
+/* ============================================================
+   Override SUCCESS: il verde di default v3 è chiaro (oklch 73%) e con
+   testo bianco (bottoni Spotify/presave) non raggiunge il 4.5:1 WCAG AA
+   (era ~2.2:1). Lo scuriamo finché bianco su success passa (~4.9:1),
+   restando un verde brand. hover/soft sono derivati via color-mix → si
+   aggiornano da soli. Uguale in light e dark.
+   ============================================================ */
+:root,
+[data-theme="light"],
+[data-theme="dark"] {
+  --success: oklch(0.53 0.15 150.81);
 }
 
 /* ============================================================

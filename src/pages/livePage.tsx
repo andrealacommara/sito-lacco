@@ -138,7 +138,7 @@ export default function LivePage() {
           </motion.div>
 
           {/* Microfono + testo */}
-          <MicIcon className="relative w-12 h-12 text-default-400" />
+          <MicIcon className="relative w-12 h-12 text-default-500" />
           <p className="relative text-lg font-semibold text-foreground text-center px-4">
             Nuove date in arrivo!
           </p>

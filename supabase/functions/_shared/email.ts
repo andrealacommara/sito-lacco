@@ -20,7 +20,7 @@ function baseTemplate(
 ): string {
   const signature = opts?.transactional
     ? ""
-    : `<p class="email-text" style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong style="color:#F31260;">Lacco</strong></p>`;
+    : `<p class="email-text" style="margin:24px 0 0;font-size:15px;color:#333;line-height:1.7;">A presto,<br/><strong class="email-accent" style="color:#c20e4d;">Lacco</strong></p>`;
 
   const footerContent =
     opts?.customFooterContent ??
@@ -63,11 +63,13 @@ function baseTemplate(
   .email-body p,.rte-body p,.rte-body li{color:#e5e5ea !important;}
   .footer-text{color:#8e8e93 !important;}
   .footer-link,.footer-link a{color:#8e8e93 !important;}
+  .email-accent{color:#f877a4 !important;}
 }
 [data-ogsc] body,[data-ogsc] .email-outer{background-color:#111111 !important;}
 [data-ogsc] .email-card,[data-ogsc] .email-header,[data-ogsc] .email-body,[data-ogsc] .email-footer{background-color:#1c1c1e !important;}
 [data-ogsc] .email-body p,[data-ogsc] .rte-body p,[data-ogsc] .rte-body li{color:#e5e5ea !important;}
 [data-ogsc] .footer-text,[data-ogsc] .footer-link,[data-ogsc] .footer-link a{color:#8e8e93 !important;}
+[data-ogsc] .email-accent{color:#f877a4 !important;}
 </style>
 </head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;color:#333333;">
@@ -129,7 +131,7 @@ export function broadcastEmailHtml(opts: {
             <td align="center">
               <table cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background:#F31260;border-radius:8px;">
+                  <td style="background:#c20e4d;border-radius:8px;">
                     <a href="${opts.ctaUrl}"
                        style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;
                               color:#fff;text-decoration:none;letter-spacing:0.02em;">
@@ -212,10 +214,10 @@ export function contactEmailHtml(
       Hai ricevuto un nuovo messaggio dal sito.
     </p>
     <p style="margin:0 0 4px;font-size:15px;color:#333;">
-      <strong style="color:#F31260;">Da:</strong> ${name}
+      <strong class="email-accent" style="color:#c20e4d;">Da:</strong> ${name}
     </p>
     <p style="margin:0 0 20px;font-size:15px;color:#333;">
-      <strong style="color:#F31260;">Email:</strong> ${email}
+      <strong class="email-accent" style="color:#c20e4d;">Email:</strong> ${email}
     </p>
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
