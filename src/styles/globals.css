@@ -246,8 +246,11 @@
 [data-theme="dark"] {
   --background: #000000;
 }
-html,
-body {
+/* Lo sfondo sta sul root <html>: si propaga al canvas del viewport (copre
+   safe-area iOS e overscroll) ed è reattivo a data-theme. Il <body> resta
+   trasparente così il canvas animato (-z-10 in backgroundPattern) resta
+   visibile sopra questo sfondo e sotto i contenuti. */
+html {
   background-color: var(--background);
 }
 
