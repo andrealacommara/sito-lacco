@@ -245,3 +245,14 @@ body {
 [data-theme="dark"] {
   --background: #000000;
 }
+
+/* Pagine slug immersive: data-force-theme-color viene "cotto" su <html> dal
+   prerender e gestito a runtime da setThemeColorOverride. Queste pagine sono
+   sempre scure (artwork fixed a tutto schermo), ma in tema chiaro lo sfondo del
+   documento resterebbe bianco e su iOS Safari (viewport-fit=cover) comparirebbe
+   nella safe-area / overscroll bounce. Lo forziamo a nero su <html> e <body> a
+   prescindere dal tema; le Card forzate light al loro interno restano invariate. */
+html[data-force-theme-color],
+html[data-force-theme-color] body {
+  background-color: #000;
+}

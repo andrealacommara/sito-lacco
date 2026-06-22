@@ -62,9 +62,21 @@ export const applyThemeColor = (): void => {
   );
 };
 
-// Imposta/azzera l'override per-pagina e riapplica subito.
+// Imposta/azzera l'override per-pagina e riapplica subito. Riflette l'override
+// anche come attributo data-force-theme-color su <html>, così la regola CSS che
+// annerisce lo sfondo del documento (safe-area/overscroll iOS) vale anche in
+// navigazione SPA, dove l'HTML prerenderizzato col flag non viene ricaricato.
 export const setThemeColorOverride = (color: string | null): void => {
   overrideColor = color;
+
+  if (typeof document !== "undefined") {
+    if (color) {
+      document.documentElement.setAttribute("data-force-theme-color", color);
+    } else {
+      document.documentElement.removeAttribute("data-force-theme-color");
+    }
+  }
+
   applyThemeColor();
 };
 
