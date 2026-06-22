@@ -19,6 +19,7 @@ import ReleaseDateBadge from "@/components/releaseDateBadge";
 import SongCarousel from "@/components/songCarousel";
 import SubscribeForm from "@/components/subscribeForm";
 import { AppleMusicIcon, Logo, SpotifyIcon } from "@/components/icons";
+import { useThemeColor } from "@/lib/themeColor";
 import NotFoundPage from "@/pages/notFoundPage";
 
 const fadeUp = (delay: number) => ({
@@ -27,9 +28,75 @@ const fadeUp = (delay: number) => ({
   transition: { duration: 0.6, ease: "easeOut" as const, delay },
 });
 
+// Artista come entità coerente con il MusicGroup dichiarato in index.html.
+const ARTIST_ENTITY = {
+  "@type": "MusicGroup",
+  name: "Lacco",
+  url: "https://lacco.it",
+};
+
+// Structured data Schema.org: MusicAlbum (EP/Album, con tracklist) o
+// MusicRecording (singolo). Migliora i rich results e l'indicizzazione del brano.
+function buildReleaseJsonLd(
+  release: Album | Single,
+  imageUrl: string,
+  description: string,
+) {
+  const url = `https://lacco.it/${release.slug}`;
+  const datePublished = release.releaseDate.toISOString().slice(0, 10);
+
+  if (isAlbum(release)) {
+    const tracks = getAlbumTracks(release);
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "MusicAlbum",
+      name: release.title,
+      url,
+      image: imageUrl,
+      description,
+      datePublished,
+      albumReleaseType: release.kind === "EP" ? "EPRelease" : "AlbumRelease",
+      byArtist: ARTIST_ENTITY,
+      numTracks: tracks.length,
+      track: tracks.map((song, i) => ({
+        "@type": "MusicRecording",
+        position: i + 1,
+        name: song.title,
+        url: `https://lacco.it/${song.slug}`,
+      })),
+    };
+  }
+
+  const album = getAlbumForSong(release.slug);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "MusicRecording",
+    name: release.title,
+    url,
+    image: imageUrl,
+    description,
+    datePublished,
+    byArtist: ARTIST_ENTITY,
+    ...(album
+      ? {
+          inAlbum: {
+            "@type": "MusicAlbum",
+            name: album.title,
+            url: `https://lacco.it/${album.slug}`,
+          },
+        }
+      : {}),
+  };
+}
+
 export default function ReleasePage() {
   const { slug } = useParams<{ slug: string }>();
   const release = slug ? getReleaseBySlug(slug) : undefined;
+
+  // Pagina immersiva sempre scura: barra del browser nera a prescindere dal tema.
+  useThemeColor(release ? "#000000" : null);
 
   if (!release) return <NotFoundPage />;
 
@@ -37,6 +104,7 @@ export default function ReleasePage() {
   const metaDescription = release.description.replace(/\n/g, " ").trim();
   const ogImageUrl = `https://lacco.it${release.ogImage}`;
   const ogType = isAlbum(release) ? "music.album" : "music.song";
+  const jsonLd = buildReleaseJsonLd(release, ogImageUrl, metaDescription);
 
   return (
     <>
@@ -57,6 +125,7 @@ export default function ReleasePage() {
         <meta content={`${release.title} | Lacco`} name="twitter:title" />
         <meta content={metaDescription} name="twitter:description" />
         <meta content={ogImageUrl} name="twitter:image" />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
       {/* Background blur: cover artwork a tutto schermo */}

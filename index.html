@@ -57,17 +57,48 @@
     <link rel="manifest" href="/manifest.json" />
 
     <!-- ========================== THEME COLORS ========================== -->
-    <!-- Defines colors for light and dark mode browser UI -->
-    <meta
-      name="theme-color"
-      media="(prefers-color-scheme: light)"
-      content="#ffffff"
-    />
-    <meta
-      name="theme-color"
-      media="(prefers-color-scheme: dark)"
-      content="#000000"
-    />
+    <!-- Colore della barra del browser (Safari/Chrome mobile). Valore di default
+         sovrascritto dallo script qui sotto col tema reale prima del primo paint. -->
+    <meta name="theme-color" content="#000000" />
+
+    <!-- Bootstrap tema: imposta data-theme e theme-color PRIMA del paint per
+         evitare il flash (FOUC) e la "banda bianca" quando il tema scelto diverge
+         dalla preferenza del sistema operativo. Replica la logica di ThemeSwitch
+         (localStorage `user-theme` con scadenza 24h, fallback su prefers-color-scheme). -->
+    <script>
+      (function () {
+        try {
+          var THEME_EXPIRATION_MS = 24 * 60 * 60 * 1000;
+          var saved = localStorage.getItem("user-theme");
+          var timestamp = localStorage.getItem("user-theme-timestamp");
+          var theme = null;
+
+          if (saved && timestamp) {
+            if (Date.now() - parseInt(timestamp, 10) <= THEME_EXPIRATION_MS) {
+              theme = saved;
+            } else {
+              localStorage.removeItem("user-theme");
+              localStorage.removeItem("user-theme-timestamp");
+            }
+          }
+
+          if (theme !== "dark" && theme !== "light") {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          }
+
+          document.documentElement.setAttribute("data-theme", theme);
+
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) {
+            meta.setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
+          }
+        } catch (e) {
+          /* localStorage/matchMedia non disponibili: si usa il default del meta. */
+        }
+      })();
+    </script>
 
     <!-- ========================== MICROSOFT ========================== -->
     <!-- Pinned site tile color and config for Windows browsers -->

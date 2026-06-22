@@ -19,6 +19,7 @@ import LiveEventRow from "@/components/liveEventRow";
 import LiveGalleryModal from "@/components/liveGalleryModal";
 import YoutubeEmbed from "@/components/youtubeEmbed";
 import { Logo } from "@/components/icons";
+import { useThemeColor } from "@/lib/themeColor";
 import NotFoundPage from "@/pages/notFoundPage";
 
 // ============================ ANIMAZIONI ============================ //
@@ -144,6 +145,46 @@ function mapsUrl(event: LiveEvent): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${event.venue}, ${event.address ?? event.city}`,
   )}`;
+}
+
+// Structured data Schema.org MusicEvent: data, luogo, biglietti e performer.
+// Migliora i rich results di Google per i concerti.
+function buildEventJsonLd(
+  event: LiveEvent,
+  pageUrl: string,
+  imageUrl: string,
+  description: string,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "MusicEvent",
+    name: event.title,
+    startDate: event.date.toISOString(),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    url: pageUrl,
+    image: imageUrl,
+    description,
+    location: {
+      "@type": "Place",
+      name: event.venue,
+      address: event.address ?? event.city,
+    },
+    performer: {
+      "@type": "MusicGroup",
+      name: "Lacco",
+      url: "https://lacco.it",
+    },
+    ...(event.ticketUrl
+      ? {
+          offers: {
+            "@type": "Offer",
+            url: event.ticketUrl,
+            availability: "https://schema.org/InStock",
+          },
+        }
+      : {}),
+  };
 }
 
 // ============================ HERO POSTER =========================== //
@@ -433,6 +474,9 @@ export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();
   const event = slug ? getLiveEventBySlug(slug) : undefined;
 
+  // Pagina immersiva sempre scura: barra del browser nera a prescindere dal tema.
+  useThemeColor(event ? "#000000" : null);
+
   if (!event) return <NotFoundPage />;
 
   const isPast = isPastLiveEvent(event);
@@ -442,6 +486,12 @@ export default function EventPage() {
     event.description?.replace(/\n/g, " ").trim() ||
     `${event.title} — live di Lacco a ${event.venue}, ${event.city} il ${formatLongDate(event.date)}.`;
   const pageUrl = `https://lacco.it/live/${event.slug}`;
+  // OG dedicata generata da generate-og-events.mjs quando esiste il poster
+  // (stesso criterio: poster su disco → og-<slug>.jpg). Altrimenti la generica.
+  const ogImageUrl = event.poster
+    ? `https://lacco.it/og-${event.slug}.jpg`
+    : "https://lacco.it/og-image.jpg";
+  const jsonLd = buildEventJsonLd(event, pageUrl, ogImageUrl, metaDescription);
 
   return (
     <>
@@ -454,14 +504,15 @@ export default function EventPage() {
         <meta content="Lacco" property="og:site_name" />
         <meta content={`${event.title} | Live | Lacco`} property="og:title" />
         <meta content={metaDescription} property="og:description" />
-        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content={ogImageUrl} property="og:image" />
         <meta content={`${event.title} — Lacco`} property="og:image:alt" />
         <meta content={pageUrl} property="og:url" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content={`${event.title} | Live | Lacco`} name="twitter:title" />
         <meta content={metaDescription} name="twitter:description" />
-        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
+        <meta content={ogImageUrl} name="twitter:image" />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
       {/* Background blur: poster a tutto schermo */}

@@ -34,6 +34,7 @@ import {
   ListBoxItem,
 } from "@heroui/react";
 import { Helmet } from "react-helmet-async";
+import clsx from "clsx";
 
 import RichTextEditor from "@/components/richTextEditor";
 import DefaultLayout from "@/layouts/default";
@@ -114,7 +115,9 @@ export default function AdminPage() {
   const [dryCount, setDryCount] = useState<number | null>(null);
   const [broadcastLoading, setBroadcastLoading] = useState(false);
   const [confirmSend, setConfirmSend] = useState(false);
-  const [siteDark, setSiteDark] = useState(
+  // Tema dell'anteprima email: default = tema corrente del sito, poi controllato
+  // dal toggle dedicato (indipendente dal tema del sito).
+  const [previewDark, setPreviewDark] = useState(
     () => document.documentElement.getAttribute("data-theme") === "dark",
   );
 
@@ -136,18 +139,6 @@ export default function AdminPage() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const obs = new MutationObserver(() =>
-      setSiteDark(
-        document.documentElement.getAttribute("data-theme") === "dark",
-      ),
-    );
-
-    obs.observe(document.documentElement, { attributeFilter: ["data-theme"] });
-
-    return () => obs.disconnect();
   }, []);
 
   // ── Stats ───────────────────────────────────────────────────────────────────
@@ -497,7 +488,10 @@ export default function AdminPage() {
     return /^www\./i.test(u) ? `https://${u}` : `https://www.${u}`;
   };
 
-  const buildBroadcastHtml = (preview = false, forceDark = false) =>
+  const buildBroadcastHtml = (
+    preview = false,
+    previewScheme?: "light" | "dark",
+  ) =>
     broadcastEmailHtml({
       body: emailBody || "Corpo dell'email…",
       imageUrl: imagePublicUrl || undefined,
@@ -505,7 +499,7 @@ export default function AdminPage() {
       ctaUrl: normalizeUrl(ctaUrl) || undefined,
       unsubscribeUrl: "{{{ RESEND_UNSUBSCRIBE_URL }}}",
       preview,
-      forceDark,
+      previewScheme,
     });
 
   const handleDryRun = async () => {
@@ -1267,12 +1261,45 @@ export default function AdminPage() {
 
                   {/* Email preview */}
                   <div>
-                    <p className="text-xs text-default-400 mb-2">
-                      Anteprima email
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-default-400">
+                        Anteprima email
+                      </p>
+                      <div className="inline-flex items-center gap-0.5 rounded-lg border border-default-200 p-0.5">
+                        <button
+                          aria-pressed={!previewDark}
+                          className={clsx(
+                            "px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer",
+                            previewDark
+                              ? "text-default-400 hover:text-default-500"
+                              : "bg-default-200 text-foreground",
+                          )}
+                          type="button"
+                          onClick={() => setPreviewDark(false)}
+                        >
+                          Chiaro
+                        </button>
+                        <button
+                          aria-pressed={previewDark}
+                          className={clsx(
+                            "px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer",
+                            previewDark
+                              ? "bg-default-200 text-foreground"
+                              : "text-default-400 hover:text-default-500",
+                          )}
+                          type="button"
+                          onClick={() => setPreviewDark(true)}
+                        >
+                          Scuro
+                        </button>
+                      </div>
+                    </div>
                     <iframe
                       className="w-full h-90 sm:h-130 rounded-lg border border-default-200"
-                      srcDoc={buildBroadcastHtml(true, siteDark)}
+                      srcDoc={buildBroadcastHtml(
+                        true,
+                        previewDark ? "dark" : "light",
+                      )}
                       title="Anteprima email"
                     />
                   </div>

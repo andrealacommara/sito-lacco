@@ -13,7 +13,9 @@ function baseTemplate(
   opts?: {
     unsubscribeUrl?: string;
     transactional?: boolean;
-    forceDark?: boolean;
+    // Solo per l'anteprima admin: forza uno schema fisso ("light"/"dark") in modo
+    // deterministico, ignorando il tema dell'OS. Assente = email reale (adattiva).
+    previewScheme?: "light" | "dark";
   },
 ): string {
   const signature = opts?.transactional
@@ -37,44 +39,49 @@ function baseTemplate(
               : ""
           }`;
 
-  return `<!DOCTYPE html>
-<html lang="it" style="color-scheme:light dark;">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="color-scheme" content="light dark"/>
-<meta name="supported-color-schemes" content="light dark"/>
-<title>Lacco</title>
-<style>
-:root{color-scheme:light dark;}
-.rte-body p{margin:0 0 16px;font-size:16px;color:#333;line-height:1.7;}
-.rte-body p:last-child{margin-bottom:0;}
-.rte-body ul,.rte-body ol{margin:0 0 16px;padding-left:24px;}
-.rte-body li{font-size:16px;color:#333;line-height:1.7;margin-bottom:4px;}
-@media (prefers-color-scheme:dark){
-  body,.email-outer{background-color:#111111 !important;color:#e5e5ea !important;}
-  .email-card{background-color:#1c1c1e !important;border-color:#2c2c2e !important;}
-  .email-header,.email-body{background-color:#1c1c1e !important;}
-  .email-footer{background-color:#1c1c1e !important;border-top-color:#2c2c2e !important;}
-  .email-body p,.rte-body p,.rte-body li{color:#e5e5ea !important;}
-  .footer-text{color:#8e8e93 !important;}
-  .footer-link,.footer-link a{color:#8e8e93 !important;}
-}
-${
-  opts?.forceDark
-    ? `body,.email-outer{background-color:#111111 !important;color:#e5e5ea !important;}
+  const previewScheme = opts?.previewScheme;
+  const isPreview = previewScheme === "light" || previewScheme === "dark";
+  const colorScheme = isPreview ? previewScheme : "light dark";
+
+  // Palette scura, condivisa fra media query (email reale) e force (anteprima dark).
+  const darkPaletteRules = `body,.email-outer{background-color:#111111 !important;color:#e5e5ea !important;}
 .email-card{background-color:#1c1c1e !important;border-color:#2c2c2e !important;}
 .email-header,.email-body{background-color:#1c1c1e !important;}
 .email-footer{background-color:#1c1c1e !important;border-top-color:#2c2c2e !important;}
 .email-body p,.rte-body p,.rte-body li{color:#e5e5ea !important;}
 .footer-text{color:#8e8e93 !important;}
-.footer-link,.footer-link a{color:#8e8e93 !important;}`
-    : ""
+.footer-link,.footer-link a{color:#8e8e93 !important;}`;
+
+  // In anteprima rendiamo in modo deterministico lo schema scelto (niente reazione
+  // all'OS): la media query e le regole Outlook (ogsc) servono solo all'email reale.
+  // Anteprima dark → applichiamo direttamente la palette; anteprima light → default.
+  const colorModeCss = isPreview
+    ? previewScheme === "dark"
+      ? darkPaletteRules
+      : ""
+    : `@media (prefers-color-scheme:dark){
+${darkPaletteRules}
 }
 [data-ogsc] body,[data-ogsc] .email-outer{background-color:#111111 !important;}
 [data-ogsc] .email-card,[data-ogsc] .email-header,[data-ogsc] .email-body,[data-ogsc] .email-footer{background-color:#1c1c1e !important;}
 [data-ogsc] .email-body p,[data-ogsc] .rte-body p,[data-ogsc] .rte-body li{color:#e5e5ea !important;}
-[data-ogsc] .footer-text,[data-ogsc] .footer-link,[data-ogsc] .footer-link a{color:#8e8e93 !important;}
+[data-ogsc] .footer-text,[data-ogsc] .footer-link,[data-ogsc] .footer-link a{color:#8e8e93 !important;}`;
+
+  return `<!DOCTYPE html>
+<html lang="it" style="color-scheme:${colorScheme};">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="${colorScheme}"/>
+<meta name="supported-color-schemes" content="light dark"/>
+<title>Lacco</title>
+<style>
+:root{color-scheme:${colorScheme};}
+.rte-body p{margin:0 0 16px;font-size:16px;color:#333;line-height:1.7;}
+.rte-body p:last-child{margin-bottom:0;}
+.rte-body ul,.rte-body ol{margin:0 0 16px;padding-left:24px;}
+.rte-body li{font-size:16px;color:#333;line-height:1.7;margin-bottom:4px;}
+${colorModeCss}
 </style>
 </head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,sans-serif;color:#333333;">
@@ -111,7 +118,7 @@ export function broadcastEmailHtml(opts: {
   ctaUrl?: string;
   unsubscribeUrl: string;
   preview?: boolean;
-  forceDark?: boolean;
+  previewScheme?: "light" | "dark";
 }): string {
   const bodyHtml = opts.body;
 
@@ -153,6 +160,6 @@ export function broadcastEmailHtml(opts: {
 
   return baseTemplate(
     `${greeting}<div class="rte-body" style="font-size:16px;color:#333;line-height:1.7;">${bodyHtml}</div>${imageSection}${ctaSection}`,
-    { unsubscribeUrl: opts.unsubscribeUrl, forceDark: opts.forceDark },
+    { unsubscribeUrl: opts.unsubscribeUrl, previewScheme: opts.previewScheme },
   );
 }

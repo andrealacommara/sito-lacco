@@ -26,6 +26,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      # Chromium serve sia al prerender (postbuild) sia allo smoke test
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
       - name: Build project
         run: npm run build
         env:
@@ -34,15 +44,6 @@ jobs:
           VITE_EMAILJS_PUBLIC_KEY: "test"
           VITE_SUPABASE_URL: "https://placeholder.supabase.co"
           VITE_SUPABASE_ANON_KEY: "placeholder"
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
-
-      - name: Install Playwright browser
-        run: npx playwright install chromium
 
       - name: Runtime smoke test
         run: npm run test:smoke
