@@ -16,9 +16,14 @@ import fs from "fs";
 import { preview } from "vite";
 import { chromium } from "playwright";
 
-import { getAllRoutes } from "./routes.mjs";
+import { getAllRoutes, STATIC_ROUTES } from "./routes.mjs";
 
 const OUTPUT_DIR = "dist";
+
+// Route immersive sempre a barra scura (release /:slug ed eventi /live/:slug):
+// sono tutte e sole quelle dinamiche, cioè NON statiche e non la home.
+const staticSet = new Set(["/", ...STATIC_ROUTES]);
+const isForcedDark = (route) => !staticSet.has(route);
 
 // dist/index.html per "/", altrimenti dist/<route>/index.html.
 function outputPathFor(route) {
@@ -70,10 +75,24 @@ try {
     //  - deduplica i tag SEO: index.html ne contiene di statici (default) e
     //    react-helmet-async ne appende di per-pagina. Senza dedup la pagina ha
     //    due <title> e doppi og:* e i crawler usano quello generico sbagliato.
-    await page.evaluate(() => {
+    await page.evaluate((forcedDark) => {
       const head = document.head;
 
       document.documentElement.removeAttribute("data-theme");
+
+      // Slug immersive: "cuoci" il colore barra forzato così lo script inline di
+      // index.html (e il sync runtime) lo applicano dal primo paint, evitando la
+      // banda bianca per gli utenti con preferenza di sistema chiara.
+      if (forcedDark) {
+        document.documentElement.setAttribute(
+          "data-force-theme-color",
+          "#000000",
+        );
+
+        const themeMeta = head.querySelector('meta[name="theme-color"]');
+
+        if (themeMeta) themeMeta.setAttribute("content", "#000000");
+      }
 
       // <title>: tieni quello che corrisponde a document.title (impostato da
       // Helmet), con fallback al primo; rimuovi gli altri.
@@ -107,7 +126,7 @@ try {
         if (seen.has(key)) el.remove();
         else seen.add(key);
       }
-    });
+    }, isForcedDark(route));
 
     // page.content() include già <!DOCTYPE html>.
     const html = await page.content();

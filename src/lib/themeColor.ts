@@ -78,6 +78,15 @@ export const initThemeColorSync = (): void => {
   )
     return;
 
+  // Le slug immersive prerenderizzate "cuociono" data-force-theme-color su
+  // <html>: rispettalo come override iniziale così la barra resta del colore
+  // forzato dal load del bundle fino al mount di React (che poi reimposta lo
+  // stesso colore via useThemeColor). Senza questo, applyThemeColor ricalcolerebbe
+  // dal data-theme reintroducendo la banda bianca prima del mount.
+  const baked = document.documentElement.getAttribute("data-force-theme-color");
+
+  if (baked) overrideColor = baked;
+
   applyThemeColor();
 
   const observer = new MutationObserver(() => applyThemeColor());
