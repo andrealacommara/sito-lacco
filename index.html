@@ -90,9 +90,13 @@
 
           document.documentElement.setAttribute("data-theme", theme);
 
+          // Le slug immersive prerenderizzate "cuociono" data-force-theme-color
+          // su <html>: la barra deve restare di quel colore a prescindere dalla
+          // preferenza di sistema, già da questo primo paint (niente banda bianca).
+          var force = document.documentElement.getAttribute("data-force-theme-color");
           var meta = document.querySelector('meta[name="theme-color"]');
           if (meta) {
-            meta.setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
+            meta.setAttribute("content", force || (theme === "dark" ? "#000000" : "#ffffff"));
           }
         } catch (e) {
           /* localStorage/matchMedia non disponibili: si usa il default del meta. */

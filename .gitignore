@@ -38,6 +38,7 @@ vite.config.d.ts
 
 # Claude Code (non committare config agenti né settings)
 .claude/
+CLAUDE.md
 
 # Supabase local env
 supabase/.env
