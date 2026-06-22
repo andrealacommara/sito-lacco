@@ -32,6 +32,7 @@ import {
   SelectPopover,
   ListBox,
   ListBoxItem,
+  CheckboxContent,
 } from "@heroui/react";
 import { Helmet } from "react-helmet-async";
 import clsx from "clsx";
@@ -897,22 +898,18 @@ export default function AdminPage() {
               {/* Header colonne */}
               {!subsLoading && subscribers.length > 0 && (
                 <div className="flex items-center gap-3 px-2 pb-2 border-b border-default-200 text-xs font-medium text-default-400 uppercase tracking-wide">
-                  <button
+                  <Checkbox
                     aria-label="Seleziona tutti gli iscritti in pagina"
-                    className="rounded-xl cursor-pointer"
-                    type="button"
-                    onClick={toggleSelectAllOnPage}
+                    isIndeterminate={someOnPageSelected}
+                    isSelected={allOnPageSelected}
+                    onChange={toggleSelectAllOnPage}
                   >
-                    <Checkbox
-                      className="pointer-events-none"
-                      isIndeterminate={someOnPageSelected}
-                      isSelected={allOnPageSelected}
-                    >
+                    <CheckboxContent>
                       <CheckboxControl>
                         <CheckboxIndicator />
                       </CheckboxControl>
-                    </Checkbox>
-                  </button>
+                    </CheckboxContent>
+                  </Checkbox>
                   <button
                     className="rounded-xl flex-1 flex items-center gap-1 text-left hover:text-default-600"
                     type="button"
