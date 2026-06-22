@@ -11,26 +11,13 @@ import VitePluginSitemap from "vite-plugin-sitemap";
 import { imagetools } from "vite-imagetools";
 import { createHtmlPlugin } from "vite-plugin-html";
 
-// @ts-expect-error — loader build-time in ESM puro, niente type declarations
-import { loadCatalog } from "./scripts/catalog-loader.mjs";
-
-// Route statiche indicizzabili (curate a mano: NON include admin/presskit/unsubscribe).
-// Le route delle release sono derivate dal catalog → unica fonte di verità.
-const STATIC_ROUTES = [
-  "/musica",
-  "/chi-sono",
-  "/live",
-  "/contatti",
-  "/newsletter",
-  "/privacy",
-];
+// @ts-expect-error — sorgente route build-time in ESM puro, niente type declarations
+import { getSitemapRoutes } from "./scripts/routes.mjs";
 
 export default defineConfig(async () => {
-  const { catalog } = await loadCatalog();
-  const releaseRoutes = catalog.map(
-    (release: { slug: string }) => `/${release.slug}`,
-  );
-  const sitemapRoutes = [...STATIC_ROUTES, ...releaseRoutes];
+  // Route indicizzabili (statiche + release + live) da un'unica fonte di verità,
+  // condivisa con lo script di prerender.
+  const sitemapRoutes = await getSitemapRoutes();
 
   return {
     plugins: [

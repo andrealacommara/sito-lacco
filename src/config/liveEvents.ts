@@ -1,5 +1,7 @@
 import type { ImageLikeImport } from "@/components/smartImage";
 
+import { liveEventsData } from "@/config/liveEvents.data";
+
 // Foto del live: `src` è la versione leggera (ottimizzata) mostrata a video,
 // `downloadUrl` è il file originale nella cartella (scaricato dal lightbox).
 export type LiveEventPhoto = {
@@ -8,22 +10,11 @@ export type LiveEventPhoto = {
   alt: string;
 };
 
-export type LiveEvent = {
-  slug: string;
-  title: string;
-  date: Date; // show start — target of the Countdown
-  doorsTime?: string;
-  venue: string;
-  address?: string;
-  city: string;
-  ticketUrl: string;
-  price?: string;
-  lineup?: string[];
+// I campi editoriali vivono in liveEvents.data.ts (puri, caricabili in Node).
+// Qui aggiungiamo solo gli asset agganciati dai file su disco.
+export type LiveEvent = (typeof liveEventsData)[number] & {
   poster?: ImageLikeImport;
-  // Campi "recap", popolati dopo il live (vedi EventPage in modalità passato).
-  description?: string; // racconto del live (\n per i paragrafi)
   gallery?: LiveEventPhoto[];
-  recapVideoIds?: string[]; // ID dei video YouTube
 };
 
 // ============================================================================
@@ -71,37 +62,8 @@ function galleryFor(slug: string, title: string): LiveEventPhoto[] {
     }));
 }
 
-// Dati editoriali dell'evento. Poster e gallery vengono agganciati dai file.
-type LiveEventInput = Omit<LiveEvent, "poster" | "gallery">;
-
-const liveEventsInput: LiveEventInput[] = [
-  {
-    slug: "into-the-laccoverse",
-    title: "INTO THE LACCOVERSE",
-    date: new Date("2026-07-11T21:00:00"),
-    doorsTime: "20:00",
-    venue: "CPG Torino",
-    address: "Strada delle Cacce, 36, 10135 Torino (TO)",
-    city: "Torino",
-    ticketUrl: "https://www.mailticket.it/evento/53852/lacco",
-    price: "€10 + prevendita (€15 in cassa)",
-    lineup: ["SCA", "tommiottocento"],
-  },
-  {
-    slug: "tempo-perso-live",
-    title: "Tempo perso LIVE",
-    date: new Date("2026-01-30T21:00:00"),
-    doorsTime: "20:00",
-    venue: "CPG Torino",
-    address: "Strada delle Cacce, 36, 10135 Torino (TO)",
-    city: "Torino",
-    ticketUrl: "https://www.mailticket.it/evento/50837/lacco",
-    price: "€10 + prevendita",
-    lineup: ["SCA"],
-  },
-];
-
-export const liveEvents: LiveEvent[] = liveEventsInput.map((event) => ({
+// Dati editoriali in liveEvents.data.ts; qui agganciamo poster e gallery dai file.
+export const liveEvents: LiveEvent[] = liveEventsData.map((event) => ({
   ...event,
   poster: posterBySlug[event.slug],
   gallery: galleryFor(event.slug, event.title),

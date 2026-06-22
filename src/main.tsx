@@ -11,6 +11,7 @@ import { Provider } from "./provider.tsx"; // Global context provider (theme, st
 
 import "@/styles/globals.css"; // Global stylesheet
 import { ensureMediaKeySystemRobustness } from "@/utils/ensureMediaKeySystemRobustness";
+import { initThemeColorSync } from "@/lib/themeColor"; // Sincronizza il theme-color della barra browser col tema reale
 import "@/config/slugs"; // Side-effect: in dev avvisa su collisioni di slug (reserved/singoli/album)
 
 // ========================== ENTRY POINT ========================== //
@@ -25,6 +26,7 @@ import "@/config/slugs"; // Side-effect: in dev avvisa su collisioni di slug (re
  * - Provider: provides shared context and configuration across the app.
  */
 ensureMediaKeySystemRobustness();
+initThemeColorSync();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

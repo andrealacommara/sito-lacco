@@ -12,14 +12,25 @@ Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
 Redirect 301 /youtube https://www.youtube.com/@Laccoverse
 Redirect 301 /preview-nokoru-mono https://on.soundcloud.com/u3ZP1Y26moVlmrQSIO
 
-# ====================== STATIC FILES & SPA FALLBACK ======================
+# ============= STATIC FILES, PRERENDER SNAPSHOT & SPA FALLBACK =============
 
-# Serve static files if they exist
+# Serve static files if they exist (sitemap, OG images, assets, …)
 
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# SPA fallback → fall back to index.html
+# Serve the prerendered SEO snapshot (dist/<route>/index.html) for clean URLs.
+# DirectorySlash Off evita il redirect 301 con slash finale, così i canonical
+# senza "/" restano serviti direttamente senza redirect.
+
+<IfModule mod_dir.c>
+  DirectorySlash Off
+</IfModule>
+
+RewriteCond %{REQUEST_FILENAME}/index.html -f
+RewriteRule ^(.+?)/?$ $1/index.html [L]
+
+# SPA fallback → index.html per le route non prerenderizzate (noindex) e sconosciute
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
