@@ -35,6 +35,8 @@ src/
 │   ├── icons/
 │   └── images/
 ├── components/             # Reusable UI components (representative)
+│   ├── admin/
+│   │   └── templateStudio.tsx  # Social-media image generator (story/post formats)
 │   ├── countdown.tsx         # Release/event countdown timer (dark/light variant)
 │   ├── icons.tsx             # SVG icons + Logo component
 │   ├── liveEventCard.tsx     # Live event card (poster, countdown, ticket CTA)
@@ -59,7 +61,8 @@ src/
 ├── layouts/
 │   └── default.tsx           # Shared layout (Navbar + Footer)
 ├── lib/
-│   └── supabase.ts           # Supabase client + Edge Function base URL
+│   ├── supabase.ts           # Supabase client + Edge Function base URL
+│   └── templateRenderer.ts   # Canvas renderer for social-media template images
 ├── pages/
 │   ├── aboutPage.tsx         # "Su di me"
 │   ├── adminPage.tsx         # Admin dashboard (subscriber list + broadcast)
@@ -125,7 +128,7 @@ supabase/
   - **Presave mode** — artwork, countdown timer, DistroKid presave button, newsletter subscribe form.
   - **Live mode** — artwork, streaming CTAs (Spotify / Apple Music), song carousel.
 - **Newsletter:** Subscribe form with name + email + consent. Single opt-in — confirmed immediately, with a welcome email sent right away. Unsubscribe link in every email, kept in sync with the Resend Audience via webhook and manual reconciliation.
-- **Admin (`/admin`):** Protected by Supabase magic link auth. Dashboard with live counters (confirmed, unsubscribed, bounced, new in last 7 days), searchable/sortable/filterable subscriber list with configurable page size, manual unsubscribe for selected subscribers, and a broadcast composer (body, optional image, optional CTA button) with live email preview — sendable to all confirmed subscribers or to individually selected ones.
+- **Admin (`/admin`):** Protected by Supabase magic link auth. Dashboard with live counters (confirmed, unsubscribed, bounced, new in last 7 days), searchable/sortable/filterable subscriber list with configurable page size, manual unsubscribe for selected subscribers, and a broadcast composer (body, optional image, optional CTA button) with live email preview — sendable to all confirmed subscribers or to individually selected ones. Also includes a **Template Studio** that generates branded social-media images (story 9:16, post 4:5/1:1) with logo and rich-text overlay, downloadable for posting.
 - **Contatti:** Contact form submitted to the `send-contact-email` Supabase Edge Function, which delivers the message via Resend.
 - **PressKit:** Dedicated private page (lazy-loaded, noindex) with official media assets, extended bio, press photos, and professional contacts; the downloadable kit is zipped at build time.
 - **Privacy Policy (`/privacy`):** GDPR-compliant privacy policy in Italian.
