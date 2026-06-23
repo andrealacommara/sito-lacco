@@ -30,7 +30,7 @@ export default function DefaultLayout({
       <BackgroundPattern />
       {/* NAVBAR - Top section */}
       <header
-        className="sticky top-0 z-50 border-b border-default-100"
+        className="relative md:sticky md:top-0 z-50 border-b border-default-100"
         role="banner"
       >
         <Navbar />

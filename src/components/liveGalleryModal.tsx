@@ -80,6 +80,9 @@ function DownloadIcon() {
 const ZOOM_MIN = 1;
 const ZOOM_MAX = 3;
 
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
 const touchDistance = (touches: React.TouchList) =>
   Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -94,13 +97,19 @@ function Slide({
   photo,
   boundsRef,
   onZoomChange,
+  onPinchChange,
 }: {
   photo: LiveEventPhoto;
   boundsRef: React.RefObject<HTMLDivElement | null>;
   onZoomChange: (zoomed: boolean) => void;
+  onPinchChange: (pinching: boolean) => void;
 }) {
   const [loaded, setLoaded] = useState(false);
   const [panEnabled, setPanEnabled] = useState(false);
+  // Pinch a due dita in corso: disattiva il drag/pan di framer-motion, che
+  // altrimenti aggancerebbe il movimento di un dito e, al rilascio, applicherebbe
+  // un'inerzia su x/y sovrascrivendo la ri-centratura → foto spostata.
+  const [pinchActive, setPinchActive] = useState(false);
   const [constraints, setConstraints] = useState({
     top: 0,
     bottom: 0,
@@ -142,6 +151,15 @@ function Slide({
           left: -overflowX,
           right: overflowX,
         });
+
+        // Riducendo lo zoom i vincoli si restringono: ri-clampa la posizione
+        // corrente così l'immagine rientra nei bordi invece di restare spostata.
+        const spring = { type: "spring", stiffness: 300, damping: 30 } as const;
+        const clampedX = clamp(x.get(), -overflowX, overflowX);
+        const clampedY = clamp(y.get(), -overflowY, overflowY);
+
+        if (clampedX !== x.get()) animate(x, clampedX, spring);
+        if (clampedY !== y.get()) animate(y, clampedY, spring);
       }
     } else {
       // Uscendo dallo zoom la foto torna sempre centrata a 1×, con animazione.
@@ -172,6 +190,10 @@ function Slide({
         dist: touchDistance(e.touches),
         scale: scale.get(),
       };
+      // Segnala subito il pinch: disattiva lo swipe di paginazione (esterno) e
+      // il pan di framer (interno), così solo il pinch controlla scala e x/y.
+      setPinchActive(true);
+      onPinchChange(true);
     }
   };
 
@@ -184,8 +206,35 @@ function Slide({
     }
   };
 
+  // Al rilascio del pinch la scala viene "assestata": un pinch-out veloce spesso
+  // termina poco sopra la soglia di zoom (es. 1.05×) senza altri touchmove, e
+  // resterebbe leggermente ingrandita e spostata. Sotto la soglia di snap si
+  // torna a 1× centrata; sopra, si ri-clampa il pan nei bordi correnti.
+  const SNAP_TO_ONE = 1.15;
+  const settlePinch = () => {
+    const current = scale.get();
+
+    setScale(current <= SNAP_TO_ONE ? 1 : current);
+  };
+
   const onTouchEnd = (e: React.TouchEvent) => {
-    if (e.touches.length < 2) pinchStart.current = null;
+    if (e.touches.length < 2) {
+      const wasPinching = pinchStart.current !== null;
+
+      pinchStart.current = null;
+      if (wasPinching) {
+        settlePinch();
+        setPinchActive(false);
+      }
+      if (e.touches.length === 0) onPinchChange(false);
+    }
+  };
+
+  const onTouchCancel = () => {
+    if (pinchStart.current !== null) settlePinch();
+    pinchStart.current = null;
+    setPinchActive(false);
+    onPinchChange(false);
   };
 
   return (
@@ -199,9 +248,10 @@ function Slide({
         className="flex items-center justify-center"
         dragConstraints={constraints}
         dragElastic={0.1}
-        dragListener={panEnabled}
+        dragListener={panEnabled && !pinchActive}
         style={{ scale, x, y, touchAction: "none" }}
         onDoubleClick={onDoubleClick}
+        onTouchCancel={onTouchCancel}
         onTouchEnd={onTouchEnd}
         onTouchMove={onTouchMove}
         onTouchStart={onTouchStart}
@@ -289,6 +339,23 @@ export default function LiveGalleryModal({
     zoomedRef.current = zoomed;
   }, [zoomed]);
 
+  // Pinch in corso: disabilita lo swipe di paginazione mentre si zooma con due
+  // dita. Lo stato pilota il `drag` del wrapper (così framer annulla un drag
+  // orizzontale già iniziato); il ref serve come guard sincrono in `onDragEnd`,
+  // dato che i primi touchmove arrivano prima del commit dello stato.
+  const [pinching, setPinching] = useState(false);
+  const pinchingRef = useRef(false);
+
+  useEffect(() => {
+    pinchingRef.current = pinching;
+  }, [pinching]);
+
+  const handlePinchChange = (active: boolean) => {
+    // Aggiorna il ref subito (guard sincrono in onDragEnd) oltre allo stato.
+    pinchingRef.current = active;
+    setPinching(active);
+  };
+
   // Reset dello zoom al cambio foto o alla (ri)apertura del modale: si aggiusta
   // lo stato in fase di render (stesso pattern di `prevStart`) invece di un
   // effetto, per non innescare render a cascata.
@@ -298,6 +365,7 @@ export default function LiveGalleryModal({
   if (resetKey !== prevResetKey) {
     setPrevResetKey(resetKey);
     if (zoomed) setZoomed(false);
+    if (pinching) setPinching(false);
   }
 
   useEffect(() => {
@@ -335,8 +403,11 @@ export default function LiveGalleryModal({
   }, [isOpen, index, count, photos]);
 
   // Scroll orizzontale (trackpad o shift+rotella) per cambiare foto, oltre allo
-  // swipe touch. Un gesto = una foto: blocco fino a quando lo scroll si ferma
-  // (~150ms senza eventi) per non saltare più foto con l'inerzia del trackpad.
+  // swipe touch. Un gesto = una foto: si resta bloccati fino a quando lo scroll
+  // è davvero fermo. La finestra di idle è ampia (320ms) perché l'inerzia del
+  // trackpad — e soprattutto il "rimbalzo" di segno opposto a fine slancio —
+  // continua a generare eventi: tenendo il lock attivo per tutta la coda si
+  // evita che il rimbalzo inverta la foto dopo uno scroll veloce e prolungato.
   useEffect(() => {
     if (!isOpen || count < 2) return;
 
@@ -344,6 +415,8 @@ export default function LiveGalleryModal({
 
     if (!el) return;
 
+    const IDLE_MS = 320;
+    const DELTA_MIN = 30;
     let locked = false;
     let endTimer: number | undefined;
 
@@ -355,12 +428,14 @@ export default function LiveGalleryModal({
 
       e.preventDefault();
 
+      // Ogni evento (inclusa l'inerzia in decadimento) riarma la fine-gesto.
       window.clearTimeout(endTimer);
       endTimer = window.setTimeout(() => {
         locked = false;
-      }, 150);
+      }, IDLE_MS);
 
-      if (locked || Math.abs(e.deltaX) < 20) return;
+      // Gesto già consumato: ignora la coda d'inerzia e il rimbalzo opposto.
+      if (locked || Math.abs(e.deltaX) < DELTA_MIN) return;
 
       locked = true;
       const dir = e.deltaX > 0 ? 1 : -1;
@@ -415,7 +490,7 @@ export default function LiveGalleryModal({
                     animate="center"
                     className="absolute inset-0 flex items-center justify-center"
                     custom={direction}
-                    drag={count > 1 && !zoomed ? "x" : false}
+                    drag={count > 1 && !zoomed && !pinching ? "x" : false}
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.9}
                     exit="exit"
@@ -426,6 +501,10 @@ export default function LiveGalleryModal({
                     }}
                     variants={variants}
                     onDragEnd={(_, { offset, velocity }) => {
+                      // Un pinch durante il gesto: niente paginazione, lo snap
+                      // elastico riporta la slide al centro.
+                      if (pinchingRef.current) return;
+
                       const power = swipePower(offset.x, velocity.x);
 
                       if (power < -SWIPE_THRESHOLD) paginate(1);
@@ -435,6 +514,7 @@ export default function LiveGalleryModal({
                     <Slide
                       boundsRef={viewportRef}
                       photo={photo}
+                      onPinchChange={handlePinchChange}
                       onZoomChange={setZoomed}
                     />
                   </motion.div>

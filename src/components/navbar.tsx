@@ -89,7 +89,7 @@ export const Navbar = () => {
           </div>
 
           {/* ================= TOGGLE MOBILE ================= */}
-          <div className="flex md:hidden items-center justify-end gap-2 ml-auto">
+          <div className="flex md:hidden items-center justify-end gap-4 ml-auto">
             <ThemeSwitch />
             <button
               aria-expanded={menuOpen}
