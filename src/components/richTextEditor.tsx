@@ -22,6 +22,7 @@ type Props = {
   onChange: (html: string) => void;
   placeholder?: string;
   variant?: "bordered" | "flat";
+  label?: string;
 };
 
 type ToolbarButtonProps = {
@@ -61,6 +62,7 @@ export default function RichTextEditor({
   onChange,
   placeholder,
   variant = "bordered",
+  label = "Testo email",
 }: Props) {
   // Track whether the latest change came from inside the editor to avoid
   // calling setContent on every keystroke (which would lose the cursor).
@@ -149,7 +151,7 @@ export default function RichTextEditor({
       `}</style>
 
       <div className="flex flex-col gap-0">
-        <span className="text-sm font-medium mb-1.5">Testo email</span>
+        <span className="text-sm font-medium mb-1.5">{label}</span>
         <div
           className={
             variant === "flat"

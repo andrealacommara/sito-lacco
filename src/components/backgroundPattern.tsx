@@ -56,7 +56,7 @@ export function BackgroundPattern() {
       const isDark =
         document.documentElement.getAttribute("data-theme") === "dark";
       const rgb = isDark ? "255,255,255" : "0,0,0";
-      const alpha = isDark ? 0.20 : 0.15;
+      const alpha = isDark ? 0.2 : 0.15;
 
       for (const wave of WAVES) {
         ctx.beginPath();
