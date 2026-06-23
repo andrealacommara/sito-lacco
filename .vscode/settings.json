@@ -3,4 +3,5 @@
     ["([\"'`][^\"'`]*.*?[\"'`])", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
   "folder-color.pathColors": [],
+  "css.lint.unknownAtRules": "ignore",
 }

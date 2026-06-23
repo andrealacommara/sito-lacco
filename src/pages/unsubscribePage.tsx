@@ -28,7 +28,7 @@ export default function UnsubscribePage() {
   const messages = {
     loading: "Elaborazione in corso…",
     ok: "Ti ho rimosso dalla lista. Puoi iscriverti di nuovo in qualsiasi momento.",
-    error: "Link non valido. Se vuoi disiscriverti, scrivimi a ciao@lacco.it.",
+    error: "Link non valido. Se vuoi disiscriverti, scrivimi a fan@lacco.it.",
   };
 
   return (

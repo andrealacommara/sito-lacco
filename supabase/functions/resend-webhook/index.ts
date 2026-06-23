@@ -11,9 +11,14 @@ async function verifySignature(req: Request, body: string): Promise<boolean> {
   const msgId = req.headers.get("svix-id") ?? "";
   const msgTimestamp = req.headers.get("svix-timestamp") ?? "";
 
+  // Il signing secret Resend/Svix ha formato `whsec_<base64>`: la chiave HMAC
+  // è il base64-decode della parte dopo il prefisso, non la stringa grezza.
+  const rawSecret = secret.startsWith("whsec_") ? secret.slice(6) : secret;
+  const keyBytes = Uint8Array.from(atob(rawSecret), (c) => c.charCodeAt(0));
+
   const key = await crypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(secret),
+    keyBytes,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["verify"],
