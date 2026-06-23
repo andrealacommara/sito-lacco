@@ -6,11 +6,20 @@ import {
   jsonResponse,
   RESEND_AUDIENCE_ID,
 } from "../_shared/clients.ts";
-import { FIRST_NAME_MERGE_TAG, resendSendBatch } from "../_shared/email.ts";
+import {
+  FIRST_NAME_MERGE_TAG,
+  RESEND_UNSUBSCRIBE_MERGE_TAG,
+  resendSendBatch,
+} from "../_shared/email.ts";
 import { syncResendContacts } from "../_shared/resendSync.ts";
 
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "";
 const FROM = "Lacco <fan@lacco.it>";
+const SITE_URL = Deno.env.get("SITE_URL") ?? "https://lacco.it";
+// Endpoint che processa la disiscrizione lato server: serve sia per il link nel
+// footer sia per l'header List-Unsubscribe one-click (RFC 8058), che con un POST
+// non eseguirebbe il JS della pagina SPA.
+const EF_UNSUBSCRIBE = `${Deno.env.get("SUPABASE_URL")}/functions/v1/unsubscribe`;
 
 async function verifyAdmin(req: Request): Promise<boolean> {
   const authHeader = req.headers.get("authorization");
@@ -74,7 +83,7 @@ Deno.serve(async (req) => {
     const supabase = getSupabaseAdmin();
     const { data: recipients, error } = await supabase
       .from("subscribers")
-      .select("email, first_name")
+      .select("email, first_name, unsubscribe_token")
       .in("id", recipientIds as string[])
       .eq("status", "confirmed");
 
@@ -89,13 +98,27 @@ Deno.serve(async (req) => {
       );
     }
 
-    const emails = (recipients ?? []).map((r) => ({
-      to: r.email,
-      subject,
-      html: htmlBody
-        .split(FIRST_NAME_MERGE_TAG)
-        .join(r.first_name?.trim() || ""),
-    }));
+    const emails = (recipients ?? []).map((r) => {
+      const token = r.unsubscribe_token as string;
+      // Resend non sostituisce RESEND_UNSUBSCRIBE_URL fuori dagli Audience
+      // Broadcast: per gli invii in batch usiamo un link tokenizzato lacco.it.
+      const unsubUrl = `${SITE_URL}/unsubscribe?token=${token}`;
+      const oneClickUrl = `${EF_UNSUBSCRIBE}?token=${token}`;
+
+      return {
+        to: r.email,
+        subject,
+        html: htmlBody
+          .split(FIRST_NAME_MERGE_TAG)
+          .join(r.first_name?.trim() || "")
+          .split(RESEND_UNSUBSCRIBE_MERGE_TAG)
+          .join(unsubUrl),
+        headers: {
+          "List-Unsubscribe": `<${oneClickUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      };
+    });
 
     const { sent, failed } = await resendSendBatch(emails);
 
@@ -160,7 +183,7 @@ Deno.serve(async (req) => {
     body: JSON.stringify({
       audience_id: RESEND_AUDIENCE_ID,
       from: FROM,
-      reply_to: "ciao@lacco.it",
+      reply_to: "fan@lacco.it",
       subject,
       html: htmlBody,
     }),

@@ -104,6 +104,12 @@ function baseTemplate(
 // manualmente lato backend — vedi admin-broadcast/index.ts.
 export const FIRST_NAME_MERGE_TAG = "{{{contact.first_name|}}}";
 
+// Placeholder del link di disiscrizione nel footer dei broadcast. Sugli Audience
+// Broadcast lo sostituisce Resend; per gli invii mirati (batch, che NON passano
+// per l'Audience) va sostituito manualmente con un link tokenizzato lacco.it —
+// vedi admin-broadcast/index.ts.
+export const RESEND_UNSUBSCRIBE_MERGE_TAG = "{{{ RESEND_UNSUBSCRIBE_URL }}}";
+
 export function broadcastEmailHtml(opts: {
   body: string;
   imageUrl?: string;
@@ -293,7 +299,12 @@ export async function resendSend(opts: {
 const BATCH_CHUNK_SIZE = 100; // limite Resend per richiesta su /emails/batch
 
 export async function resendSendBatch(
-  emails: { to: string; subject: string; html: string }[],
+  emails: {
+    to: string;
+    subject: string;
+    html: string;
+    headers?: Record<string, string>;
+  }[],
 ): Promise<{ sent: number; failed: number }> {
   let sent = 0;
   let failed = 0;
@@ -312,6 +323,7 @@ export async function resendSendBatch(
           to: e.to,
           subject: e.subject,
           html: e.html,
+          ...(e.headers ? { headers: e.headers } : {}),
         })),
       ),
     });
