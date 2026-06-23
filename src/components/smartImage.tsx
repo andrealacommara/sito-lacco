@@ -347,7 +347,7 @@ export default function SmartImage({
         <img
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 z-0 h-full w-full scale-105 rounded-[14px] object-cover opacity-30 blur-lg saturate-150"
+          className="absolute inset-0 z-0 h-full w-full scale-105 transform-gpu rounded-[14px] object-cover opacity-30 blur-lg saturate-150 will-change-transform"
           decoding="async"
           loading={priority ? "eager" : "lazy"}
           src={resolvedSrc}
