@@ -25,11 +25,22 @@ Deno.serve(async (req) => {
   }
 
   let followers: ExportFollower[];
+  let following: string[] = [];
 
   try {
-    const body = (await req.json()) as { followers?: ExportFollower[] };
+    const body = (await req.json()) as {
+      followers?: ExportFollower[];
+      following?: { username: string }[];
+    };
 
     followers = (body.followers ?? []).filter((f) => f?.username);
+    following = [
+      ...new Set(
+        (body.following ?? [])
+          .map((f) => f?.username)
+          .filter((u): u is string => !!u),
+      ),
+    ];
   } catch {
     return jsonResponse({ ok: false, error: "JSON non valido" }, 400, origin);
   }
@@ -80,6 +91,28 @@ Deno.serve(async (req) => {
         )}
         on conflict (snapshot_id, username) do nothing
       `;
+    }
+
+    // Lista "seguiti" (following): snapshot a parte, alimenta lo studio
+    // "chi ho smesso di seguire" (diff calcolato a read-time in admin-stats).
+    if (following.length > 0) {
+      const fsnap = await sql<{ id: number }[]>`
+        insert into instagram.following_snapshots (total_count)
+        values (${following.length})
+        returning id
+      `;
+      const fsnapId = fsnap[0].id;
+
+      for (let i = 0; i < following.length; i += CHUNK) {
+        const rows = following
+          .slice(i, i + CHUNK)
+          .map((username) => ({ snapshot_id: fsnapId, username }));
+
+        await sql`
+          insert into instagram.following ${sql(rows, "snapshot_id", "username")}
+          on conflict (snapshot_id, username) do nothing
+        `;
+      }
     }
 
     let lost: { username: string; was_following_since: string | null }[] = [];

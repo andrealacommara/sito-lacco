@@ -4,7 +4,9 @@ import { getSql } from "../_shared/db.ts";
 import {
   fetchAccount,
   fetchAccountInsights,
+  fetchFollowerDemographics,
   fetchRecentMedia,
+  fetchStories,
   getAccessToken,
   refreshIfNeeded,
 } from "../_shared/instagram.ts";
@@ -71,7 +73,14 @@ Deno.serve(async (req) => {
 
     const account = await fetchAccount(token);
     const insights = await fetchAccountInsights(token);
+    const demographics = await fetchFollowerDemographics(token);
+
+    if (Object.keys(demographics).length) insights.demographics = demographics;
     const media = await fetchRecentMedia(token);
+    // Storie vive ora (best-effort): convivono coi post in media_insights,
+    // distinte da media_type = 'STORY'.
+    const stories = await fetchStories(token);
+    const allMedia = [...media, ...stories];
 
     // Snapshot account (idempotente per giorno).
     await sql`
@@ -87,21 +96,26 @@ Deno.serve(async (req) => {
             insights        = excluded.insights
     `;
 
-    // Report post (serie storica, idempotente per giorno).
-    for (const m of media) {
+    // Report post + storie (serie storica, idempotente per giorno).
+    for (const m of allMedia) {
       await sql`
         insert into instagram.media_insights
           (ig_media_id, captured_at, media_type, permalink, caption, posted_at,
-           likes, comments, saves, shares, reach, views)
+           likes, comments, saves, shares, reach, views,
+           thumbnail_url, media_url, insights)
         values
           (${m.ig_media_id}, current_date, ${m.media_type}, ${m.permalink},
            ${m.caption}, ${m.posted_at}, ${m.likes}, ${m.comments}, ${m.saves},
-           ${m.shares}, ${m.reach}, ${m.views})
+           ${m.shares}, ${m.reach}, ${m.views},
+           ${m.thumbnail_url}, ${m.media_url},
+           ${m.insights ? sql.json(m.insights) : null})
         on conflict (ig_media_id, captured_at) do update
           set likes = excluded.likes, comments = excluded.comments,
               saves = excluded.saves, shares = excluded.shares,
               reach = excluded.reach, views = excluded.views,
-              caption = excluded.caption, permalink = excluded.permalink
+              caption = excluded.caption, permalink = excluded.permalink,
+              thumbnail_url = excluded.thumbnail_url,
+              media_url = excluded.media_url, insights = excluded.insights
       `;
     }
 
@@ -130,7 +144,7 @@ Deno.serve(async (req) => {
       {
         ok: true,
         followers: account.followers_count,
-        mediaTracked: media.length,
+        mediaTracked: allMedia.length,
         alertSent,
       },
       200,

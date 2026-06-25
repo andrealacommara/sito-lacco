@@ -277,8 +277,8 @@ export function instagramDigestHtml(data: InstagramDigestData): string {
       `
       <p style="margin:0 0 16px;font-size:18px;font-weight:600;color:#111;">È ora di caricare l'export 📥</p>
       <p style="margin:0;font-size:16px;color:#333;line-height:1.6;">
-        Promemoria settimanale: richiedi l'export "Follower e seguiti" (formato JSON) dal
-        Centro gestione account di Instagram, poi trascina lo ZIP in
+        Promemoria settimanale: richiedi l'export "Follower e seguiti" (formato JSON)
+        <a href="${IG_DOWNLOAD_URL}" style="color:#c20e4d;">direttamente da qui</a>, poi trascina lo ZIP in
         <a href="${adminUrl}" style="color:#c20e4d;">/admin</a> per aggiornare il diff degli unfollower.
       </p>
       ${igButton(IG_DOWNLOAD_URL, "Richiedi l'export")}

@@ -9,7 +9,6 @@ import type {
   BroadcastResponse,
   SendMagicLinkResponse,
 } from "@/types/api";
-import type { Key } from "react";
 
 import { useState, useEffect, useCallback } from "react";
 import {
@@ -25,13 +24,6 @@ import {
   Skeleton,
   Spinner,
   toast,
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-  SelectIndicator,
-  SelectPopover,
-  ListBox,
-  ListBoxItem,
   CheckboxContent,
 } from "@heroui/react";
 import { Helmet } from "react-helmet-async";
@@ -40,6 +32,7 @@ import clsx from "clsx";
 import RichTextEditor from "@/components/richTextEditor";
 import TemplateStudio from "@/components/admin/templateStudio";
 import InstagramSection from "@/components/admin/instagramSection";
+import AdminSelect from "@/components/admin/adminSelect";
 import DefaultLayout from "@/layouts/default";
 import { supabase, EF_BASE } from "@/lib/supabase";
 import { broadcastEmailHtml } from "@/emails/templates";
@@ -719,7 +712,7 @@ export default function AdminPage() {
           {section === "newsletter" && (
             <>
               {/* Tab bar */}
-              <div className="flex gap-1 sm:gap-2 flex-wrap justify-center lg:justify-start">
+              <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
                 <Button
                   className="rounded-xl font-semibold shrink-0"
                   size="sm"
@@ -1464,45 +1457,5 @@ function StatCard({
         {value ?? "–"}
       </span>
     </div>
-  );
-}
-
-// Select v3 (react-aria compound): SelectRoot/Trigger/Value/Indicator/Popover +
-// ListBox/ListBoxItem. Wrapper che preserva il comportamento del vecchio
-// <Select selectedKeys onSelectionChange><SelectItem/></Select> di HeroUI v2.
-function AdminSelect({
-  options,
-  selectedKey,
-  onSelectionChange,
-  className,
-  "aria-label": ariaLabel,
-}: {
-  options: { key: string; label: string }[];
-  selectedKey: string;
-  onSelectionChange: (key: Key | null) => void;
-  className?: string;
-  "aria-label"?: string;
-}) {
-  return (
-    <SelectRoot
-      aria-label={ariaLabel}
-      className={className}
-      selectedKey={selectedKey}
-      onSelectionChange={onSelectionChange}
-    >
-      <SelectTrigger>
-        <SelectValue />
-        <SelectIndicator />
-      </SelectTrigger>
-      <SelectPopover>
-        <ListBox>
-          {options.map((o) => (
-            <ListBoxItem key={o.key} id={o.key} textValue={o.label}>
-              {o.label}
-            </ListBoxItem>
-          ))}
-        </ListBox>
-      </SelectPopover>
-    </SelectRoot>
   );
 }

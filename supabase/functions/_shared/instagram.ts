@@ -32,6 +32,10 @@ export type MediaInsight = {
   shares: number | null;
   reach: number | null;
   views: number | null;
+  thumbnail_url: string | null;
+  media_url: string | null;
+  // Metriche extra (storie: replies, navigation, total_interactions, ...).
+  insights: Record<string, number | null> | null;
 };
 
 // ── Token ────────────────────────────────────────────────────────────────────
@@ -155,6 +159,47 @@ export async function fetchAccountInsights(
   return out;
 }
 
+// Demografica dei follower (età, genere, paese, città). Best-effort: richiede
+// il permesso instagram_business_manage_insights e ≥100 follower. Se non
+// disponibile ritorna {} senza rompere lo snapshot.
+export async function fetchFollowerDemographics(
+  token: string,
+): Promise<Record<string, Record<string, number>>> {
+  const out: Record<string, Record<string, number>> = {};
+
+  for (const dim of ["age", "gender", "country", "city"]) {
+    try {
+      const data = await graphGet(
+        `${IG_USER_ID}/insights`,
+        {
+          metric: "follower_demographics",
+          period: "lifetime",
+          timeframe: "last_30_days",
+          breakdown: dim,
+          metric_type: "total_value",
+        },
+        token,
+      );
+
+      const results =
+        data.data?.[0]?.total_value?.breakdowns?.[0]?.results ?? [];
+      const map: Record<string, number> = {};
+
+      for (const r of results) {
+        const key = r.dimension_values?.[0];
+
+        if (key != null) map[String(key)] = r.value ?? 0;
+      }
+
+      if (Object.keys(map).length) out[dim] = map;
+    } catch {
+      // best-effort: metric non disponibile o permesso mancante
+    }
+  }
+
+  return out;
+}
+
 // Media recenti + insight per-post. like/comment vengono dai campi diretti
 // (più affidabili); reach/saves/shares/views dagli insights (best-effort).
 export async function fetchRecentMedia(
@@ -165,7 +210,7 @@ export async function fetchRecentMedia(
     `${IG_USER_ID}/media`,
     {
       fields:
-        "id,media_type,media_product_type,permalink,caption,timestamp,like_count,comments_count",
+        "id,media_type,media_product_type,permalink,caption,timestamp,like_count,comments_count,media_url,thumbnail_url",
       limit: String(limit),
     },
     token,
@@ -189,10 +234,81 @@ export async function fetchRecentMedia(
       shares: insights.shares,
       reach: insights.reach,
       views: insights.views,
+      // thumbnail_url presente per video/reel; per le immagini usiamo media_url.
+      thumbnail_url: m.thumbnail_url ?? null,
+      media_url: m.media_url ?? null,
+      insights: null,
     });
   }
 
   return media;
+}
+
+// Storie attualmente attive (la Graph API le espone solo finché sono vive, 24h).
+// Best-effort: se l'endpoint o gli insight non sono disponibili, ritorna [].
+// Le metriche storia (reach/replies/navigation/...) finiscono in `insights`.
+export async function fetchStories(token: string): Promise<MediaInsight[]> {
+  let list: any;
+
+  try {
+    list = await graphGet(
+      `${IG_USER_ID}/stories`,
+      {
+        fields:
+          "id,media_type,media_product_type,permalink,timestamp,media_url,thumbnail_url",
+      },
+      token,
+    );
+  } catch {
+    return [];
+  }
+
+  const stories: MediaInsight[] = [];
+
+  for (const s of list.data ?? []) {
+    const insights = await fetchStoryInsights(s.id, token);
+
+    stories.push({
+      ig_media_id: s.id,
+      media_type: "STORY",
+      permalink: s.permalink ?? null,
+      caption: null,
+      posted_at: s.timestamp ?? null,
+      likes: null,
+      comments: null,
+      saves: null,
+      shares: typeof insights.shares === "number" ? insights.shares : null,
+      reach: typeof insights.reach === "number" ? insights.reach : null,
+      views: typeof insights.views === "number" ? insights.views : null,
+      thumbnail_url: s.thumbnail_url ?? null,
+      media_url: s.media_url ?? null,
+      insights,
+    });
+  }
+
+  return stories;
+}
+
+async function fetchStoryInsights(
+  mediaId: string,
+  token: string,
+): Promise<Record<string, number | null>> {
+  try {
+    const data = await graphGet(
+      `${mediaId}/insights`,
+      { metric: "reach,replies,shares,total_interactions,navigation" },
+      token,
+    );
+    const map: Record<string, number | null> = {};
+
+    for (const entry of data.data ?? []) {
+      map[entry.name] = entry.values?.[0]?.value ?? null;
+    }
+
+    return map;
+  } catch {
+    return {};
+  }
 }
 
 async function fetchMediaInsights(
