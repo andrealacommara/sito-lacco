@@ -39,12 +39,13 @@ import clsx from "clsx";
 
 import RichTextEditor from "@/components/richTextEditor";
 import TemplateStudio from "@/components/admin/templateStudio";
+import InstagramSection from "@/components/admin/instagramSection";
 import DefaultLayout from "@/layouts/default";
 import { supabase, EF_BASE } from "@/lib/supabase";
 import { broadcastEmailHtml } from "@/emails/templates";
 
 type View = "login" | "check-email" | "dashboard";
-type Section = "newsletter" | "template";
+type Section = "newsletter" | "template" | "instagram";
 type Tab = "subscribers" | "broadcast" | "individuale";
 type FilterStatus = "" | "confirmed" | "unsubscribed" | "bounced";
 type SortBy = "email" | "status" | "source" | "createdAt";
@@ -663,7 +664,7 @@ export default function AdminPage() {
         <div
           className={clsx(
             "mx-auto mb-2 flex justify-end",
-            section === "template" ? "max-w-5xl" : "max-w-3xl",
+            section === "newsletter" ? "max-w-3xl" : "max-w-5xl",
           )}
         >
           <Button
@@ -678,7 +679,7 @@ export default function AdminPage() {
         <div
           className={clsx(
             "py-6 mx-auto flex flex-col gap-6",
-            section === "template" ? "max-w-5xl" : "max-w-3xl",
+            section === "newsletter" ? "max-w-3xl" : "max-w-5xl",
           )}
         >
           {/* Section bar: Newsletter | Template */}
@@ -699,9 +700,21 @@ export default function AdminPage() {
             >
               Template
             </Button>
+            <Button
+              className="rounded-xl font-semibold shrink-0"
+              size="sm"
+              variant={section === "instagram" ? "danger" : "outline"}
+              onPress={() => setSection("instagram")}
+            >
+              Instagram
+            </Button>
           </div>
 
           {section === "template" && <TemplateStudio />}
+
+          {section === "instagram" && session && (
+            <InstagramSection session={session} />
+          )}
 
           {section === "newsletter" && (
             <>

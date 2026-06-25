@@ -19,6 +19,11 @@ verify_jwt = false
 [functions.send-magic-link]
 verify_jwt = false
 
+# Chiamata dal pg_cron senza JWT Supabase: l'auth è interna (header x-cron-secret
+# o verifyAdmin per il trigger manuale).
+[functions.admin-instagram-snapshot]
+verify_jwt = false
+
 [api]
 enabled = true
 # Port to use for the API URL.
