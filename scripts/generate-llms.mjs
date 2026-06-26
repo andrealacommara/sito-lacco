@@ -56,7 +56,7 @@ const eventLinks = [...events]
 const sections = [
   "# Lacco",
   "",
-  "> Lacco è un cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Sito ufficiale con musica, eventi live, newsletter e contatti.",
+  "> Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Sito ufficiale con musica, eventi live, newsletter e contatti.",
   "",
   "## Pagine principali",
   "",

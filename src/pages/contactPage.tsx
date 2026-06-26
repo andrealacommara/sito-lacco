@@ -114,7 +114,7 @@ export default function ContactPage() {
       <Helmet>
         <title>Lacco | Contatti</title>
         <meta
-          content="Scrivimi per collaborazioni, booking live o informazioni. Lacco è un cantautore italiano di R&B e Hip-Hop."
+          content="Scrivimi per collaborazioni, booking live o informazioni. Lacco è un cantante e cantautore italiano di R&B e Hip-Hop."
           name="description"
         />
         <meta content="index, follow" name="robots" />
@@ -123,12 +123,12 @@ export default function ContactPage() {
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Contatti" property="og:title" />
         <meta
-          content="Scrivimi per collaborazioni, booking live o informazioni. Lacco è un cantautore italiano di R&B e Hip-Hop."
+          content="Scrivimi per collaborazioni, booking live o informazioni. Lacco è un cantante e cantautore italiano di R&B e Hip-Hop."
           property="og:description"
         />
         <meta content="https://lacco.it/contatti" property="og:url" />
         <meta content="https://lacco.it/og-image.jpg" property="og:image" />
-        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content="Lacco | Contatti" name="twitter:title" />

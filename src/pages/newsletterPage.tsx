@@ -10,7 +10,7 @@ export default function NewsletterPage() {
       <Helmet>
         <title>Lacco | Newsletter</title>
         <meta
-          content="Iscriviti alla newsletter di Lacco per ricevere aggiornamenti su nuove uscite, date live e novità dal cantautore R&B e Hip-Hop."
+          content="Iscriviti alla newsletter di Lacco per ricevere aggiornamenti su nuove uscite, date live e novità dal cantante e cantautore R&B e Hip-Hop."
           name="description"
         />
         <meta content="index, follow" name="robots" />
@@ -19,12 +19,12 @@ export default function NewsletterPage() {
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Newsletter" property="og:title" />
         <meta
-          content="Iscriviti per ricevere aggiornamenti su nuove uscite, date live e novità da Lacco, cantautore R&B e Hip-Hop."
+          content="Iscriviti per ricevere aggiornamenti su nuove uscite, date live e novità da Lacco, cantante e cantautore R&B e Hip-Hop."
           property="og:description"
         />
         <meta content="https://lacco.it/newsletter" property="og:url" />
         <meta content="https://lacco.it/og-image.jpg" property="og:image" />
-        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content="Lacco | Newsletter" name="twitter:title" />

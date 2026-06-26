@@ -61,7 +61,7 @@ export default function LivePage() {
       <Helmet>
         <title>Lacco | Live</title>
         <meta
-          content="Scopri le prossime date live di Lacco, cantautore italiano di R&B e Hip-Hop. Biglietti e info sui concerti."
+          content="Scopri le prossime date live di Lacco, cantante e cantautore italiano di R&B e Hip-Hop. Biglietti e info sui concerti."
           name="description"
         />
         <meta content="index, follow" name="robots" />
@@ -70,17 +70,17 @@ export default function LivePage() {
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Live" property="og:title" />
         <meta
-          content="Scopri le prossime date live di Lacco, cantautore italiano di R&B e Hip-Hop. Biglietti e info sui concerti."
+          content="Scopri le prossime date live di Lacco, cantante e cantautore italiano di R&B e Hip-Hop. Biglietti e info sui concerti."
           property="og:description"
         />
         <meta content="https://lacco.it/live" property="og:url" />
         <meta content="https://lacco.it/og-image.jpg" property="og:image" />
-        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content="Lacco | Live" name="twitter:title" />
         <meta
-          content="Le prossime date live di Lacco, cantautore R&B e Hip-Hop."
+          content="Le prossime date live di Lacco, cantante e cantautore R&B e Hip-Hop."
           name="twitter:description"
         />
         <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />

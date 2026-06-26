@@ -18,7 +18,7 @@ export default function MusicPage() {
       <Helmet>
         <title>Lacco | Musica</title>
         <meta
-          content="Ascolta la musica di Lacco, cantautore italiano di R&B e Hip-Hop. Scopri i suoi EP, singoli e la storia dietro ogni brano."
+          content="Ascolta la musica di Lacco, cantante e cantautore italiano di R&B e Hip-Hop. Scopri i suoi EP, singoli e la storia dietro ogni brano."
           name="description"
         />
         <meta content="index, follow" name="robots" />
@@ -27,17 +27,17 @@ export default function MusicPage() {
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Musica" property="og:title" />
         <meta
-          content="Ascolta la musica di Lacco, cantautore italiano di R&B e Hip-Hop. Scopri i suoi EP, singoli e la storia dietro ogni brano."
+          content="Ascolta la musica di Lacco, cantante e cantautore italiano di R&B e Hip-Hop. Scopri i suoi EP, singoli e la storia dietro ogni brano."
           property="og:description"
         />
         <meta content="https://lacco.it/musica" property="og:url" />
         <meta content="https://lacco.it/og-image.jpg" property="og:image" />
-        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content="Lacco | Musica" name="twitter:title" />
         <meta
-          content="Ascolta la musica di Lacco, cantautore italiano di R&B e Hip-Hop."
+          content="Ascolta la musica di Lacco, cantante e cantautore italiano di R&B e Hip-Hop."
           name="twitter:description"
         />
         <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
