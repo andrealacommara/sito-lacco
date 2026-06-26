@@ -119,6 +119,61 @@ export function GrowthChart({ data }: { data: InstagramGrowthPoint[] }) {
   );
 }
 
+// ── Reach account nel tempo (area) ────────────────────────────────────────────
+
+export function ReachChart({ data }: { data: InstagramGrowthPoint[] }) {
+  // Salta i giorni senza reach (best-effort: il metric può mancare sotto i 100
+  // follower o se il permesso insight non è attivo).
+  const points = data
+    .filter((d) => d.reach != null)
+    .map((d) => ({ label: itDate(d.date), reach: d.reach as number }));
+
+  if (points.length === 0) {
+    return (
+      <p className="text-default-400 text-sm py-10 text-center">
+        Reach non ancora disponibile. Verrà popolato ai prossimi snapshot.
+      </p>
+    );
+  }
+
+  return (
+    <div className="text-default-300">
+      <ResponsiveContainer height={240} width="100%">
+        <AreaChart
+          data={points}
+          margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
+        >
+          <defs>
+            <linearGradient id="ig-reach" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#006FEE" stopOpacity={0.35} />
+              <stop offset="100%" stopColor="#006FEE" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid
+            opacity={0.12}
+            stroke="currentColor"
+            strokeDasharray="3 3"
+          />
+          <XAxis dataKey="label" minTickGap={28} {...axisProps} />
+          <YAxis domain={["auto", "auto"]} width={44} {...axisProps} />
+          <Tooltip
+            content={<ChartTooltip />}
+            cursor={{ stroke: "#006FEE", strokeOpacity: 0.3 }}
+          />
+          <Area
+            dataKey="reach"
+            fill="url(#ig-reach)"
+            name="Reach"
+            stroke="#006FEE"
+            strokeWidth={2}
+            type="monotone"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 // ── Engagement top post (bar, indice) ─────────────────────────────────────────
 
 export function PostsChart({ data }: { data: InstagramPost[] }) {
@@ -404,7 +459,10 @@ export function AvgBarChart({
   return (
     <div className="text-default-300">
       <ResponsiveContainer height={180} width="100%">
-        <BarChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+        <BarChart
+          data={data}
+          margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
+        >
           <CartesianGrid
             opacity={0.12}
             stroke="currentColor"
@@ -419,11 +477,7 @@ export function AvgBarChart({
           />
           <Bar dataKey="avg" name="Engagement medio" radius={[6, 6, 0, 0]}>
             {data.map((d, i) => (
-              <Cell
-                key={i}
-                fill={color}
-                fillOpacity={d.count ? 1 : 0.18}
-              />
+              <Cell key={i} fill={color} fillOpacity={d.count ? 1 : 0.18} />
             ))}
           </Bar>
         </BarChart>

@@ -4,10 +4,13 @@ import type {
   InstagramDemographics,
   InstagramExportBody,
   InstagramExportResponse,
+  InstagramGrowthPoint,
   InstagramPost,
   InstagramSnapshotResponse,
   InstagramStatsResponse,
+  InstagramVelocity,
 } from "@/types/api";
+import type { Insight, InsightTone } from "@/lib/instagramAnalytics";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -27,6 +30,7 @@ import AdminSelect from "@/components/admin/adminSelect";
 import { EF_BASE } from "@/lib/supabase";
 import {
   GrowthChart,
+  ReachChart,
   FlowChart,
   ChronoEngagementChart,
   TypeBreakdownChart,
@@ -49,6 +53,9 @@ import {
   unfollowerTenure,
   avgTenure,
   tenureHistogram,
+  periodComparison,
+  buildInsights,
+  postLifecycle,
   toCsv,
   download,
 } from "@/lib/instagramAnalytics";
@@ -528,6 +535,180 @@ function SectionCard({
   );
 }
 
+// ── Confronto periodi ─────────────────────────────────────────────────────────
+
+const COMPARE_WINDOWS: [number, string][] = [
+  [7, "7 giorni"],
+  [30, "30 giorni"],
+];
+
+function DeltaChip({ pct }: { pct: number | null }) {
+  if (pct == null) {
+    return <span className="text-[10px] text-default-300">—</span>;
+  }
+  const up = pct >= 0;
+
+  return (
+    <span
+      className={`text-[10px] font-semibold ${up ? "text-success" : "text-danger"}`}
+    >
+      {up ? "▲" : "▼"} {Math.abs(Math.round(pct))}%
+    </span>
+  );
+}
+
+function ComparisonCards({
+  posts,
+  growth,
+}: {
+  posts: InstagramPost[];
+  growth: InstagramGrowthPoint[];
+}) {
+  const [windowDays, setWindowDays] = useState(7);
+  const nonStory = useMemo(
+    () => posts.filter((p) => p.mediaType !== "STORY"),
+    [posts],
+  );
+  const metrics = useMemo(
+    () => periodComparison(nonStory, growth, windowDays),
+    [nonStory, growth, windowDays],
+  );
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">
+          Confronto col periodo precedente
+        </h3>
+        <div className="flex gap-1">
+          {COMPARE_WINDOWS.map(([days, label]) => (
+            <Button
+              key={days}
+              className="rounded-xl font-semibold shrink-0"
+              size="sm"
+              variant={windowDays === days ? "danger" : "outline"}
+              onPress={() => setWindowDays(days)}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {metrics.map((m) => (
+          <div
+            key={m.key}
+            className="rounded-xl border border-default-100 bg-default-50 p-3 flex flex-col gap-1"
+          >
+            <span className="text-xs text-default-400 uppercase tracking-wide">
+              {m.label}
+            </span>
+            <span className="text-2xl font-bold text-default-700">
+              {m.current == null
+                ? "–"
+                : `${m.signed && m.current > 0 ? "+" : ""}${m.current}${m.unit}`}
+            </span>
+            <DeltaChip pct={m.deltaPct} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Consigli automatici ───────────────────────────────────────────────────────
+
+const INSIGHT_TONE: Record<InsightTone, { cls: string; icon: string }> = {
+  good: { cls: "text-success", icon: "✓" },
+  warn: { cls: "text-danger", icon: "!" },
+  tip: { cls: "text-primary", icon: "→" },
+};
+
+function InsightsPanel({ insights }: { insights: Insight[] }) {
+  if (insights.length === 0) return null;
+
+  return (
+    <SectionCard
+      note="Sintesi automatica dai tuoi dati. Indicazioni, non regole assolute."
+      title="Consigli"
+    >
+      <div className="flex flex-col gap-2">
+        {insights.map((it, i) => {
+          const tone = INSIGHT_TONE[it.tone];
+
+          return (
+            <div key={i} className="flex items-start gap-2 text-sm">
+              <span
+                className={`shrink-0 w-5 h-5 rounded-full bg-default-100 flex items-center justify-center text-xs font-bold ${tone.cls}`}
+              >
+                {tone.icon}
+              </span>
+              <span className="text-default-600 leading-snug">{it.text}</span>
+            </div>
+          );
+        })}
+      </div>
+    </SectionCard>
+  );
+}
+
+// ── Ciclo di vita post ────────────────────────────────────────────────────────
+
+function LifecycleList({
+  velocity,
+  posts,
+}: {
+  velocity: InstagramVelocity[];
+  posts: InstagramPost[];
+}) {
+  const rows = useMemo(
+    () =>
+      velocity
+        .map((v) => ({
+          id: v.id,
+          post: posts.find((p) => p.id === v.id),
+          lc: postLifecycle(v.series),
+        }))
+        .filter((r) => r.lc != null),
+    [velocity, posts],
+  );
+
+  if (rows.length === 0) return null;
+
+  return (
+    <SectionCard
+      note="Stato dei post recenti dalla loro serie storica: 'in crescita' = l'ultimo rilevamento è ancora salito, 'plateau' = ormai fermo. 'picco' = giorni dalla pubblicazione al massimo engagement."
+      title="Ciclo di vita dei post"
+    >
+      <div className="flex flex-col">
+        {rows.map((r) => (
+          <div
+            key={r.id}
+            className="flex items-center gap-3 py-2.5 px-2 border-b border-default-100 text-sm last:border-b-0"
+          >
+            <Chip
+              color={r.lc!.status === "growing" ? "success" : "default"}
+              size="sm"
+              variant="soft"
+            >
+              {r.lc!.status === "growing" ? "In crescita" : "Plateau"}
+            </Chip>
+            <span className="flex-1 min-w-0 truncate text-default-600">
+              {r.post
+                ? `${mediaTypeLabel(r.post.mediaType)} · ${dateFmt(r.post.postedAt)}`
+                : r.id}
+            </span>
+            <span className="text-xs text-default-400 shrink-0">
+              picco g{(r.lc!.daysToPeak ?? 0) + 1} · {r.lc!.latestEngagement}{" "}
+              eng.
+            </span>
+          </div>
+        ))}
+      </div>
+    </SectionCard>
+  );
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 
 function DashboardView({
@@ -552,6 +733,18 @@ function DashboardView({
         .sort((a, b) => b.engagement - a.engagement)
         .slice(0, 8),
     [stats?.posts],
+  );
+
+  const insights = useMemo(
+    () =>
+      buildInsights({
+        posts: stats?.posts ?? [],
+        followers: stats?.followers,
+        growth: stats?.growth ?? [],
+        unfollowersLast30: stats?.unfollowersLast30,
+        delta7d: stats?.delta7d,
+      }),
+    [stats],
   );
 
   const daysLeft =
@@ -604,6 +797,12 @@ function DashboardView({
           value={stats?.unfollowersLast30}
         />
       </div>
+
+      {(stats?.growth?.length ?? 0) > 0 && (
+        <ComparisonCards growth={stats!.growth!} posts={stats?.posts ?? []} />
+      )}
+
+      <InsightsPanel insights={insights} />
 
       {topPosts.length > 0 && (
         <div className="flex flex-col gap-2">
@@ -868,6 +1067,10 @@ function ContentAnalytics({
         >
           <VelocityChart data={stats!.velocity!} posts={posts} />
         </SectionCard>
+      )}
+
+      {showAggregate && (stats?.velocity?.length ?? 0) > 0 && (
+        <LifecycleList posts={posts} velocity={stats!.velocity!} />
       )}
 
       <SectionCard
@@ -1188,6 +1391,15 @@ function FollowerView({
           </p>
         )}
       </SectionCard>
+
+      {hasGrowth && (
+        <SectionCard
+          note="Account unici raggiunti al giorno (fonte Instagram). Mostra se la distribuzione dei contenuti cresce a prescindere dai follower."
+          title="Reach account nel tempo"
+        >
+          <ReachChart data={stats!.growth!} />
+        </SectionCard>
+      )}
 
       {flow.length > 0 && (
         <SectionCard

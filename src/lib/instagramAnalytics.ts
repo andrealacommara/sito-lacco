@@ -1,4 +1,9 @@
-import type { InstagramPost, InstagramRecentUnfollower } from "@/types/api";
+import type {
+  InstagramGrowthPoint,
+  InstagramPost,
+  InstagramRecentUnfollower,
+  InstagramVelocity,
+} from "@/types/api";
 
 // Derivazioni pure per la dashboard IG. Niente side-effect tranne gli helper di
 // download in fondo (DOM), isolati e usati solo on-click.
@@ -265,6 +270,332 @@ export function tenureHistogram(
       count: days.filter((d) => d >= min && d < b.max).length,
     };
   });
+}
+
+// ── Confronto tra periodi ─────────────────────────────────────────────────────
+
+const DAY_MS = 86_400_000;
+
+export type PeriodMetric = {
+  key: "followers" | "reach" | "engagement" | "er";
+  label: string;
+  current: number | null;
+  previous: number | null;
+  deltaPct: number | null; // variazione % corrente vs precedente
+  unit: "" | "%";
+  signed: boolean; // mostra il segno (+/–) sul valore, es. guadagno follower
+};
+
+const inWindow = (posts: InstagramPost[], startMs: number, endMs: number) =>
+  posts.filter((p) => {
+    if (!p.postedAt) return false;
+    const t = new Date(p.postedAt).getTime();
+
+    return t >= startMs && t < endMs;
+  });
+
+const avgErOnReach = (posts: InstagramPost[]): number | null => {
+  const vals = posts
+    .map((p) =>
+      p.reach && p.reach > 0 ? (p.engagement / p.reach) * 100 : null,
+    )
+    .filter((v): v is number => v != null);
+
+  return vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : null;
+};
+
+// Follower all'istante `ms`: ultimo snapshot con data ≤ ms (growth è asc).
+const followersAt = (
+  growth: InstagramGrowthPoint[],
+  ms: number,
+): number | null => {
+  let val: number | null = null;
+
+  for (const g of growth) {
+    if (new Date(g.date).getTime() <= ms) val = g.followers;
+    else break;
+  }
+
+  return val;
+};
+
+const avgReachInWindow = (
+  growth: InstagramGrowthPoint[],
+  startMs: number,
+  endMs: number,
+): number | null => {
+  const vals = growth
+    .filter((g) => {
+      const t = new Date(g.date).getTime();
+
+      return t >= startMs && t < endMs;
+    })
+    .map((g) => g.reach)
+    .filter((v): v is number => v != null && v > 0);
+
+  return vals.length
+    ? Math.round(vals.reduce((s, v) => s + v, 0) / vals.length)
+    : null;
+};
+
+const deltaPct = (cur: number | null, prev: number | null): number | null =>
+  cur != null && prev != null && prev !== 0
+    ? ((cur - prev) / Math.abs(prev)) * 100
+    : null;
+
+/**
+ * Confronto finestra corrente vs precedente (stessa ampiezza). Engagement ed ER
+ * dai post pubblicati nella finestra; follower (guadagno netto) e reach medio
+ * dalla serie account.
+ */
+export function periodComparison(
+  posts: InstagramPost[],
+  growth: InstagramGrowthPoint[],
+  windowDays: number,
+): PeriodMetric[] {
+  const now = Date.now();
+  const span = windowDays * DAY_MS;
+  const curStart = now - span;
+  const prevStart = now - 2 * span;
+
+  const curPosts = inWindow(posts, curStart, now);
+  const prevPosts = inWindow(posts, prevStart, curStart);
+
+  const curFollowers = followersAt(growth, now);
+  const midFollowers = followersAt(growth, curStart);
+  const prevFollowers = followersAt(growth, prevStart);
+  const curFollowerNet =
+    curFollowers != null && midFollowers != null
+      ? curFollowers - midFollowers
+      : null;
+  const prevFollowerNet =
+    midFollowers != null && prevFollowers != null
+      ? midFollowers - prevFollowers
+      : null;
+
+  const curReach = avgReachInWindow(growth, curStart, now);
+  const prevReach = avgReachInWindow(growth, prevStart, curStart);
+
+  const curEng = curPosts.reduce((s, p) => s + p.engagement, 0);
+  const prevEng = prevPosts.reduce((s, p) => s + p.engagement, 0);
+
+  const curEr = avgErOnReach(curPosts);
+  const prevEr = avgErOnReach(prevPosts);
+
+  const round = (v: number | null) => (v == null ? null : Math.round(v));
+  const round1 = (v: number | null) =>
+    v == null ? null : Math.round(v * 10) / 10;
+
+  return [
+    {
+      key: "followers",
+      label: "Follower netti",
+      current: curFollowerNet,
+      previous: prevFollowerNet,
+      deltaPct: deltaPct(curFollowerNet, prevFollowerNet),
+      unit: "",
+      signed: true,
+    },
+    {
+      key: "reach",
+      label: "Reach medio",
+      current: curReach,
+      previous: prevReach,
+      deltaPct: deltaPct(curReach, prevReach),
+      unit: "",
+      signed: false,
+    },
+    {
+      key: "engagement",
+      label: "Engagement",
+      current: curPosts.length ? curEng : null,
+      previous: prevPosts.length ? prevEng : null,
+      deltaPct: deltaPct(
+        curPosts.length ? curEng : null,
+        prevPosts.length ? prevEng : null,
+      ),
+      unit: "",
+      signed: false,
+    },
+    {
+      key: "er",
+      label: "ER medio",
+      current: round1(curEr),
+      previous: round1(prevEr),
+      deltaPct: deltaPct(curEr, prevEr),
+      unit: "%",
+      signed: false,
+    },
+  ].map((m) => ({
+    ...m,
+    current: m.key === "er" ? m.current : round(m.current),
+  })) as PeriodMetric[];
+}
+
+// ── Ciclo di vita post ────────────────────────────────────────────────────────
+
+export type LifecycleStatus = "growing" | "plateau";
+
+export type PostLifecycle = {
+  status: LifecycleStatus;
+  daysToPeak: number | null; // snapshot dall'inizio al picco di engagement
+  latestEngagement: number;
+};
+
+/**
+ * Stato di un post dalla sua serie giornaliera. `growing` se l'ultimo rilevamento
+ * è cresciuto oltre l'1% sul precedente, altrimenti `plateau`. Una sola
+ * rilevazione = troppo recente, lo consideriamo ancora in crescita.
+ */
+export function postLifecycle(
+  series: InstagramVelocity["series"],
+): PostLifecycle | null {
+  if (!series.length) return null;
+  const vals = series.map((s) => s.likes + s.comments + s.saves);
+  const latest = vals[vals.length - 1];
+
+  let peakIdx = 0;
+
+  for (let i = 1; i < vals.length; i++) {
+    if (vals[i] > vals[peakIdx]) peakIdx = i;
+  }
+
+  let status: LifecycleStatus = "growing";
+
+  if (vals.length >= 2) {
+    const prev = vals[vals.length - 2];
+    const delta = latest - prev;
+
+    status = delta / (prev || 1) > 0.01 ? "growing" : "plateau";
+  }
+
+  return { status, daysToPeak: peakIdx, latestEngagement: latest };
+}
+
+// ── Consigli automatici ───────────────────────────────────────────────────────
+
+export type InsightTone = "good" | "warn" | "tip";
+export type Insight = { tone: InsightTone; text: string };
+
+/** Sintesi azionabile che compone le derivazioni esistenti in poche frasi. */
+export function buildInsights(args: {
+  posts: InstagramPost[];
+  followers: number | null | undefined;
+  growth: InstagramGrowthPoint[];
+  unfollowersLast30: number | undefined;
+  delta7d: number | null | undefined;
+}): Insight[] {
+  const { posts, followers, growth, unfollowersLast30, delta7d } = args;
+  const nonStory = posts.filter((p) => p.mediaType !== "STORY");
+  const out: Insight[] = [];
+
+  if (nonStory.length === 0) return out;
+
+  const types = typeBreakdown(nonStory);
+
+  if (types.length > 1) {
+    const top = types[0];
+
+    out.push({
+      tone: "tip",
+      text: `I ${top.label} rendono di più: ${top.avgEngagement} di engagement medio. Puntaci più spesso.`,
+    });
+  }
+
+  const slot = bestSlot(nonStory);
+
+  if (slot) {
+    out.push({
+      tone: "tip",
+      text: `Momento migliore per pubblicare: ${slot.day} nella fascia ${slot.bucket}.`,
+    });
+  }
+
+  const hashtags = extractHashtags(nonStory);
+
+  if (hashtags.length && hashtags[0].count >= 2) {
+    out.push({
+      tone: "good",
+      text: `${hashtags[0].tag} è il tuo hashtag più efficace (${hashtags[0].avgEngagement} engagement medio su ${hashtags[0].count} post).`,
+    });
+  }
+
+  const churn = churnRate(unfollowersLast30, followers);
+
+  if (delta7d != null && delta7d < 0) {
+    out.push({
+      tone: "warn",
+      text: `Hai perso ${Math.abs(delta7d)} follower negli ultimi 7 giorni${
+        churn != null ? ` (churn ${churn.toFixed(1)}%)` : ""
+      }.`,
+    });
+  } else if (churn != null && churn > 2) {
+    out.push({
+      tone: "warn",
+      text: `Churn alto: ${churn.toFixed(1)}% dei follower persi in 30 giorni. Cura la costanza.`,
+    });
+  }
+
+  const reachEffVals = nonStory
+    .map((p) => viralitySignals(p, followers).reachEfficiency)
+    .filter((v): v is number => v != null);
+  const reachEff = reachEffVals.length
+    ? reachEffVals.reduce((s, v) => s + v, 0) / reachEffVals.length
+    : null;
+
+  if (reachEff != null && reachEff < 100) {
+    out.push({
+      tone: "warn",
+      text: `I contenuti restano nella tua bolla: reach medio al ${Math.round(
+        reachEff,
+      )}% dei follower. Prova Reel e hashtag nuovi per uscirne.`,
+    });
+  } else if (reachEff != null && reachEff >= 150) {
+    out.push({
+      tone: "good",
+      text: `Ottima distribuzione: reach medio al ${Math.round(
+        reachEff,
+      )}% dei follower, stai arrivando oltre la tua cerchia.`,
+    });
+  }
+
+  const lastPostedMs = Math.max(
+    0,
+    ...nonStory.map((p) => (p.postedAt ? new Date(p.postedAt).getTime() : 0)),
+  );
+
+  if (lastPostedMs > 0) {
+    const days = Math.floor((Date.now() - lastPostedMs) / DAY_MS);
+
+    if (days >= 7) {
+      out.push({
+        tone: "warn",
+        text: `Non pubblichi da ${days} giorni: la costanza è il fattore numero uno per crescere.`,
+      });
+    }
+  }
+
+  const reachTrend = periodComparison(nonStory, growth, 30).find(
+    (m) => m.key === "reach",
+  );
+
+  if (reachTrend?.deltaPct != null && reachTrend.deltaPct <= -15) {
+    out.push({
+      tone: "warn",
+      text: `Reach account in calo del ${Math.abs(
+        Math.round(reachTrend.deltaPct),
+      )}% rispetto al mese precedente.`,
+    });
+  } else if (reachTrend?.deltaPct != null && reachTrend.deltaPct >= 15) {
+    out.push({
+      tone: "good",
+      text: `Reach account in crescita del ${Math.round(
+        reachTrend.deltaPct,
+      )}% rispetto al mese precedente.`,
+    });
+  }
+
+  return out;
 }
 
 // ── Export JSON/CSV ───────────────────────────────────────────────────────────

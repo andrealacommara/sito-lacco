@@ -109,6 +109,7 @@ export type InstagramGrowthPoint = {
   date: string; // YYYY-MM-DD
   followers: number;
   follows: number;
+  reach?: number | null; // reach account giornaliero (best-effort, può mancare)
 };
 
 export type InstagramPost = {

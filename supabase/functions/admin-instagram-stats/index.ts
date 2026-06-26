@@ -21,9 +21,14 @@ Deno.serve(async (req) => {
 
   try {
     const growth = await sql<
-      { captured_at: string; followers_count: number; follows_count: number }[]
+      {
+        captured_at: string;
+        followers_count: number;
+        follows_count: number;
+        insights: { reach?: number | null } | null;
+      }[]
     >`
-      select captured_at, followers_count, follows_count
+      select captured_at, followers_count, follows_count, insights
       from instagram.account_snapshots
       where captured_at >= current_date - 90
       order by captured_at asc
@@ -34,7 +39,9 @@ Deno.serve(async (req) => {
         followers_count: number;
         follows_count: number;
         media_count: number;
-        insights: { demographics?: Record<string, Record<string, number>> } | null;
+        insights: {
+          demographics?: Record<string, Record<string, number>>;
+        } | null;
       }[]
     >`
       select followers_count, follows_count, media_count, insights
@@ -107,14 +114,22 @@ Deno.serve(async (req) => {
       order by ig_media_id, captured_at desc
     `;
 
-    // Velocity: serie storica engagement per i 6 post più recenti (no storie).
+    // Velocity / ciclo di vita: serie storica engagement dei post non-storia
+    // pubblicati negli ultimi 30 giorni (cap a 15, dal più recente). Alimenta sia
+    // il grafico velocity sia la classificazione "in crescita / plateau".
+    const lifecycleCutoff = Date.now() - 30 * 86_400_000;
     const recentIds = posts
-      .filter((p) => p.media_type !== "STORY" && p.posted_at)
+      .filter(
+        (p) =>
+          p.media_type !== "STORY" &&
+          p.posted_at &&
+          new Date(p.posted_at).getTime() >= lifecycleCutoff,
+      )
       .sort(
         (a, b) =>
           new Date(b.posted_at!).getTime() - new Date(a.posted_at!).getTime(),
       )
-      .slice(0, 6)
+      .slice(0, 15)
       .map((p) => p.ig_media_id);
 
     const velocityRows = recentIds.length
@@ -319,6 +334,7 @@ Deno.serve(async (req) => {
           date: g.captured_at,
           followers: g.followers_count,
           follows: g.follows_count,
+          reach: g.insights?.reach ?? null,
         })),
         posts: allPosts,
         flow,

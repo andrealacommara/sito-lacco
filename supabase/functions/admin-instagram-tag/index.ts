@@ -25,7 +25,10 @@ Deno.serve(async (req) => {
   let tag: string | null;
 
   try {
-    const body = (await req.json()) as { username?: string; tag?: string | null };
+    const body = (await req.json()) as {
+      username?: string;
+      tag?: string | null;
+    };
 
     username = (body.username ?? "").trim();
     tag = body.tag ? String(body.tag).trim().toLowerCase() : null;
