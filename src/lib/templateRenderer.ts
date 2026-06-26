@@ -86,12 +86,33 @@ interface WaveSpec {
 }
 
 const WAVES: WaveSpec[] = [
-  { baseY: 0.08, amp: 0.026, cycles: 1.3, cycles2: 2.1, amp2: 0.35, phase: 0.0 },
+  {
+    baseY: 0.08,
+    amp: 0.026,
+    cycles: 1.3,
+    cycles2: 2.1,
+    amp2: 0.35,
+    phase: 0.0,
+  },
   { baseY: 0.2, amp: 0.02, cycles: 1.9, cycles2: 3.3, amp2: 0.3, phase: 1.2 },
   { baseY: 0.31, amp: 0.034, cycles: 1.0, cycles2: 2.4, amp2: 0.4, phase: 2.5 },
   { baseY: 0.42, amp: 0.028, cycles: 1.6, cycles2: 2.8, amp2: 0.3, phase: 0.8 },
-  { baseY: 0.52, amp: 0.022, cycles: 2.2, cycles2: 3.7, amp2: 0.28, phase: 3.1 },
-  { baseY: 0.63, amp: 0.032, cycles: 1.2, cycles2: 2.0, amp2: 0.38, phase: 1.8 },
+  {
+    baseY: 0.52,
+    amp: 0.022,
+    cycles: 2.2,
+    cycles2: 3.7,
+    amp2: 0.28,
+    phase: 3.1,
+  },
+  {
+    baseY: 0.63,
+    amp: 0.032,
+    cycles: 1.2,
+    cycles2: 2.0,
+    amp2: 0.38,
+    phase: 1.8,
+  },
   { baseY: 0.74, amp: 0.024, cycles: 1.8, cycles2: 3.1, amp2: 0.3, phase: 4.2 },
   { baseY: 0.85, amp: 0.03, cycles: 1.1, cycles2: 2.5, amp2: 0.35, phase: 2.0 },
   { baseY: 0.94, amp: 0.02, cycles: 1.5, cycles2: 2.9, amp2: 0.3, phase: 5.4 },

@@ -70,25 +70,21 @@ export default function TemplateStudio() {
   const [downloading, setDownloading] = useState(false);
 
   // Verifichiamo a runtime se il pannello di condivisione nativo con file è
-  // disponibile, invece di indovinare dal solo touch. Usiamo un'immagine
-  // jpeg di prova: alcuni browser supportano navigator.share ma non con
-  // files, e canShare() lo distingue correttamente.
-  const [canUseNativeShare, setCanUseNativeShare] = useState(false);
-
-  useEffect(() => {
-    if (typeof navigator === "undefined" || !navigator.canShare) {
-      setCanUseNativeShare(false);
-      return;
-    }
+  // disponibile, invece di indovinare dal solo touch: alcuni browser supportano
+  // navigator.share ma non con files, e canShare() lo distingue. In prerender
+  // (Node) navigator è assente → resta false. Inizializzatore lazy, niente effect.
+  const [canUseNativeShare] = useState(() => {
+    if (typeof navigator === "undefined" || !navigator.canShare) return false;
     try {
       const probe = new File([new Uint8Array([0xff, 0xd8])], "probe.jpg", {
         type: "image/jpeg",
       });
-      setCanUseNativeShare(navigator.canShare({ files: [probe] }));
+
+      return navigator.canShare({ files: [probe] });
     } catch {
-      setCanUseNativeShare(false);
+      return false;
     }
-  }, []);
+  });
 
   const current = FORMATS.find((f) => f.key === format) ?? FORMATS[0];
 
@@ -141,6 +137,7 @@ export default function TemplateStudio() {
       const files = await Promise.all(
         formats.map(async (f) => {
           const blob = await renderTemplateToBlob(buildOptions(f));
+
           return new File([blob], fileName(f), { type: "image/jpeg" });
         }),
       );
@@ -168,6 +165,7 @@ export default function TemplateStudio() {
   // revocano il permesso di condivisione se passa troppo tempo dal gesture.
   const handleSaveToGallery = async () => {
     const canvas = canvasRef.current;
+
     if (!canvas) return;
 
     setDownloading(true);
@@ -289,8 +287,8 @@ export default function TemplateStudio() {
             <TextField
               className="flex flex-col gap-1.5"
               value={title}
-              onChange={setTitle}
               variant="secondary"
+              onChange={setTitle}
             >
               <Label>Titolo (opzionale)</Label>
               <Input placeholder="Inserisci un titolo" />

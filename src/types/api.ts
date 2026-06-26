@@ -102,3 +102,151 @@ export type AdminStatsResponse = {
   newLast7Days?: number;
   error?: string;
 };
+
+// ── Instagram analytics (tutti richiedono Bearer JWT) ────────────────────────
+
+export type InstagramGrowthPoint = {
+  date: string; // YYYY-MM-DD
+  followers: number;
+  follows: number;
+  reach?: number | null; // reach account giornaliero (best-effort, può mancare)
+};
+
+export type InstagramPost = {
+  id: string;
+  permalink: string | null;
+  caption: string | null;
+  mediaType: string | null; // IMAGE | VIDEO | CAROUSEL_ALBUM | REEL | STORY
+  postedAt: string | null;
+  likes: number | null;
+  comments: number | null;
+  saves: number | null;
+  shares: number | null;
+  reach: number | null;
+  views: number | null;
+  thumbnailUrl: string | null;
+  mediaUrl: string | null;
+  // Metriche extra delle storie (reach/replies/navigation/...).
+  storyMetrics?: Record<string, number | null> | null;
+  engagement: number;
+};
+
+export type InstagramRecentUnfollower = {
+  username: string;
+  since: string | null; // was_following_since
+  detectedAt: string;
+};
+
+// Crescita scomposta: follower guadagnati/persi per giorno.
+export type InstagramFlowPoint = {
+  date: string; // YYYY-MM-DD
+  gained: number;
+  lost: number;
+};
+
+// Serie storica engagement di un post (accumulo nei giorni dopo la pubblicazione).
+export type InstagramVelocity = {
+  id: string;
+  series: {
+    capturedAt: string; // YYYY-MM-DD
+    likes: number;
+    comments: number;
+    saves: number;
+  }[];
+};
+
+// Diff tra gli ultimi due snapshot dei "seguiti".
+export type InstagramFollowingChanges = {
+  stoppedFollowing: string[];
+  startedFollowing: string[];
+};
+
+// Non-mutuals persistenti (ultimo snapshot follower ↔ seguiti).
+// available = false se non c'è ancora uno snapshot dei seguiti.
+export type InstagramNonMutuals = {
+  available: boolean;
+  reliable: boolean; // false se l'export follower è incompleto (periodo ristretto)
+  notFollowingBack: string[]; // segui ma non ti seguono
+  fans: string[]; // ti seguono ma non li segui
+};
+
+// Tag manuale assegnato a un account nella lista "Non ti ricambiano".
+export type InstagramAccountTag = "persona" | "vip" | "pagina";
+
+// Demografica follower da Instagram (chiave dimensione → valore → conteggio).
+// Es: { age: { "25-34": 45 }, gender: { F: 60, M: 40 }, country: { IT: 80 } }.
+export type InstagramDemographics = {
+  age?: Record<string, number>;
+  gender?: Record<string, number>;
+  country?: Record<string, number>;
+  city?: Record<string, number>;
+};
+
+// Engagement a livello account da Meta (metric_type=total_value). Tutti i campi
+// sono best-effort: assenti/null se la metrica non è disponibile sull'account.
+export type InstagramAccountEngagement = {
+  totalInteractions?: number | null; // like + commenti + salvataggi + condivisioni
+  accountsEngaged?: number | null; // account unici che hanno interagito
+  profileViews?: number | null;
+  profileLinksTaps?: number | null; // tap sui link in bio
+  followsAndUnfollows?: number | null;
+  views?: number | null;
+  likes?: number | null;
+  comments?: number | null;
+  saves?: number | null;
+  shares?: number | null;
+  replies?: number | null;
+};
+
+// GET /functions/v1/admin-instagram-stats
+export type InstagramStatsResponse = {
+  ok: boolean;
+  followers?: number | null;
+  follows?: number | null;
+  mediaCount?: number | null;
+  delta7d?: number | null;
+  unfollowersLast30?: number;
+  growth?: InstagramGrowthPoint[];
+  posts?: InstagramPost[];
+  flow?: InstagramFlowPoint[];
+  velocity?: InstagramVelocity[];
+  followingChanges?: InstagramFollowingChanges;
+  nonMutuals?: InstagramNonMutuals;
+  markedUnfollowed?: string[];
+  // Tag manuali per account: username → tag (persona | vip | pagina).
+  tags?: Record<string, InstagramAccountTag>;
+  demographics?: InstagramDemographics | null;
+  // Engagement account-level da Meta (best-effort, popolato solo in avanti).
+  accountEngagement?: InstagramAccountEngagement | null;
+  reach28?: number | null; // reach account rolling a 28 giorni
+  // Follower online per ora UTC (0-23 → conteggio medio). Best-effort.
+  onlineFollowers?: Record<string, number> | null;
+  recentUnfollowers?: InstagramRecentUnfollower[];
+  tokenExpiresAt?: string | null;
+  error?: string;
+};
+
+// POST /functions/v1/admin-instagram-export
+// Il client estrae le liste dallo ZIP (JSZip) e invia solo il JSON pulito.
+export type InstagramExportBody = {
+  followers: { username: string; followedYouAt: string | null }[];
+  following?: { username: string }[];
+};
+export type InstagramExportResponse = {
+  ok: boolean;
+  snapshotId?: number;
+  isFirstSnapshot?: boolean;
+  total?: number;
+  gained?: number;
+  unfollowers?: { username: string; since: string | null }[];
+  error?: string;
+};
+
+// POST /functions/v1/admin-instagram-snapshot (trigger manuale dall'admin)
+export type InstagramSnapshotResponse = {
+  ok: boolean;
+  followers?: number;
+  mediaTracked?: number;
+  alertSent?: boolean;
+  error?: string;
+};

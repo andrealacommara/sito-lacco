@@ -20,7 +20,7 @@ export default function AboutPage() {
       <Helmet>
         <title>Lacco | Chi sono</title>
         <meta
-          content="Scopri chi è Lacco: cantautore italiano di R&B e Hip-Hop. La sua storia, il percorso musicale e la filosofia dietro ogni canzone."
+          content="Scopri chi è Lacco: cantante e cantautore italiano di R&B e Hip-Hop. La sua storia, il percorso musicale e la filosofia dietro ogni canzone."
           name="description"
         />
         <meta content="index, follow" name="robots" />
@@ -29,17 +29,17 @@ export default function AboutPage() {
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Chi sono" property="og:title" />
         <meta
-          content="Scopri chi è Lacco: cantautore italiano di R&B e Hip-Hop. La sua storia, il percorso musicale e la filosofia dietro ogni canzone."
+          content="Scopri chi è Lacco: cantante e cantautore italiano di R&B e Hip-Hop. La sua storia, il percorso musicale e la filosofia dietro ogni canzone."
           property="og:description"
         />
         <meta content="https://lacco.it/chi-sono" property="og:url" />
         <meta content="https://lacco.it/og-image.jpg" property="og:image" />
-        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content="Lacco | Chi sono" name="twitter:title" />
         <meta
-          content="Scopri chi è Lacco: cantautore italiano di R&B e Hip-Hop."
+          content="Scopri chi è Lacco: cantante e cantautore italiano di R&B e Hip-Hop."
           name="twitter:description"
         />
         <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />

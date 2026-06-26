@@ -239,6 +239,116 @@ export function contactEmailHtml(
   );
 }
 
+// ── Instagram digest ──────────────────────────────────────────────────────────
+// Notifiche private verso l'admin. Subject con prefisso [IG] per distinguerle in
+// inbox dai send newsletter. Sempre transactional (niente footer disiscrizione).
+
+export type InstagramDigestData =
+  | { kind: "drop"; followers: number; delta: number; date: string }
+  | {
+      kind: "unfollowers";
+      date: string;
+      gained: number;
+      lost: { username: string; since: string | null }[];
+    }
+  | { kind: "reminder" };
+
+const IG_DOWNLOAD_URL =
+  "https://accountscenter.instagram.com/info_and_permissions/dyi/";
+
+function igButton(href: string, label: string): string {
+  return `<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+    <tr><td align="center">
+      <table cellpadding="0" cellspacing="0"><tr>
+        <td style="background:#c20e4d;border-radius:8px;">
+          <a href="${href}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#fff;text-decoration:none;letter-spacing:0.02em;">${label}</a>
+        </td>
+      </tr></table>
+    </td></tr>
+  </table>`;
+}
+
+export function instagramDigestHtml(data: InstagramDigestData): string {
+  const siteUrl = Deno.env.get("SITE_URL") ?? "https://lacco.it";
+  const adminUrl = `${siteUrl}/admin`;
+
+  if (data.kind === "reminder") {
+    return baseTemplate(
+      `
+      <p style="margin:0 0 16px;font-size:18px;font-weight:600;color:#111;">È ora di caricare l'export 📥</p>
+      <p style="margin:0;font-size:16px;color:#333;line-height:1.6;">
+        Promemoria settimanale: richiedi l'export "Follower e seguiti" (formato JSON)
+        <a href="${IG_DOWNLOAD_URL}" style="color:#c20e4d;">direttamente da qui</a>, poi trascina lo ZIP in
+        <a href="${adminUrl}" style="color:#c20e4d;">/admin</a> per aggiornare il diff degli unfollower.
+      </p>
+      ${igButton(IG_DOWNLOAD_URL, "Richiedi l'export")}
+    `,
+      { transactional: true },
+    );
+  }
+
+  if (data.kind === "drop") {
+    return baseTemplate(
+      `
+      <p style="margin:0 0 16px;font-size:18px;font-weight:600;color:#111;">Calo follower rilevato 📉</p>
+      <p style="margin:0 0 8px;font-size:16px;color:#333;line-height:1.6;">
+        Al ${data.date} risultano <strong>${data.followers}</strong> follower
+        (<strong style="color:#c20e4d;">${data.delta}</strong> rispetto a ieri).
+      </p>
+      <p style="margin:0;font-size:15px;color:#555;line-height:1.6;">
+        Carica l'export per sapere <em>chi</em> è sparito.
+      </p>
+      ${igButton(adminUrl, "Apri la dashboard")}
+    `,
+      { transactional: true },
+    );
+  }
+
+  const rows = data.lost
+    .map(
+      (u) =>
+        `<tr>
+          <td style="padding:8px 12px;font-size:15px;color:#333;border-bottom:1px solid #e4e4e7;">@${u.username}</td>
+          <td style="padding:8px 12px;font-size:13px;color:#777;border-bottom:1px solid #e4e4e7;text-align:right;">${
+            u.since ? `ti seguiva dal ${u.since}` : "—"
+          }</td>
+        </tr>`,
+    )
+    .join("");
+
+  return baseTemplate(
+    `
+    <p style="margin:0 0 16px;font-size:18px;font-weight:600;color:#111;">Chi è sparito dal ${data.date}</p>
+    <p style="margin:0 0 16px;font-size:15px;color:#555;line-height:1.6;">
+      ${data.lost.length} unfollower · ${data.gained} nuovi follower nel periodo.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e4e4e7;border-radius:8px;border-collapse:separate;overflow:hidden;">
+      ${rows || `<tr><td style="padding:12px;font-size:15px;color:#777;">Nessun unfollower 🎉</td></tr>`}
+    </table>
+    ${igButton(adminUrl, "Apri la dashboard")}
+  `,
+    { transactional: true },
+  );
+}
+
+export async function sendInstagramDigest(
+  data: InstagramDigestData,
+): Promise<void> {
+  const adminEmail = Deno.env.get("ADMIN_EMAIL") ?? "management@lacco.it";
+  const subject =
+    data.kind === "reminder"
+      ? "[IG] Promemoria: carica l'export"
+      : data.kind === "drop"
+        ? `[IG] Calo follower (${data.delta})`
+        : `[IG] ${data.lost.length} unfollower dal ${data.date}`;
+
+  await resendSend({
+    to: adminEmail,
+    subject,
+    html: instagramDigestHtml(data),
+  });
+}
+
 // ── Resend helpers ──────────────────────────────────────────────────────────
 
 export async function sendWelcomeEmail(

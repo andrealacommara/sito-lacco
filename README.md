@@ -19,6 +19,8 @@ The website features a modern, responsive, and high-performance structure, with 
 | **Backend / DB**       | [Supabase](https://supabase.com/) (Postgres + Edge Functions + Auth)       |
 | **Email Service**      | [Resend](https://resend.com/) — contact form, newsletter welcome + broadcast (all via Supabase Edge Functions) |
 | **Rich Text**          | [Tiptap](https://tiptap.dev/) for the admin broadcast composer             |
+| **Charts**             | [Recharts](https://recharts.org/) — admin Instagram analytics dashboard    |
+| **Instagram Analytics**| [Instagram Graph API](https://developers.facebook.com/docs/instagram-platform/) (Business Login) — follower growth, post insights, unfollower tracking (admin-only) |
 | **Image Handling**     | Custom `SmartImage` component with AVIF/WebP/JPEG fallback                 |
 | **SEO**                | Static prerendering (Playwright) · per-release/event OG images · Schema.org JSON-LD · `sitemap.xml` + `llms.txt` |
 | **Build Tools**        | Vite + TailwindCSS (PostCSS) + HeroUI Theme                                |
@@ -36,6 +38,9 @@ src/
 │   └── images/
 ├── components/             # Reusable UI components (representative)
 │   ├── admin/
+│   │   ├── adminSelect.tsx      # HeroUI v3 Select wrapper (v2-compatible API)
+│   │   ├── instagramCharts.tsx  # Recharts growth + post-engagement charts (IG dashboard)
+│   │   ├── instagramSection.tsx # Instagram analytics (Dashboard / Follower / Contenuti tabs)
 │   │   └── templateStudio.tsx  # Social-media image generator (story/post formats)
 │   ├── countdown.tsx         # Release/event countdown timer (dark/light variant)
 │   ├── icons.tsx             # SVG icons + Logo component
@@ -62,6 +67,8 @@ src/
 │   └── default.tsx           # Shared layout (Navbar + Footer)
 ├── lib/
 │   ├── supabase.ts           # Supabase client + Edge Function base URL
+│   ├── instagramAnalytics.ts # Pure derivations for the IG dashboard (series, buckets, CSV download)
+│   ├── themeColor.ts         # Single owner of <meta name="theme-color"> synced to the real theme
 │   └── templateRenderer.ts   # Canvas renderer for social-media template images
 ├── pages/
 │   ├── aboutPage.tsx         # "Su di me"
@@ -82,7 +89,7 @@ src/
 ├── styles/
 │   └── globals.css
 ├── types/
-│   └── api.ts                # Shared API types (subscribe, broadcast, contact, etc.)
+│   └── api.ts                # Shared API types (subscribe, broadcast, contact, Instagram analytics, etc.)
 ├── utils/
 │   ├── createIcon.tsx
 │   └── lazyWithPreload.ts
@@ -103,7 +110,7 @@ scripts/                      # Build-time tooling (run via postbuild)
 
 supabase/
 ├── functions/
-│   ├── _shared/              # Shared helpers (Supabase clients, email, Resend sync, validation)
+│   ├── _shared/              # Shared helpers (Supabase clients, direct Postgres, admin auth, email, Instagram Graph API, Resend sync, validation)
 │   ├── subscribe/            # POST: add subscriber (single opt-in) + welcome email
 │   ├── unsubscribe/          # GET: unsubscribe via personal token
 │   ├── send-contact-email/   # POST: contact form submission → email via Resend
@@ -112,8 +119,13 @@ supabase/
 │   ├── admin-subscribers/    # GET/POST/PATCH: list, add, manually unsubscribe (admin-only)
 │   ├── admin-broadcast/      # POST: send broadcast to all confirmed subscribers or to selected ones
 │   ├── admin-sync-resend/    # POST: reconcile subscriber status with the Resend Audience
-│   └── admin-stats/          # GET: dashboard counters (confirmed, unsubscribed, bounced, new)
-└── migrations/               # SQL migrations (subscribers table, keep-alive cron, status changes)
+│   ├── admin-stats/          # GET: dashboard counters (confirmed, unsubscribed, bounced, new)
+│   ├── admin-instagram-snapshot/  # Daily cron: IG Graph API snapshot (followers + post insights) + net-drop alert; auto-refreshes the token
+│   ├── admin-instagram-export/    # POST: diff a client-parsed IG data export → unfollower/follower events + email
+│   ├── admin-instagram-stats/     # GET: IG dashboard data (growth series, top posts, unfollowers)
+│   ├── admin-instagram-mark/      # POST: toggle the "removed" check on a non-follower-back username
+│   └── admin-instagram-tag/       # POST: assign/clear a manual tag (persona/vip/pagina) on a username
+└── migrations/               # SQL migrations (subscribers table, keep-alive cron, status changes, instagram schema + cron)
 ```
 
 ---
@@ -129,6 +141,7 @@ supabase/
   - **Live mode** — artwork, streaming CTAs (Spotify / Apple Music), song carousel.
 - **Newsletter:** Subscribe form with name + email + consent. Single opt-in — confirmed immediately, with a welcome email sent right away. Unsubscribe link in every email, kept in sync with the Resend Audience via webhook and manual reconciliation.
 - **Admin (`/admin`):** Protected by Supabase magic link auth. Dashboard with live counters (confirmed, unsubscribed, bounced, new in last 7 days), searchable/sortable/filterable subscriber list with configurable page size, manual unsubscribe for selected subscribers, and a broadcast composer (body, optional image, optional CTA button) with live email preview — sendable to all confirmed subscribers or to individually selected ones. Also includes a **Template Studio** that generates branded social-media images (story 9:16, post 4:5/1:1) with logo and rich-text overlay, downloadable for posting.
+- **Instagram analytics (`/admin` → Instagram):** Private analytics for the artist account, split across **Dashboard**, **Follower**, and **Contenuti** tabs. A daily cron (pg_cron + pg_net) snapshots follower growth, per-post insights, and account-level engagement from the Instagram Graph API — auto-refreshing the 60-day long-lived token — with email alerts on net follower drops and a weekly export reminder. The Dashboard surfaces account-wide engagement straight from Meta (total interactions, accounts engaged, profile views, link taps, 28-day reach), alongside the per-post metrics. Charts (growth curve, decomposed growth, post/reel/story engagement, engagement velocity) render with Recharts. A best-time-to-post view combines per-post engagement by weekday/time-slot with Meta's account-level *online followers* signal (when the audience is active, by hour). Unfollower tracking works by drag-and-dropping the Instagram data-export ZIP, parsed **client-side** with JSZip so only usernames + timestamps reach the server, which diffs them to detect who unfollowed and surfaces a "Non ti ricambiano" (doesn't follow you back) list — each entry can be manually tagged (persona/vip/pagina) or checked off as removed. Data lives in a dedicated, non-exposed `instagram` Postgres schema reached only by Edge Functions via a direct DB connection.
 - **Contatti:** Contact form submitted to the `send-contact-email` Supabase Edge Function, which delivers the message via Resend.
 - **PressKit:** Dedicated private page (lazy-loaded, noindex) with official media assets, extended bio, press photos, and professional contacts; the downloadable kit is zipped at build time.
 - **Privacy Policy (`/privacy`):** GDPR-compliant privacy policy in Italian.
@@ -162,7 +175,7 @@ VITE_SUPABASE_URL="https://your-project.supabase.co"
 VITE_SUPABASE_ANON_KEY="your_anon_key"
 ```
 
-> **Note:** The contact form, newsletter, and admin features all run through Supabase Edge Functions. Their server-side secrets (`RESEND_API_KEY`, `service_role`, etc.) are configured in the Supabase dashboard — never in `VITE_*` variables.
+> **Note:** The contact form, newsletter, and admin features all run through Supabase Edge Functions. Their server-side secrets (`RESEND_API_KEY`, `service_role`, `IG_GRAPH_TOKEN`, `IG_BUSINESS_ACCOUNT_ID`, etc.) are configured in the Supabase dashboard — never in `VITE_*` variables. The Instagram cron secret lives only in Supabase Vault (`ig_cron_secret`).
 
 ### 4. Start the development server
 

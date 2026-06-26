@@ -44,7 +44,7 @@ export default function HomePage() {
       <Helmet>
         <title>Lacco</title>
         <meta
-          content="Lacco è un cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Ascolta la sua musica, scopri i live e rimani aggiornato."
+          content="Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Ascolta la sua musica, scopri i live e rimani aggiornato."
           name="description"
         />
         <meta content="index, follow" name="robots" />
@@ -55,19 +55,19 @@ export default function HomePage() {
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco" property="og:title" />
         <meta
-          content="Lacco è un cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Ascolta la sua musica, scopri i live e rimani aggiornato."
+          content="Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Ascolta la sua musica, scopri i live e rimani aggiornato."
           property="og:description"
         />
         <meta content="https://lacco.it" property="og:url" />
         <meta content="https://lacco.it/og-image.jpg" property="og:image" />
-        <meta content="Lacco — Cantautore" property="og:image:alt" />
+        <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
 
         {/* Twitter / X */}
         <meta content="summary_large_image" name="twitter:card" />
         <meta content="Lacco" name="twitter:title" />
         <meta
-          content="Lacco è un cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire."
+          content="Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire."
           name="twitter:description"
         />
         <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
@@ -78,9 +78,17 @@ export default function HomePage() {
             "@context": "https://schema.org",
             "@type": "MusicGroup",
             name: "Lacco",
+            description:
+              "Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire.",
             genre: ["Pop", "R&B", "Hip-Hop"],
             url: "https://lacco.it",
             image: "https://lacco.it/og-image.jpg",
+            member: {
+              "@type": "Person",
+              name: "Lacco",
+              jobTitle: ["Cantante", "Cantautore"],
+              url: "https://lacco.it",
+            },
             sameAs: [
               siteConfig.links.spotify,
               siteConfig.links.tiktok,
@@ -129,7 +137,8 @@ export default function HomePage() {
             className="text-base lg:text-lg text-default-500 leading-relaxed font-hero"
             style={{ animation: "fadeInUp 0.5s ease 0.5s both" }}
           >
-            Lacco è un cantautore che trasforma emozioni, esperienze e frammenti
+            Lacco è un cantante e cantautore che trasforma emozioni, esperienze e
+            frammenti
             di vita in storie da ascoltare.
           </p>
         </div>
