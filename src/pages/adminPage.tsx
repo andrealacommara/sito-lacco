@@ -28,6 +28,7 @@ import {
 } from "@heroui/react";
 import { Helmet } from "react-helmet-async";
 import clsx from "clsx";
+import RefreshIcon from "@/assets/icons/refresh.svg?react";
 
 import RichTextEditor from "@/components/richTextEditor";
 import TemplateStudio from "@/components/admin/templateStudio";
@@ -70,7 +71,7 @@ const PAGE_SIZE_OPTIONS = [15, 30, 50, 100];
 export default function AdminPage() {
   const [view, setView] = useState<View>("login");
   const [session, setSession] = useState<Session | null>(null);
-  const [section, setSection] = useState<Section>("newsletter");
+  const [section, setSection] = useState<Section>("instagram");
   const [tab, setTab] = useState<Tab>("subscribers");
   const [loginLoading, setLoginLoading] = useState(false);
 
@@ -675,8 +676,16 @@ export default function AdminPage() {
             section === "newsletter" ? "max-w-3xl" : "max-w-5xl",
           )}
         >
-          {/* Section bar: Newsletter | Template */}
+          {/* Section bar: Instagram | Newsletter | Template */}
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
+            <Button
+              className="rounded-xl font-semibold shrink-0"
+              size="sm"
+              variant={section === "instagram" ? "danger" : "outline"}
+              onPress={() => setSection("instagram")}
+            >
+              Instagram
+            </Button>
             <Button
               className="rounded-xl font-semibold shrink-0"
               size="sm"
@@ -692,14 +701,6 @@ export default function AdminPage() {
               onPress={() => setSection("template")}
             >
               Template
-            </Button>
-            <Button
-              className="rounded-xl font-semibold shrink-0"
-              size="sm"
-              variant={section === "instagram" ? "danger" : "outline"}
-              onPress={() => setSection("instagram")}
-            >
-              Instagram
             </Button>
           </div>
 
@@ -851,22 +852,8 @@ export default function AdminPage() {
                       {syncLoading && <Spinner size="sm" />}
                       {!syncLoading && (
                         <>
-                          Ricarica
-                          <svg
-                            fill="none"
-                            height="18"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            width="18"
-                          >
-                            <path d="M21 2v6h-6" />
-                            <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-                            <path d="M3 22v-6h6" />
-                            <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-                          </svg>
+                          <RefreshIcon aria-hidden className="w-4 h-4" />
+                          Aggiorna
                         </>
                       )}
                     </Button>
