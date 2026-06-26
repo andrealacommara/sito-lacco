@@ -4,7 +4,7 @@ import type {
   InstagramPost,
   InstagramVelocity,
 } from "@/types/api";
-import type { TypeStat } from "@/lib/instagramAnalytics";
+import type { CadencePoint, TypeStat } from "@/lib/instagramAnalytics";
 
 import {
   Area,
@@ -303,35 +303,100 @@ export function UnfollowTimelineChart({
 
 // ── Engagement cronologico, colore per tipo ───────────────────────────────────
 
-export function ChronoEngagementChart({ data }: { data: InstagramPost[] }) {
-  const bars = [...data]
+type ChronoBar = {
+  label: string;
+  n: number;
+  engagement: number;
+  type: string | null;
+  thumb: string | null;
+  typeLabel: string;
+};
+
+function ChronoThumbTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: { payload?: ChronoBar }[];
+}) {
+  const bar = payload?.[0]?.payload;
+
+  if (!active || !bar) return null;
+
+  return (
+    <div className="flex items-center gap-2 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs shadow-md">
+      {bar.thumb && (
+        <img
+          alt=""
+          className="h-10 w-10 rounded-xl object-cover"
+          src={bar.thumb}
+        />
+      )}
+      <div>
+        <p className="font-medium text-default-600">
+          #{bar.n} · {bar.typeLabel} · {bar.label}
+        </p>
+        <p className="text-default-500">
+          Engagement:{" "}
+          <span className="font-semibold text-foreground">
+            {bar.engagement}
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export function ChronoEngagementChart({
+  data,
+  numbered = false,
+}: {
+  data: InstagramPost[];
+  /** Asse X come progressivo (#1, #2, …) invece della data: si abbina a una
+   *  lista numerata di post sotto il grafico. */
+  numbered?: boolean;
+}) {
+  const sorted = [...data]
     .filter((p) => p.postedAt)
     .sort(
       (a, b) =>
         new Date(a.postedAt!).getTime() - new Date(b.postedAt!).getTime(),
-    )
-    .map((p) => ({
-      label: itDate(p.postedAt!),
-      engagement: p.engagement,
-      type: p.mediaType,
-    }));
+    );
+
+  // Asse X sempre cronologico crescente (più vecchio a sinistra). In modalità
+  // numbered il numero segue invece la recency (#1 = più recente), così il
+  // grafico va da #12 a #1 e i numeri combaciano con la lista decrescente sotto.
+  const bars: ChronoBar[] = sorted.map((p, i) => ({
+    label: itDate(p.postedAt!),
+    n: numbered ? sorted.length - i : i + 1,
+    engagement: p.engagement,
+    type: p.mediaType,
+    thumb: p.thumbnailUrl ?? p.mediaUrl ?? null,
+    typeLabel: mediaTypeLabel(p.mediaType),
+  }));
 
   return (
     <div className="text-default-300">
       <ResponsiveContainer height={240} width="100%">
-        <BarChart
-          data={bars}
-          margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
-        >
+        <BarChart data={bars} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
           <CartesianGrid
             opacity={0.12}
             stroke="currentColor"
             strokeDasharray="3 3"
             vertical={false}
           />
-          <XAxis dataKey="label" minTickGap={20} {...axisProps} />
+          <XAxis
+            dataKey={numbered ? "n" : "label"}
+            interval={numbered ? 0 : "preserveStartEnd"}
+            minTickGap={numbered ? 0 : 20}
+            tickFormatter={numbered ? (v) => `#${v}` : undefined}
+            {...axisProps}
+          />
           <YAxis width={44} {...axisProps} />
-          <Tooltip content={<ChartTooltip />} cursor={{ fillOpacity: 0.06 }} />
+          <Tooltip
+            content={numbered ? <ChronoThumbTooltip /> : <ChartTooltip />}
+            cursor={{ fillOpacity: 0.06 }}
+          />
           <Bar dataKey="engagement" name="Engagement" radius={[4, 4, 0, 0]}>
             {bars.map((b, i) => (
               <Cell key={i} fill={colorOf(b.type)} />
@@ -478,6 +543,39 @@ export function AvgBarChart({
           <Bar dataKey="avg" name="Engagement medio" radius={[6, 6, 0, 0]}>
             {data.map((d, i) => (
               <Cell key={i} fill={color} fillOpacity={d.count ? 1 : 0.18} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ── Cadenza di pubblicazione (post per settimana) ─────────────────────────────
+
+export function CadenceChart({ data }: { data: CadencePoint[] }) {
+  return (
+    <div className="text-default-300">
+      <ResponsiveContainer height={180} width="100%">
+        <BarChart
+          data={data}
+          margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
+        >
+          <CartesianGrid
+            opacity={0.12}
+            stroke="currentColor"
+            strokeDasharray="3 3"
+            vertical={false}
+          />
+          <XAxis dataKey="label" minTickGap={8} {...axisProps} />
+          <YAxis allowDecimals={false} width={44} {...axisProps} />
+          <Tooltip
+            content={<ChartTooltip />}
+            cursor={{ fill: BRAND, fillOpacity: 0.08 }}
+          />
+          <Bar dataKey="count" name="Post pubblicati" radius={[6, 6, 0, 0]}>
+            {data.map((d, i) => (
+              <Cell key={i} fill={BRAND} fillOpacity={d.count ? 1 : 0.18} />
             ))}
           </Bar>
         </BarChart>

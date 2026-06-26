@@ -12,6 +12,7 @@ import type {
   InstagramVelocity,
 } from "@/types/api";
 import type { Insight, InsightTone } from "@/lib/instagramAnalytics";
+import type { EngagementTier } from "@/lib/instagramAnalytics";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -40,6 +41,7 @@ import {
   UnfollowTimelineChart,
   AvgBarChart,
   OnlineFollowersChart,
+  CadenceChart,
 } from "@/components/admin/instagramCharts";
 import {
   bucketOf,
@@ -59,6 +61,8 @@ import {
   periodComparison,
   buildInsights,
   postLifecycle,
+  engagementTiers,
+  postingCadence,
   toCsv,
   download,
 } from "@/lib/instagramAnalytics";
@@ -68,6 +72,7 @@ import SavesIcon from "@/assets/icons/saves.svg?react";
 import SharesIcon from "@/assets/icons/shares.svg?react";
 import ReachIcon from "@/assets/icons/reach.svg?react";
 import ViewsIcon from "@/assets/icons/views.svg?react";
+import RefreshIcon from "@/assets/icons/refresh.svg?react";
 
 type SubTab = "dashboard" | "follower" | "contenuti";
 type ContentTab = "generale" | "post" | "reel" | "storie";
@@ -227,7 +232,6 @@ async function parseExportZip(file: File): Promise<ParsedExport> {
 export default function InstagramSection({ session }: { session: Session }) {
   const [subTab, setSubTab] = useState<SubTab>("dashboard");
   const [stats, setStats] = useState<InstagramStatsResponse | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const [dragOver, setDragOver] = useState(false);
   const [parsing, setParsing] = useState(false);
@@ -326,7 +330,6 @@ export default function InstagramSection({ session }: { session: Session }) {
   );
 
   const fetchStats = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch(`${EF_BASE}/admin-instagram-stats`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
@@ -336,8 +339,6 @@ export default function InstagramSection({ session }: { session: Session }) {
       setStats(data);
     } catch {
       toast.danger("Errore nel caricamento delle statistiche IG");
-    } finally {
-      setLoading(false);
     }
   }, [session.access_token]);
 
@@ -454,8 +455,6 @@ export default function InstagramSection({ session }: { session: Session }) {
 
       {subTab === "dashboard" && (
         <DashboardView
-          fetchStats={fetchStats}
-          loading={loading}
           snapshotLoading={snapshotLoading}
           stats={stats}
           onSnapshot={handleManualSnapshot}
@@ -782,26 +781,32 @@ function AccountEngagementSection({
 
 function DashboardView({
   stats,
-  loading,
-  fetchStats,
   onSnapshot,
   snapshotLoading,
 }: {
   stats: InstagramStatsResponse | null;
-  loading: boolean;
-  fetchStats: () => void;
   onSnapshot: () => void;
   snapshotLoading: boolean;
 }) {
   const delta = stats?.delta7d;
 
-  const topPosts = useMemo(
+  // Ultimi post/reel in ordine cronologico decrescente (storie escluse).
+  const recentPosts = useMemo(
     () =>
       [...(stats?.posts ?? [])]
-        .filter((p) => p.mediaType !== "STORY")
-        .sort((a, b) => b.engagement - a.engagement)
-        .slice(0, 8),
+        .filter((p) => p.mediaType !== "STORY" && p.postedAt)
+        .sort(
+          (a, b) =>
+            new Date(b.postedAt!).getTime() - new Date(a.postedAt!).getTime(),
+        )
+        .slice(0, 12),
     [stats?.posts],
+  );
+
+  // Classifica Top/Flop sui post mostrati, come in Dettaglio contenuti.
+  const recentTiers = useMemo(
+    () => engagementTiers(recentPosts),
+    [recentPosts],
   );
 
   const insights = useMemo(
@@ -816,28 +821,25 @@ function DashboardView({
     [stats],
   );
 
-  const daysLeft =
-    stats?.tokenExpiresAt != null
-      ? Math.round(
-          // eslint-disable-next-line react-hooks/purity
-          (new Date(stats.tokenExpiresAt).getTime() - Date.now()) / 86_400_000,
-        )
-      : null;
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Panoramica</h3>
         <Button
-          isIconOnly
-          aria-label="Ricarica"
-          className="rounded-xl"
-          isDisabled={loading}
+          className="rounded-xl font-semibold"
+          isDisabled={snapshotLoading}
           size="sm"
           variant="secondary"
-          onPress={fetchStats}
+          onPress={onSnapshot}
         >
-          {loading ? <Spinner size="sm" /> : "↻"}
+          {snapshotLoading ? (
+            <Spinner size="sm" />
+          ) : (
+            <span className="inline-flex items-center gap-1.5">
+              <RefreshIcon aria-hidden className="w-4 h-4" />
+              Aggiorna
+            </span>
+          )}
         </Button>
       </div>
 
@@ -878,51 +880,33 @@ function DashboardView({
 
       <InsightsPanel insights={insights} />
 
-      {topPosts.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-semibold">Top post per engagement</h3>
+      {recentPosts.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h3 className="text-sm font-semibold">Andamento ultimi post/reel</h3>
           <p className="text-[10px] text-default-400 -mt-1">
-            Dettaglio completo nella scheda <strong>Contenuti</strong>.
+            Engagement in ordine cronologico · ogni barra (#n) corrisponde al
+            post numerato qui sotto. Completo nella scheda{" "}
+            <strong>Contenuti</strong>.
           </p>
-          {topPosts.slice(0, 3).map((p) => (
-            <PostCard key={p.id} followers={stats?.followers} post={p} />
-          ))}
+          <ChronoEngagementChart numbered data={recentPosts} />
+          <div className="flex flex-col gap-2">
+            {recentPosts.map((post, i) => (
+              <div key={post.id ?? i} className="flex items-stretch gap-2">
+                <span className="shrink-0 self-stretch flex w-7 items-center justify-center rounded-xl bg-default-100 text-xs font-semibold text-default-500">
+                  {i + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <PostCard
+                    followers={stats?.followers}
+                    post={post}
+                    tier={recentTiers.get(post.id)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
-
-      {/* Token + snapshot manuale (ex Impostazioni) */}
-      <div className="rounded-xl border border-default-100 bg-default-50 p-4 flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold">Token Graph API</span>
-          <Chip
-            color={
-              daysLeft == null
-                ? "default"
-                : daysLeft > 10
-                  ? "success"
-                  : "warning"
-            }
-            size="sm"
-            variant="soft"
-          >
-            {daysLeft == null ? "non inizializzato" : `scade tra ${daysLeft}gg`}
-          </Chip>
-        </div>
-        <p className="text-xs text-default-400 leading-relaxed">
-          Il token si auto-rinnova nel cron giornaliero (&lt;10gg alla
-          scadenza). Lo snapshot manuale forza ora una lettura della Graph API
-          (follower + insight post + storie vive).
-        </p>
-        <Button
-          className="rounded-xl font-semibold self-center"
-          isDisabled={snapshotLoading}
-          size="sm"
-          variant="danger"
-          onPress={onSnapshot}
-        >
-          {snapshotLoading ? <Spinner size="sm" /> : "Esegui snapshot ora"}
-        </Button>
-      </div>
     </div>
   );
 }
@@ -972,9 +956,11 @@ function PostThumb({ post }: { post: InstagramPost }) {
 function PostCard({
   post,
   followers,
+  tier,
 }: {
   post: InstagramPost;
   followers: number | null | undefined;
+  tier?: EngagementTier;
 }) {
   const er = engagementRate(post, followers);
   const vir = viralitySignals(post, followers);
@@ -992,6 +978,15 @@ function PostCard({
           <Chip color="danger" size="sm" variant="soft">
             {mediaTypeLabel(post.mediaType)}
           </Chip>
+          {tier && (
+            <Chip
+              color={tier === "top" ? "success" : "warning"}
+              size="sm"
+              variant="soft"
+            >
+              {tier === "top" ? "Top" : "Flop"}
+            </Chip>
+          )}
           <span className="text-xs text-default-400">
             {dateFmt(post.postedAt)}
           </span>
@@ -1106,6 +1101,8 @@ function ContentAnalytics({
   stats: InstagramStatsResponse | null;
 }) {
   const types = useMemo(() => typeBreakdown(posts), [posts]);
+  const tiers = useMemo(() => engagementTiers(posts), [posts]);
+  const cadence = useMemo(() => postingCadence(posts), [posts]);
   const hashtags = useMemo(() => extractHashtags(posts).slice(0, 12), [posts]);
   const byDay = useMemo(() => engagementByDay(posts), [posts]);
   const byBucket = useMemo(() => engagementByBucket(posts), [posts]);
@@ -1138,6 +1135,19 @@ function ContentAnalytics({
       {showAggregate && types.length > 1 && (
         <SectionCard title="Engagement medio per tipo">
           <TypeBreakdownChart data={types} />
+        </SectionCard>
+      )}
+
+      {showAggregate && (
+        <SectionCard
+          note={
+            cadence.declining
+              ? "Post pubblicati per settimana. Attenzione: la cadenza delle ultime settimane è in calo."
+              : "Post pubblicati per settimana (storie escluse). La costanza è il fattore numero uno per crescere."
+          }
+          title="Cadenza di pubblicazione"
+        >
+          <CadenceChart data={cadence.weeks} />
         </SectionCard>
       )}
 
@@ -1215,8 +1225,19 @@ function ContentAnalytics({
         </p>
         {[...posts]
           .sort((a, b) => b.engagement - a.engagement)
-          .map((p) => (
-            <PostCard key={p.id} followers={followers} post={p} />
+          .map((p, i) => (
+            <div key={p.id} className="flex items-stretch gap-2">
+              <span className="shrink-0 self-stretch flex w-7 items-center justify-center rounded-xl bg-default-100 text-xs font-semibold text-default-500">
+                {i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <PostCard
+                  followers={followers}
+                  post={p}
+                  tier={tiers.get(p.id)}
+                />
+              </div>
+            </div>
           ))}
       </div>
     </div>
@@ -1514,7 +1535,7 @@ function FollowerView({
         />
         <StatCard
           color="default"
-          hint="da quanto ti seguivano, in media, gli unfollower"
+          hint="da quanto ti seguivano, in media, gli unfollower (dall'inizio del follow, da export, al rilevamento dell'uscita)"
           label="Fedeltà media"
           value={meanTenure == null ? undefined : `${meanTenure} gg`}
         />
@@ -1697,7 +1718,7 @@ function FollowerView({
 
         {tenureDays.length > 0 && (
           <SectionCard
-            note="Da quanto ti seguivano prima di andarsene."
+            note="Da quando hanno iniziato a seguirti (data dell'export) fino al rilevamento dell'uscita (caricamento del file): l'inizio è preciso, la fine è il momento in cui ce ne siamo accorti."
             title="Fedeltà degli unfollower"
           >
             <TenureHistogram data={tenureHistogram(tenureDays)} />

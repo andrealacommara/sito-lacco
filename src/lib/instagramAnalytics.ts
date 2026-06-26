@@ -109,6 +109,97 @@ export function typeBreakdown(posts: InstagramPost[]): TypeStat[] {
     .sort((a, b) => b.avgEngagement - a.avgEngagement);
 }
 
+// ── Fascia di performance (top / flop) ────────────────────────────────────────
+
+export type EngagementTier = "top" | "flop";
+
+/**
+ * Classifica i post per engagement rispetto ai quartili del campione:
+ * ≥ p75 = "top", ≤ p25 = "flop". Ritorna una mappa id → tier (solo i post
+ * classificati). Con meno di 4 post il campione è troppo piccolo per quartili
+ * sensati → mappa vuota (niente badge fuorvianti). Le storie sono escluse.
+ */
+export function engagementTiers(
+  posts: InstagramPost[],
+): Map<string, EngagementTier> {
+  const out = new Map<string, EngagementTier>();
+  const ranked = posts.filter((p) => p.mediaType !== "STORY");
+
+  if (ranked.length < 4) return out;
+
+  const sorted = [...ranked].sort((a, b) => a.engagement - b.engagement);
+  const quantile = (q: number) => {
+    const idx = (sorted.length - 1) * q;
+    const lo = Math.floor(idx);
+    const hi = Math.ceil(idx);
+
+    if (lo === hi) return sorted[lo].engagement;
+
+    return (
+      sorted[lo].engagement +
+      (sorted[hi].engagement - sorted[lo].engagement) * (idx - lo)
+    );
+  };
+
+  const p25 = quantile(0.25);
+  const p75 = quantile(0.75);
+
+  for (const p of ranked) {
+    if (p.engagement >= p75) out.set(p.id, "top");
+    else if (p.engagement <= p25) out.set(p.id, "flop");
+  }
+
+  return out;
+}
+
+// ── Cadenza di pubblicazione (post per settimana) ─────────────────────────────
+
+const WEEK_MS = 7 * 86_400_000;
+
+export type CadencePoint = { label: string; count: number };
+export type Cadence = { weeks: CadencePoint[]; declining: boolean };
+
+/**
+ * Conteggio di post (escluse storie) per settimana nelle ultime `weeksBack`
+ * settimane, dalla più vecchia alla più recente. `declining` è true se la media
+ * settimanale delle ultime 4 settimane è scesa sensibilmente (< 60%) rispetto
+ * alle 8 precedenti — segnale di costanza in calo. Settimane allineate a oggi
+ * (ogni bucket è un intervallo di 7 giorni che termina "ora").
+ */
+export function postingCadence(
+  posts: InstagramPost[],
+  weeksBack = 12,
+): Cadence {
+  const now = Date.now();
+  const counts = new Array(weeksBack).fill(0) as number[];
+
+  for (const p of posts) {
+    if (p.mediaType === "STORY" || !p.postedAt) continue;
+    const t = new Date(p.postedAt).getTime();
+    const weeksAgo = Math.floor((now - t) / WEEK_MS);
+
+    if (weeksAgo >= 0 && weeksAgo < weeksBack) counts[weeksAgo] += 1;
+  }
+
+  // counts[0] = settimana corrente; inverto per avere l'asse cronologico asc.
+  const weeks: CadencePoint[] = counts
+    .map((count, i) => ({
+      label: i === 0 ? "questa" : `-${i}sett`,
+      count,
+    }))
+    .reverse();
+
+  const recent = counts.slice(0, 4);
+  const prior = counts.slice(4, 12);
+  const avg = (arr: number[]) =>
+    arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0;
+  const recentAvg = avg(recent);
+  const priorAvg = avg(prior);
+  const declining = priorAvg > 0 && recentAvg < priorAvg * 0.6;
+
+  return { weeks, declining };
+}
+
 // ── Hashtag ───────────────────────────────────────────────────────────────────
 
 export type HashtagStat = {
@@ -608,6 +699,13 @@ export function buildInsights(args: {
         text: `Non pubblichi da ${days} giorni: la costanza è il fattore numero uno per crescere.`,
       });
     }
+  }
+
+  if (postingCadence(nonStory).declining) {
+    out.push({
+      tone: "warn",
+      text: "Cadenza in calo: stai pubblicando molto meno delle settimane precedenti. Torna a un ritmo regolare per non perdere reach.",
+    });
   }
 
   const reachTrend = periodComparison(nonStory, growth, 30).find(
