@@ -3,6 +3,7 @@ import type {
   InstagramAccountTag,
   InstagramDemographics,
   InstagramExportBody,
+  InstagramAccountEngagement,
   InstagramExportResponse,
   InstagramGrowthPoint,
   InstagramPost,
@@ -38,6 +39,7 @@ import {
   TenureHistogram,
   UnfollowTimelineChart,
   AvgBarChart,
+  OnlineFollowersChart,
 } from "@/components/admin/instagramCharts";
 import {
   bucketOf,
@@ -48,6 +50,7 @@ import {
   extractHashtags,
   engagementByDay,
   engagementByBucket,
+  onlineFollowersByBucket,
   bestSlot,
   churnRate,
   unfollowerTenure,
@@ -677,7 +680,7 @@ function LifecycleList({
 
   return (
     <SectionCard
-      note="Stato dei post recenti dalla loro serie storica: 'in crescita' = l'ultimo rilevamento è ancora salito, 'plateau' = ormai fermo. 'picco' = giorni dalla pubblicazione al massimo engagement."
+      note="Stato dei post recenti dalla loro serie storica: 'in crescita' = l'ultimo rilevamento è ancora salito, 'plateau' = ormai fermo. 'picco rilN' = il rilevamento (snapshot giornaliero) in cui il post ha toccato il massimo engagement."
       title="Ciclo di vita dei post"
     >
       <div className="flex flex-col">
@@ -699,7 +702,7 @@ function LifecycleList({
                 : r.id}
             </span>
             <span className="text-xs text-default-400 shrink-0">
-              picco g{(r.lc!.daysToPeak ?? 0) + 1} · {r.lc!.latestEngagement}{" "}
+              picco ril{(r.lc!.daysToPeak ?? 0) + 1} · {r.lc!.latestEngagement}{" "}
               eng.
             </span>
           </div>
@@ -710,6 +713,72 @@ function LifecycleList({
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
+
+// Engagement a livello account da Meta (best-effort). Si popola solo dai
+// prossimi snapshot dopo il deploy: prima di allora mostra l'empty-state.
+function AccountEngagementSection({
+  engagement,
+  reach28,
+}: {
+  engagement: InstagramAccountEngagement | null | undefined;
+  reach28: number | null | undefined;
+}) {
+  const hasData =
+    reach28 != null ||
+    (engagement != null && Object.values(engagement).some((v) => v != null));
+
+  return (
+    <SectionCard
+      note="Metriche aggregate dall'account Instagram (Meta), non solo dai post tracciati. Best-effort: alcune voci possono mancare se non esposte dall'account."
+      title="Engagement generale (account)"
+    >
+      {hasData ? (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <StatCard
+            color="primary"
+            hint="like + commenti + salvataggi + condivisioni"
+            label="Interazioni totali"
+            value={engagement?.totalInteractions ?? undefined}
+          />
+          <StatCard
+            color="default"
+            hint="account unici che hanno interagito"
+            label="Account coinvolti"
+            value={engagement?.accountsEngaged ?? undefined}
+          />
+          <StatCard
+            color="default"
+            hint="reach rolling 28 giorni"
+            label="Reach 28gg"
+            value={reach28 ?? undefined}
+          />
+          <StatCard
+            color="default"
+            hint="visite al profilo"
+            label="Visite profilo"
+            value={engagement?.profileViews ?? undefined}
+          />
+          <StatCard
+            color="default"
+            hint="tap sui link in bio"
+            label="Tap sui link"
+            value={engagement?.profileLinksTaps ?? undefined}
+          />
+          <StatCard
+            color="default"
+            hint="visualizzazioni dei contenuti"
+            label="Visualizzazioni"
+            value={engagement?.views ?? undefined}
+          />
+        </div>
+      ) : (
+        <p className="text-default-400 text-sm py-6 text-center">
+          Verrà popolato ai prossimi snapshot.
+        </p>
+      )}
+    </SectionCard>
+  );
+}
 
 function DashboardView({
   stats,
@@ -797,6 +866,11 @@ function DashboardView({
           value={stats?.unfollowersLast30}
         />
       </div>
+
+      <AccountEngagementSection
+        engagement={stats?.accountEngagement}
+        reach28={stats?.reach28}
+      />
 
       {(stats?.growth?.length ?? 0) > 0 && (
         <ComparisonCards growth={stats!.growth!} posts={stats?.posts ?? []} />
@@ -1036,6 +1110,13 @@ function ContentAnalytics({
   const byDay = useMemo(() => engagementByDay(posts), [posts]);
   const byBucket = useMemo(() => engagementByBucket(posts), [posts]);
   const best = useMemo(() => bestSlot(posts), [posts]);
+  // Derivazione leggera (6 bucket): niente useMemo, l'offset TZ è una lettura
+  // impura che il compiler non può tracciare in un memo manuale.
+
+  const tzOffset = new Date().getTimezoneOffset();
+  const onlineByBucket = stats?.onlineFollowers
+    ? onlineFollowersByBucket(stats.onlineFollowers, tzOffset)
+    : null;
 
   if (posts.length === 0) {
     return (
@@ -1062,7 +1143,7 @@ function ContentAnalytics({
 
       {showAggregate && (stats?.velocity?.length ?? 0) > 0 && (
         <SectionCard
-          note="Accumulo di like+commenti+salvataggi nei giorni dopo la pubblicazione (ultimi post)."
+          note="Accumulo di like+commenti+salvataggi rilevamento dopo rilevamento (ril = snapshot giornaliero, ril1 = primo rilevamento del post)."
           title="Velocity dell'engagement"
         >
           <VelocityChart data={stats!.velocity!} posts={posts} />
@@ -1074,7 +1155,11 @@ function ContentAnalytics({
       )}
 
       <SectionCard
-        note="Engagement medio · campione limitato ai post tracciati."
+        note={
+          showAggregate && onlineByBucket
+            ? "Giorno/fascia = engagement medio dei tuoi post (campione limitato). Follower online = quando il tuo pubblico è attivo, dato Meta a livello account (ora locale)."
+            : "Engagement medio · campione limitato ai post tracciati."
+        }
         title="Quando pubblicare"
       >
         {best && (
@@ -1095,6 +1180,14 @@ function ContentAnalytics({
             <AvgBarChart color="#006FEE" data={byBucket} />
           </div>
         </div>
+        {showAggregate && onlineByBucket && (
+          <div className="mt-4">
+            <p className="text-xs text-default-400 mb-1">
+              Follower online per fascia (dato Meta · ora locale)
+            </p>
+            <OnlineFollowersChart data={onlineByBucket} />
+          </div>
+        )}
       </SectionCard>
 
       {hashtags.length > 0 && (
@@ -1151,7 +1244,8 @@ function StoriesAnalytics({ posts }: { posts: InstagramPost[] }) {
       <h3 className="text-sm font-semibold">Storie ({posts.length})</h3>
       <p className="text-[10px] text-default-400">
         Metriche storia: reach (account unici raggiunti) · risposte ·
-        condivisioni · ↪ navigazione (tap avanti/indietro e uscite).
+        condivisioni · Σ interazioni totali · ↪ navigazione (tap avanti/indietro
+        e uscite).
       </p>
       {posts.map((s) => (
         <a
@@ -1170,6 +1264,7 @@ function StoriesAnalytics({ posts }: { posts: InstagramPost[] }) {
               <Metric icon={ReachIcon} value={num(s, "reach")} />
               <Metric icon={CommentsIcon} value={num(s, "replies")} />
               <Metric icon={SharesIcon} value={num(s, "shares")} />
+              <span>Σ {num(s, "total_interactions") ?? "–"}</span>
               <span>↪ {num(s, "navigation") ?? "–"}</span>
             </div>
           </div>

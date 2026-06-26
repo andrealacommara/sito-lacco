@@ -182,6 +182,22 @@ export type InstagramDemographics = {
   city?: Record<string, number>;
 };
 
+// Engagement a livello account da Meta (metric_type=total_value). Tutti i campi
+// sono best-effort: assenti/null se la metrica non è disponibile sull'account.
+export type InstagramAccountEngagement = {
+  totalInteractions?: number | null; // like + commenti + salvataggi + condivisioni
+  accountsEngaged?: number | null; // account unici che hanno interagito
+  profileViews?: number | null;
+  profileLinksTaps?: number | null; // tap sui link in bio
+  followsAndUnfollows?: number | null;
+  views?: number | null;
+  likes?: number | null;
+  comments?: number | null;
+  saves?: number | null;
+  shares?: number | null;
+  replies?: number | null;
+};
+
 // GET /functions/v1/admin-instagram-stats
 export type InstagramStatsResponse = {
   ok: boolean;
@@ -200,6 +216,11 @@ export type InstagramStatsResponse = {
   // Tag manuali per account: username → tag (persona | vip | pagina).
   tags?: Record<string, InstagramAccountTag>;
   demographics?: InstagramDemographics | null;
+  // Engagement account-level da Meta (best-effort, popolato solo in avanti).
+  accountEngagement?: InstagramAccountEngagement | null;
+  reach28?: number | null; // reach account rolling a 28 giorni
+  // Follower online per ora UTC (0-23 → conteggio medio). Best-effort.
+  onlineFollowers?: Record<string, number> | null;
   recentUnfollowers?: InstagramRecentUnfollower[];
   tokenExpiresAt?: string | null;
   error?: string;

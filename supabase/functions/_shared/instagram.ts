@@ -137,13 +137,26 @@ export async function fetchAccount(token: string): Promise<AccountData> {
   };
 }
 
-// Insight account best-effort (reach giornaliero). Mai fatale: se il metric non è
-// disponibile (es. account < 100 follower o metric deprecato) ritorna {}.
+// Metriche engagement account-level richieste con metric_type=total_value.
+// Raggruppate in piccoli batch: la Graph API risponde 400 sull'intera richiesta
+// se anche una sola metrica è invalida/deprecata, quindi un gruppo che fallisce
+// non deve azzerare gli altri. Diverse di queste sono storicamente Business-only
+// o rinominate tra versioni Graph e possono mancare sull'API Instagram Login.
+const ACCOUNT_ENGAGEMENT_GROUPS: string[][] = [
+  ["total_interactions", "likes", "comments", "saves", "shares", "replies"],
+  ["accounts_engaged", "profile_views", "profile_links_taps"],
+  ["follows_and_unfollows", "views"],
+];
+
+// Insight account best-effort. Mai fatale: ogni blocco degrada in silenzio se il
+// metric non è disponibile (es. account < 100 follower o metric deprecato).
+// Ritorna { reach?, reach28?, engagement? } — chiavi assenti = metrica mancante.
 export async function fetchAccountInsights(
   token: string,
 ): Promise<Record<string, unknown>> {
   const out: Record<string, unknown> = {};
 
+  // Reach giornaliero (serie storica: forma values[0].value).
   try {
     const data = await graphGet(
       `${IG_USER_ID}/insights`,
@@ -154,6 +167,84 @@ export async function fetchAccountInsights(
     out.reach = data.data?.[0]?.values?.[0]?.value ?? null;
   } catch {
     // ignorato di proposito
+  }
+
+  // Reach rolling a 28 giorni.
+  try {
+    const data = await graphGet(
+      `${IG_USER_ID}/insights`,
+      { metric: "reach", period: "days_28" },
+      token,
+    );
+
+    out.reach28 = data.data?.[0]?.values?.[0]?.value ?? null;
+  } catch {
+    // ignorato di proposito
+  }
+
+  // Engagement account-level (forma total_value: entry.total_value.value).
+  const engagement: Record<string, number> = {};
+
+  for (const group of ACCOUNT_ENGAGEMENT_GROUPS) {
+    try {
+      const data = await graphGet(
+        `${IG_USER_ID}/insights`,
+        {
+          metric: group.join(","),
+          metric_type: "total_value",
+          period: "day",
+        },
+        token,
+      );
+
+      for (const entry of data.data ?? []) {
+        const value = entry?.total_value?.value;
+
+        if (entry?.name && typeof value === "number") {
+          engagement[entry.name] = value;
+        }
+      }
+    } catch {
+      // gruppo non disponibile: si perde solo questo batch, non gli altri
+    }
+  }
+
+  if (Object.keys(engagement).length) out.engagement = engagement;
+
+  // Follower online per ora (UTC), audience-based: complementa il "quando
+  // pubblicare" che è basato solo sui post. Meta ritorna ~30 valori giornalieri
+  // (mappa ora→conteggio): ne faccio la media per ora. Best-effort: spesso non
+  // disponibile sull'API Instagram Login.
+  try {
+    const data = await graphGet(
+      `${IG_USER_ID}/insights`,
+      { metric: "online_followers", period: "lifetime" },
+      token,
+    );
+    const sums: Record<string, number> = {};
+    let days = 0;
+
+    for (const v of data.data?.[0]?.values ?? []) {
+      const map = v?.value;
+
+      if (map && typeof map === "object" && Object.keys(map).length) {
+        days++;
+        for (const [hour, count] of Object.entries(map)) {
+          if (typeof count === "number") sums[hour] = (sums[hour] ?? 0) + count;
+        }
+      }
+    }
+
+    if (days > 0) {
+      const avg: Record<string, number> = {};
+
+      for (const [hour, total] of Object.entries(sums)) {
+        avg[hour] = Math.round(total / days);
+      }
+      out.onlineFollowers = avg;
+    }
+  } catch {
+    // best-effort: metric non disponibile o permesso mancante
   }
 
   return out;

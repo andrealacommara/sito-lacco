@@ -41,6 +41,9 @@ Deno.serve(async (req) => {
         media_count: number;
         insights: {
           demographics?: Record<string, Record<string, number>>;
+          reach28?: number | null;
+          engagement?: Record<string, number | null>;
+          onlineFollowers?: Record<string, number>;
         } | null;
       }[]
     >`
@@ -322,6 +325,25 @@ Deno.serve(async (req) => {
       series: velocityMap.get(id) ?? [],
     }));
 
+    // Engagement account-level: rimappo le chiavi snake_case di Meta in camelCase
+    // per coerenza col resto della response. null se nessuna metrica disponibile.
+    const rawEngagement = latest[0]?.insights?.engagement ?? null;
+    const accountEngagement = rawEngagement
+      ? {
+          totalInteractions: rawEngagement.total_interactions ?? null,
+          accountsEngaged: rawEngagement.accounts_engaged ?? null,
+          profileViews: rawEngagement.profile_views ?? null,
+          profileLinksTaps: rawEngagement.profile_links_taps ?? null,
+          followsAndUnfollows: rawEngagement.follows_and_unfollows ?? null,
+          views: rawEngagement.views ?? null,
+          likes: rawEngagement.likes ?? null,
+          comments: rawEngagement.comments ?? null,
+          saves: rawEngagement.saves ?? null,
+          shares: rawEngagement.shares ?? null,
+          replies: rawEngagement.replies ?? null,
+        }
+      : null;
+
     return jsonResponse(
       {
         ok: true,
@@ -344,6 +366,9 @@ Deno.serve(async (req) => {
         markedUnfollowed: marked.map((m) => m.username),
         tags,
         demographics: latest[0]?.insights?.demographics ?? null,
+        accountEngagement,
+        reach28: latest[0]?.insights?.reach28 ?? null,
+        onlineFollowers: latest[0]?.insights?.onlineFollowers ?? null,
         recentUnfollowers: recentUnfollowers.map((u) => ({
           username: u.username,
           since: u.was_following_since,

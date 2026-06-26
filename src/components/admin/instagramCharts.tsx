@@ -395,7 +395,7 @@ export function VelocityChart({
   // Allineo le serie su un asse "giorni dallo snapshot iniziale" comune.
   const maxLen = Math.max(0, ...data.map((d) => d.series.length));
   const rows = Array.from({ length: maxLen }, (_, i) => {
-    const row: Record<string, number | string> = { label: `g${i + 1}` };
+    const row: Record<string, number | string> = { label: `ril${i + 1}` };
 
     for (const v of data) {
       const pt = v.series[i];
@@ -476,6 +476,45 @@ export function AvgBarChart({
             cursor={{ fill: color, fillOpacity: 0.08 }}
           />
           <Bar dataKey="avg" name="Engagement medio" radius={[6, 6, 0, 0]}>
+            {data.map((d, i) => (
+              <Cell key={i} fill={color} fillOpacity={d.count ? 1 : 0.18} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ── Follower online per fascia oraria (dato Meta, account-level) ──────────────
+
+export function OnlineFollowersChart({
+  data,
+  color = "#7828C8",
+}: {
+  data: { label: string; avg: number; count: number }[];
+  color?: string;
+}) {
+  return (
+    <div className="text-default-300">
+      <ResponsiveContainer height={180} width="100%">
+        <BarChart
+          data={data}
+          margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
+        >
+          <CartesianGrid
+            opacity={0.12}
+            stroke="currentColor"
+            strokeDasharray="3 3"
+            vertical={false}
+          />
+          <XAxis dataKey="label" {...axisProps} />
+          <YAxis width={44} {...axisProps} />
+          <Tooltip
+            content={<ChartTooltip />}
+            cursor={{ fill: color, fillOpacity: 0.08 }}
+          />
+          <Bar dataKey="avg" name="Follower online" radius={[6, 6, 0, 0]}>
             {data.map((d, i) => (
               <Cell key={i} fill={color} fillOpacity={d.count ? 1 : 0.18} />
             ))}

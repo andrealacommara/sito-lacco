@@ -185,6 +185,41 @@ export function engagementByBucket(posts: InstagramPost[]): SlotStat[] {
   return aggregateBy(posts, TIME_BUCKETS, bucketIndex);
 }
 
+/**
+ * Distribuzione dei follower online per fascia oraria (le stesse 6 fasce di
+ * `engagementByBucket`, così i due grafici sono confrontabili). `map` arriva da
+ * Meta con ore in UTC (0-23 → conteggio): le converto in ora locale —
+ * coerente col resto del dashboard, che usa `new Date(postedAt)` in locale.
+ * `tzOffsetMinutes` = `Date.getTimezoneOffset()` (passato dal chiamante per
+ * mantenere pura questa funzione): minuti da aggiungere al locale per ottenere
+ * UTC, quindi localHour = utcHour - offsetMin/60 (Italia estate -120 → +2).
+ */
+export function onlineFollowersByBucket(
+  map: Record<string, number> | null | undefined,
+  tzOffsetMinutes: number,
+): SlotStat[] {
+  const acc = TIME_BUCKETS.map(() => 0);
+
+  if (map) {
+    const offsetH = tzOffsetMinutes / 60;
+
+    for (const [hourStr, count] of Object.entries(map)) {
+      const utcHour = Number(hourStr);
+
+      if (!Number.isFinite(utcHour) || typeof count !== "number") continue;
+      const localHour = (((utcHour - offsetH) % 24) + 24) % 24;
+
+      acc[Math.min(5, Math.floor(localHour / 4))] += count;
+    }
+  }
+
+  return TIME_BUCKETS.map((label, i) => ({
+    label,
+    avg: Math.round(acc[i]),
+    count: acc[i] > 0 ? 1 : 0,
+  }));
+}
+
 /** Miglior combinazione giorno×fascia tra quelle con dati. */
 export function bestSlot(
   posts: InstagramPost[],
