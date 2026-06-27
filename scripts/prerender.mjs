@@ -80,6 +80,20 @@ try {
 
       document.documentElement.removeAttribute("data-theme");
 
+      // Rimuovi i <link rel=modulepreload|preload|prefetch> con href ASSOLUTO:
+      // il warming delle route (App idle) inietta a runtime preload dei chunk e
+      // a partire da vite 8.1.0 questi usano l'origine assoluta del server di
+      // prerender (es. http://localhost:4178/assets/…), che finirebbe cotta
+      // nello snapshot statico e fallirebbe in produzione/smoke test. I preload
+      // legittimi emessi da vite nella index.html hanno href root-relative
+      // (/assets/…) e vengono preservati.
+      for (const link of head.querySelectorAll(
+        'link[rel="modulepreload"], link[rel="preload"], link[rel="prefetch"]',
+      )) {
+        const href = link.getAttribute("href") || "";
+        if (/^https?:\/\//i.test(href)) link.remove();
+      }
+
       // Slug immersive: "cuoci" il colore barra forzato così lo script inline di
       // index.html (e il sync runtime) lo applicano dal primo paint, evitando la
       // banda bianca per gli utenti con preferenza di sistema chiara.
