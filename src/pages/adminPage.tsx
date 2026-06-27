@@ -655,12 +655,7 @@ export default function AdminPage() {
         <meta content="noindex, nofollow" name="robots" />
       </Helmet>
       <div className="py-8">
-        <div
-          className={clsx(
-            "mx-auto mb-2 flex justify-end",
-            section === "newsletter" ? "max-w-3xl" : "max-w-5xl",
-          )}
-        >
+        <div className="max-w-4xl mx-auto mb-2 flex justify-end">
           <Button
             className="rounded-xl"
             size="sm"
@@ -670,12 +665,7 @@ export default function AdminPage() {
             Esci
           </Button>
         </div>
-        <div
-          className={clsx(
-            "py-6 mx-auto flex flex-col gap-6",
-            section === "newsletter" ? "max-w-3xl" : "max-w-5xl",
-          )}
-        >
+        <div className="max-w-4xl py-6 mx-auto flex flex-col gap-6">
           {/* Section bar: Instagram | Newsletter | Template */}
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
             <Button

@@ -7,6 +7,9 @@ import type postgres from "https://esm.sh/postgres@3.4.5";
 const GRAPH = "https://graph.instagram.com";
 const API_VERSION = "v21.0";
 const REFRESH_THRESHOLD_MS = 10 * 24 * 60 * 60 * 1000; // rinnova se < 10gg alla scadenza
+// Quante richieste insight per-post lanciare in parallelo (lotto): bilancia
+// velocità e rate limit della Graph API.
+const MEDIA_INSIGHTS_CONCURRENCY = 4;
 
 export const IG_USER_ID = Deno.env.get("IG_BUSINESS_ACCOUNT_ID") ?? "";
 
@@ -112,7 +115,14 @@ async function graphGet(
   token: string,
 ): Promise<any> {
   const qs = new URLSearchParams({ ...params, access_token: token });
-  const res = await fetch(`${GRAPH}/${API_VERSION}/${path}?${qs}`);
+
+  return graphGetUrl(`${GRAPH}/${API_VERSION}/${path}?${qs}`);
+}
+
+// Fetch di una URL Graph assoluta — usato per seguire i cursori di paginazione
+// (`paging.next`), che Meta ritorna già completi di access_token e cursore.
+async function graphGetUrl(url: string): Promise<any> {
+  const res = await fetch(url);
 
   if (!res.ok) {
     const err = await res.text();
@@ -293,42 +303,67 @@ export async function fetchFollowerDemographics(
 
 // Media recenti + insight per-post. like/comment vengono dai campi diretti
 // (più affidabili); reach/saves/shares/views dagli insights (best-effort).
+// Recupera TUTTI i post seguendo la paginazione (`paging.next`), non solo gli
+// ultimi N. `pageSize` è la dimensione della pagina Graph; `maxPages` è un tetto
+// di sicurezza contro loop infiniti (200 pagine × 100 = 20k post, ben oltre il reale).
 export async function fetchRecentMedia(
   token: string,
-  limit = 25,
+  pageSize = 100,
+  maxPages = 200,
 ): Promise<MediaInsight[]> {
-  const list = await graphGet(
+  const fields =
+    "id,media_type,media_product_type,permalink,caption,timestamp,like_count,comments_count,media_url,thumbnail_url";
+
+  const items: any[] = [];
+
+  let page = await graphGet(
     `${IG_USER_ID}/media`,
-    {
-      fields:
-        "id,media_type,media_product_type,permalink,caption,timestamp,like_count,comments_count,media_url,thumbnail_url",
-      limit: String(limit),
-    },
+    { fields, limit: String(pageSize) },
     token,
   );
+  let pages = 0;
 
+  while (true) {
+    items.push(...(page.data ?? []));
+
+    const next = page.paging?.next as string | undefined;
+
+    if (!next || ++pages >= maxPages) break;
+    page = await graphGetUrl(next);
+  }
+
+  // Gli insight si recuperano a lotti paralleli (CONCURRENCY per volta) anziché
+  // uno alla volta: il collo di bottiglia è l'attesa di rete, non la CPU.
+  // Lotti contenuti per non sfondare i rate limit della Graph API.
   const media: MediaInsight[] = [];
 
-  for (const m of list.data ?? []) {
-    const insights = await fetchMediaInsights(m.id, token);
+  for (let i = 0; i < items.length; i += MEDIA_INSIGHTS_CONCURRENCY) {
+    const batch = items.slice(i, i + MEDIA_INSIGHTS_CONCURRENCY);
+    const insightsBatch = await Promise.all(
+      batch.map((m) => fetchMediaInsights(m.id, token)),
+    );
 
-    media.push({
-      ig_media_id: m.id,
-      media_type:
-        m.media_product_type === "REELS" ? "REEL" : (m.media_type ?? null),
-      permalink: m.permalink ?? null,
-      caption: m.caption ?? null,
-      posted_at: m.timestamp ?? null,
-      likes: m.like_count ?? null,
-      comments: m.comments_count ?? null,
-      saves: insights.saved,
-      shares: insights.shares,
-      reach: insights.reach,
-      views: insights.views,
-      // thumbnail_url presente per video/reel; per le immagini usiamo media_url.
-      thumbnail_url: m.thumbnail_url ?? null,
-      media_url: m.media_url ?? null,
-      insights: null,
+    batch.forEach((m, j) => {
+      const insights = insightsBatch[j];
+
+      media.push({
+        ig_media_id: m.id,
+        media_type:
+          m.media_product_type === "REELS" ? "REEL" : (m.media_type ?? null),
+        permalink: m.permalink ?? null,
+        caption: m.caption ?? null,
+        posted_at: m.timestamp ?? null,
+        likes: m.like_count ?? null,
+        comments: m.comments_count ?? null,
+        saves: insights.saved,
+        shares: insights.shares,
+        reach: insights.reach,
+        views: insights.views,
+        // thumbnail_url presente per video/reel; per le immagini usiamo media_url.
+        thumbnail_url: m.thumbnail_url ?? null,
+        media_url: m.media_url ?? null,
+        insights: null,
+      });
     });
   }
 

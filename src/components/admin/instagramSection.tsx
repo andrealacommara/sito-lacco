@@ -1225,8 +1225,9 @@ function ContentAnalytics({
           Dettaglio contenuti ({posts.length})
         </h3>
         <p className="text-[10px] text-default-400 -mt-1">
-          ER = engagement / reach · Salv. = salvataggi / reach · Reach = reach /
-          follower (oltre 100% = uscito dai tuoi follower)
+          Ordinati per engagement totale · ER = engagement / reach · Salv. =
+          salvataggi / reach · Reach = reach / follower (oltre 100% = uscito dai
+          tuoi follower)
         </p>
         {[...posts]
           .sort((a, b) => b.engagement - a.engagement)
