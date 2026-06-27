@@ -434,7 +434,7 @@ export default function InstagramSection({ session }: { session: Session }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Sub-tab bar */}
-      <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
+      <div className="flex gap-1 sm:gap-2 justify-center">
         {(
           [
             ["dashboard", "Dashboard"],
@@ -444,12 +444,12 @@ export default function InstagramSection({ session }: { session: Session }) {
         ).map(([key, label]) => (
           <Button
             key={key}
-            className="rounded-xl font-semibold shrink-0"
+            className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
             size="sm"
             variant={subTab === key ? "danger" : "outline"}
             onPress={() => setSubTab(key)}
           >
-            {label}
+            <span className="truncate">{label}</span>
           </Button>
         ))}
       </div>
@@ -579,23 +579,23 @@ function ComparisonCards({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="min-w-0 truncate text-sm font-semibold">
           Confronto col periodo precedente
         </h3>
-        <div className="flex gap-1">
-          {COMPARE_WINDOWS.map(([days, label]) => (
-            <Button
-              key={days}
-              className="rounded-xl font-semibold shrink-0"
-              size="sm"
-              variant={windowDays === days ? "danger" : "outline"}
-              onPress={() => setWindowDays(days)}
-            >
-              {label}
-            </Button>
-          ))}
-        </div>
+      </div>
+      <div className="flex gap-1 justify-center">
+        {COMPARE_WINDOWS.map(([days, label]) => (
+          <Button
+            key={days}
+            className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
+            size="sm"
+            variant={windowDays === days ? "danger" : "outline"}
+            onPress={() => setWindowDays(days)}
+          >
+            <span className="truncate">{label}</span>
+          </Button>
+        ))}
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {metrics.map((m) => (
@@ -729,7 +729,6 @@ function AccountEngagementSection({
 
   return (
     <SectionCard
-      note="Metriche aggregate dall'account Instagram (Meta), non solo dai post tracciati. Best-effort: alcune voci possono mancare se non esposte dall'account."
       title="Engagement generale (account)"
     >
       {hasData ? (
@@ -884,11 +883,6 @@ function DashboardView({
       {recentPosts.length > 0 && (
         <div className="flex flex-col gap-3">
           <h3 className="text-sm font-semibold">Andamento ultimi post/reel</h3>
-          <p className="text-[10px] text-default-400 -mt-1">
-            Engagement in ordine cronologico · ogni barra (#n) corrisponde al
-            post numerato qui sotto. Completo nella scheda{" "}
-            <strong>Contenuti</strong>.
-          </p>
           <ChronoEngagementChart numbered data={recentPosts} />
           <div className="flex flex-col gap-2">
             {recentPosts.map((post, i) => (
@@ -1060,7 +1054,7 @@ function ContenutiView({ stats }: { stats: InstagramStatsResponse | null }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
+      <div className="flex gap-1 sm:gap-2 justify-center">
         {(
           [
             ["generale", "Generale"],
@@ -1071,12 +1065,12 @@ function ContenutiView({ stats }: { stats: InstagramStatsResponse | null }) {
         ).map(([key, label]) => (
           <Button
             key={key}
-            className="rounded-xl font-semibold shrink-0"
+            className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
             size="sm"
             variant={tab === key ? "danger" : "outline"}
             onPress={() => setTab(key)}
           >
-            {label}
+            <span className="truncate">{label}</span>
           </Button>
         ))}
       </div>
@@ -1255,12 +1249,12 @@ function ContentAnalytics({
           ).map(([key, label]) => (
             <Button
               key={key}
-              className="rounded-xl font-semibold shrink-0"
+              className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
               size="sm"
               variant={sortBy === key ? "danger" : "outline"}
               onPress={() => setSortBy(key)}
             >
-              {label}
+              <span className="truncate">{label}</span>
             </Button>
           ))}
         </div>
@@ -1591,10 +1585,6 @@ function FollowerView({
       <div className="border-t border-default-100 pt-5 flex flex-col gap-5">
         <div>
           <h3 className="text-sm font-semibold">Chi ha smesso di seguirti</h3>
-          <p className="text-xs text-default-400 mt-0.5">
-            Instagram non dà la lista follower via API: caricando l&apos;export
-            ZIP la confrontiamo con la precedente per scoprire gli unfollower.
-          </p>
         </div>
 
         <p className="text-sm text-default-500 leading-relaxed">
@@ -1608,8 +1598,7 @@ function FollowerView({
           >
             direttamente da qui
           </a>
-          , poi trascina qui lo ZIP. Il parsing avviene nel tuo browser: al
-          server arrivano solo username e date, mai il file.
+          , poi trascina qui lo ZIP.
         </p>
 
         <div className="relative">
