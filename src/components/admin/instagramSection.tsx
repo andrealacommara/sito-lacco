@@ -61,6 +61,7 @@ import {
   tenureHistogram,
   periodComparison,
   buildInsights,
+  buildAdvicePayload,
   postLifecycle,
   engagementTiers,
   postingCadence,
@@ -456,6 +457,7 @@ export default function InstagramSection({ session }: { session: Session }) {
 
       {subTab === "dashboard" && (
         <DashboardView
+          accessToken={session.access_token}
           snapshotLoading={snapshotLoading}
           stats={stats}
           onSnapshot={handleManualSnapshot}
@@ -523,15 +525,20 @@ function StatCard({
 function SectionCard({
   title,
   note,
+  action,
   children,
 }: {
   title: string;
   note?: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="rounded-xl border border-default-100 bg-default-50 p-4">
-      <h3 className="text-sm font-semibold mb-3">{title}</h3>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        {action}
+      </div>
       {children}
       {note && <p className="text-xs text-default-400 mt-2">{note}</p>}
     </div>
@@ -627,30 +634,67 @@ const INSIGHT_TONE: Record<InsightTone, { cls: string; icon: string }> = {
   tip: { cls: "text-primary", icon: "→" },
 };
 
-function InsightsPanel({ insights }: { insights: Insight[] }) {
-  if (insights.length === 0) return null;
+function InsightsPanel({
+  insights,
+  loading,
+  isAi,
+  onRegenerate,
+}: {
+  insights: Insight[];
+  loading?: boolean;
+  isAi?: boolean;
+  onRegenerate?: () => void;
+}) {
+  if (!loading && insights.length === 0) return null;
 
   return (
     <SectionCard
-      note="Sintesi automatica dai tuoi dati. Indicazioni, non regole assolute."
+      action={
+        onRegenerate ? (
+          <Button
+            className="rounded-lg"
+            isDisabled={loading}
+            size="sm"
+            variant="ghost"
+            onPress={onRegenerate}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <RefreshIcon aria-hidden className="w-3.5 h-3.5" />
+              Rigenera
+            </span>
+          </Button>
+        ) : undefined
+      }
+      note={
+        isAi
+          ? "Generati dall'AI sui tuoi dati. Indicazioni, non regole assolute."
+          : "Sintesi automatica dai tuoi dati. Indicazioni, non regole assolute."
+      }
       title="Consigli"
     >
-      <div className="flex flex-col gap-2">
-        {insights.map((it, i) => {
-          const tone = INSIGHT_TONE[it.tone];
+      {loading ? (
+        <div className="flex items-center gap-2 text-sm text-default-500">
+          <Spinner size="sm" />
+          Genero i consigli…
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {insights.map((it, i) => {
+            const tone = INSIGHT_TONE[it.tone];
 
-          return (
-            <div key={i} className="flex items-start gap-2 text-sm">
-              <span
-                className={`shrink-0 w-5 h-5 rounded-full bg-default-100 flex items-center justify-center text-xs font-bold ${tone.cls}`}
-              >
-                {tone.icon}
-              </span>
-              <span className="text-default-600 leading-snug">{it.text}</span>
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div key={i} className="flex items-start gap-2 text-sm">
+                <span
+                  className={`shrink-0 w-5 h-5 rounded-full bg-default-100 flex items-center justify-center text-xs font-bold ${tone.cls}`}
+                >
+                  {tone.icon}
+                </span>
+                <span className="text-default-600 leading-snug">{it.text}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </SectionCard>
   );
 }
@@ -728,9 +772,7 @@ function AccountEngagementSection({
     (engagement != null && Object.values(engagement).some((v) => v != null));
 
   return (
-    <SectionCard
-      title="Engagement generale (account)"
-    >
+    <SectionCard title="Engagement generale (account)">
       {hasData ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <StatCard
@@ -783,10 +825,12 @@ function DashboardView({
   stats,
   onSnapshot,
   snapshotLoading,
+  accessToken,
 }: {
   stats: InstagramStatsResponse | null;
   onSnapshot: () => void;
   snapshotLoading: boolean;
+  accessToken: string;
 }) {
   const delta = stats?.delta7d;
 
@@ -809,7 +853,23 @@ function DashboardView({
     [recentPosts],
   );
 
-  const insights = useMemo(
+  // Consigli generati dall'AI (Gemini, via edge function). I consigli
+  // rule-based di buildInsights restano come fallback se l'API fallisce, per non
+  // lasciare il pannello vuoto. Il payload sintetico riusa le derivazioni note.
+  const advicePayload = useMemo(
+    () =>
+      stats
+        ? buildAdvicePayload({
+            posts: stats.posts ?? [],
+            followers: stats.followers,
+            growth: stats.growth ?? [],
+            unfollowersLast30: stats.unfollowersLast30,
+            delta7d: stats.delta7d,
+          })
+        : null,
+    [stats],
+  );
+  const fallbackInsights = useMemo(
     () =>
       buildInsights({
         posts: stats?.posts ?? [],
@@ -820,6 +880,50 @@ function DashboardView({
       }),
     [stats],
   );
+
+  const [aiInsights, setAiInsights] = useState<Insight[] | null>(null);
+  const [adviceState, setAdviceState] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
+
+  const fetchAdvice = useCallback(async () => {
+    if (!advicePayload || advicePayload.postsAnalysed === 0) {
+      setAdviceState("ready");
+
+      return;
+    }
+    setAdviceState("loading");
+    try {
+      const res = await fetch(`${EF_BASE}/admin-instagram-advice`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(advicePayload),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        insights?: Insight[];
+      };
+
+      if (!res.ok || !data.ok || !Array.isArray(data.insights)) {
+        throw new Error("advice non valida");
+      }
+      setAiInsights(data.insights);
+      setAdviceState("ready");
+    } catch {
+      setAdviceState("error");
+    }
+  }, [accessToken, advicePayload]);
+
+  useEffect(() => {
+    // Genera i consigli AI quando arrivano (o cambiano) i dati.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAdvice();
+  }, [fetchAdvice]);
+
+  const insights = aiInsights ?? fallbackInsights;
 
   return (
     <div className="flex flex-col gap-6">
@@ -878,7 +982,12 @@ function DashboardView({
         <ComparisonCards growth={stats!.growth!} posts={stats?.posts ?? []} />
       )}
 
-      <InsightsPanel insights={insights} />
+      <InsightsPanel
+        insights={insights}
+        isAi={aiInsights != null}
+        loading={adviceState === "loading"}
+        onRegenerate={fetchAdvice}
+      />
 
       {recentPosts.length > 0 && (
         <div className="flex flex-col gap-3">
