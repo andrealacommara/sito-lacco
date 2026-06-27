@@ -47,6 +47,7 @@ import {
   bucketOf,
   mediaTypeLabel,
   engagementRate,
+  engagementRateOnReach,
   viralitySignals,
   typeBreakdown,
   extractHashtags,
@@ -60,6 +61,7 @@ import {
   tenureHistogram,
   periodComparison,
   buildInsights,
+  buildAdvicePayload,
   postLifecycle,
   engagementTiers,
   postingCadence,
@@ -433,7 +435,7 @@ export default function InstagramSection({ session }: { session: Session }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Sub-tab bar */}
-      <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
+      <div className="flex gap-1 sm:gap-2 justify-center">
         {(
           [
             ["dashboard", "Dashboard"],
@@ -443,18 +445,19 @@ export default function InstagramSection({ session }: { session: Session }) {
         ).map(([key, label]) => (
           <Button
             key={key}
-            className="rounded-xl font-semibold shrink-0"
+            className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
             size="sm"
             variant={subTab === key ? "danger" : "outline"}
             onPress={() => setSubTab(key)}
           >
-            {label}
+            <span className="truncate">{label}</span>
           </Button>
         ))}
       </div>
 
       {subTab === "dashboard" && (
         <DashboardView
+          accessToken={session.access_token}
           snapshotLoading={snapshotLoading}
           stats={stats}
           onSnapshot={handleManualSnapshot}
@@ -522,15 +525,20 @@ function StatCard({
 function SectionCard({
   title,
   note,
+  action,
   children,
 }: {
   title: string;
   note?: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="rounded-xl border border-default-100 bg-default-50 p-4">
-      <h3 className="text-sm font-semibold mb-3">{title}</h3>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        {action}
+      </div>
       {children}
       {note && <p className="text-xs text-default-400 mt-2">{note}</p>}
     </div>
@@ -578,23 +586,23 @@ function ComparisonCards({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="min-w-0 truncate text-sm font-semibold">
           Confronto col periodo precedente
         </h3>
-        <div className="flex gap-1">
-          {COMPARE_WINDOWS.map(([days, label]) => (
-            <Button
-              key={days}
-              className="rounded-xl font-semibold shrink-0"
-              size="sm"
-              variant={windowDays === days ? "danger" : "outline"}
-              onPress={() => setWindowDays(days)}
-            >
-              {label}
-            </Button>
-          ))}
-        </div>
+      </div>
+      <div className="flex gap-1 justify-center">
+        {COMPARE_WINDOWS.map(([days, label]) => (
+          <Button
+            key={days}
+            className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
+            size="sm"
+            variant={windowDays === days ? "danger" : "outline"}
+            onPress={() => setWindowDays(days)}
+          >
+            <span className="truncate">{label}</span>
+          </Button>
+        ))}
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {metrics.map((m) => (
@@ -626,30 +634,67 @@ const INSIGHT_TONE: Record<InsightTone, { cls: string; icon: string }> = {
   tip: { cls: "text-primary", icon: "→" },
 };
 
-function InsightsPanel({ insights }: { insights: Insight[] }) {
-  if (insights.length === 0) return null;
+function InsightsPanel({
+  insights,
+  loading,
+  isAi,
+  onRegenerate,
+}: {
+  insights: Insight[];
+  loading?: boolean;
+  isAi?: boolean;
+  onRegenerate?: () => void;
+}) {
+  if (!loading && insights.length === 0) return null;
 
   return (
     <SectionCard
-      note="Sintesi automatica dai tuoi dati. Indicazioni, non regole assolute."
+      action={
+        onRegenerate ? (
+          <Button
+            className="rounded-lg"
+            isDisabled={loading}
+            size="sm"
+            variant="ghost"
+            onPress={onRegenerate}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <RefreshIcon aria-hidden className="w-3.5 h-3.5" />
+              Rigenera
+            </span>
+          </Button>
+        ) : undefined
+      }
+      note={
+        isAi
+          ? "Generati dall'AI sui tuoi dati. Indicazioni, non regole assolute."
+          : "Sintesi automatica dai tuoi dati. Indicazioni, non regole assolute."
+      }
       title="Consigli"
     >
-      <div className="flex flex-col gap-2">
-        {insights.map((it, i) => {
-          const tone = INSIGHT_TONE[it.tone];
+      {loading ? (
+        <div className="flex items-center gap-2 text-sm text-default-500">
+          <Spinner size="sm" />
+          Genero i consigli…
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {insights.map((it, i) => {
+            const tone = INSIGHT_TONE[it.tone];
 
-          return (
-            <div key={i} className="flex items-start gap-2 text-sm">
-              <span
-                className={`shrink-0 w-5 h-5 rounded-full bg-default-100 flex items-center justify-center text-xs font-bold ${tone.cls}`}
-              >
-                {tone.icon}
-              </span>
-              <span className="text-default-600 leading-snug">{it.text}</span>
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div key={i} className="flex items-start gap-2 text-sm">
+                <span
+                  className={`shrink-0 w-5 h-5 rounded-full bg-default-100 flex items-center justify-center text-xs font-bold ${tone.cls}`}
+                >
+                  {tone.icon}
+                </span>
+                <span className="text-default-600 leading-snug">{it.text}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </SectionCard>
   );
 }
@@ -727,10 +772,7 @@ function AccountEngagementSection({
     (engagement != null && Object.values(engagement).some((v) => v != null));
 
   return (
-    <SectionCard
-      note="Metriche aggregate dall'account Instagram (Meta), non solo dai post tracciati. Best-effort: alcune voci possono mancare se non esposte dall'account."
-      title="Engagement generale (account)"
-    >
+    <SectionCard title="Engagement generale (account)">
       {hasData ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <StatCard
@@ -783,10 +825,12 @@ function DashboardView({
   stats,
   onSnapshot,
   snapshotLoading,
+  accessToken,
 }: {
   stats: InstagramStatsResponse | null;
   onSnapshot: () => void;
   snapshotLoading: boolean;
+  accessToken: string;
 }) {
   const delta = stats?.delta7d;
 
@@ -809,7 +853,23 @@ function DashboardView({
     [recentPosts],
   );
 
-  const insights = useMemo(
+  // Consigli generati dall'AI (Gemini, via edge function). I consigli
+  // rule-based di buildInsights restano come fallback se l'API fallisce, per non
+  // lasciare il pannello vuoto. Il payload sintetico riusa le derivazioni note.
+  const advicePayload = useMemo(
+    () =>
+      stats
+        ? buildAdvicePayload({
+            posts: stats.posts ?? [],
+            followers: stats.followers,
+            growth: stats.growth ?? [],
+            unfollowersLast30: stats.unfollowersLast30,
+            delta7d: stats.delta7d,
+          })
+        : null,
+    [stats],
+  );
+  const fallbackInsights = useMemo(
     () =>
       buildInsights({
         posts: stats?.posts ?? [],
@@ -820,6 +880,50 @@ function DashboardView({
       }),
     [stats],
   );
+
+  const [aiInsights, setAiInsights] = useState<Insight[] | null>(null);
+  const [adviceState, setAdviceState] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
+
+  const fetchAdvice = useCallback(async () => {
+    if (!advicePayload || advicePayload.postsAnalysed === 0) {
+      setAdviceState("ready");
+
+      return;
+    }
+    setAdviceState("loading");
+    try {
+      const res = await fetch(`${EF_BASE}/admin-instagram-advice`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(advicePayload),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        insights?: Insight[];
+      };
+
+      if (!res.ok || !data.ok || !Array.isArray(data.insights)) {
+        throw new Error("advice non valida");
+      }
+      setAiInsights(data.insights);
+      setAdviceState("ready");
+    } catch {
+      setAdviceState("error");
+    }
+  }, [accessToken, advicePayload]);
+
+  useEffect(() => {
+    // Genera i consigli AI quando arrivano (o cambiano) i dati.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAdvice();
+  }, [fetchAdvice]);
+
+  const insights = aiInsights ?? fallbackInsights;
 
   return (
     <div className="flex flex-col gap-6">
@@ -878,16 +982,16 @@ function DashboardView({
         <ComparisonCards growth={stats!.growth!} posts={stats?.posts ?? []} />
       )}
 
-      <InsightsPanel insights={insights} />
+      <InsightsPanel
+        insights={insights}
+        isAi={aiInsights != null}
+        loading={adviceState === "loading"}
+        onRegenerate={fetchAdvice}
+      />
 
       {recentPosts.length > 0 && (
         <div className="flex flex-col gap-3">
           <h3 className="text-sm font-semibold">Andamento ultimi post/reel</h3>
-          <p className="text-[10px] text-default-400 -mt-1">
-            Engagement in ordine cronologico · ogni barra (#n) corrisponde al
-            post numerato qui sotto. Completo nella scheda{" "}
-            <strong>Contenuti</strong>.
-          </p>
           <ChronoEngagementChart numbered data={recentPosts} />
           <div className="flex flex-col gap-2">
             {recentPosts.map((post, i) => (
@@ -982,6 +1086,11 @@ function PostCard({
             <Chip
               color={tier === "top" ? "success" : "warning"}
               size="sm"
+              title={
+                tier === "top"
+                  ? "Tra i migliori per engagement rate (interazioni sul reach)"
+                  : "Tra i più bassi per engagement rate (interazioni sul reach)"
+              }
               variant="soft"
             >
               {tier === "top" ? "Top" : "Flop"}
@@ -1054,7 +1163,7 @@ function ContenutiView({ stats }: { stats: InstagramStatsResponse | null }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
+      <div className="flex gap-1 sm:gap-2 justify-center">
         {(
           [
             ["generale", "Generale"],
@@ -1065,12 +1174,12 @@ function ContenutiView({ stats }: { stats: InstagramStatsResponse | null }) {
         ).map(([key, label]) => (
           <Button
             key={key}
-            className="rounded-xl font-semibold shrink-0"
+            className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
             size="sm"
             variant={tab === key ? "danger" : "outline"}
             onPress={() => setTab(key)}
           >
-            {label}
+            <span className="truncate">{label}</span>
           </Button>
         ))}
       </div>
@@ -1100,8 +1209,27 @@ function ContentAnalytics({
   showAggregate: boolean;
   stats: InstagramStatsResponse | null;
 }) {
+  const [sortBy, setSortBy] = useState<"total" | "rate">("total");
   const types = useMemo(() => typeBreakdown(posts), [posts]);
   const tiers = useMemo(() => engagementTiers(posts), [posts]);
+  // Classifica del dettaglio: per engagement totale grezzo, oppure per
+  // engagement rate (eng/reach), la stessa metrica dei badge top/flop. I post
+  // senza reach non hanno un rate confrontabile → in fondo.
+  const ranked = useMemo(() => {
+    if (sortBy === "total")
+      return [...posts].sort((a, b) => b.engagement - a.engagement);
+
+    return [...posts].sort((a, b) => {
+      const ra = engagementRateOnReach(a);
+      const rb = engagementRateOnReach(b);
+
+      if (ra == null && rb == null) return b.engagement - a.engagement;
+      if (ra == null) return 1;
+      if (rb == null) return -1;
+
+      return rb - ra;
+    });
+  }, [posts, sortBy]);
   const cadence = useMemo(() => postingCadence(posts), [posts]);
   const hashtags = useMemo(() => extractHashtags(posts).slice(0, 12), [posts]);
   const byDay = useMemo(() => engagementByDay(posts), [posts]);
@@ -1216,29 +1344,39 @@ function ContentAnalytics({
       )}
 
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold">
-          Dettaglio contenuti ({posts.length})
-        </h3>
-        <p className="text-[10px] text-default-400 -mt-1">
-          ER = engagement / reach · Salv. = salvataggi / reach · Reach = reach /
-          follower (oltre 100% = uscito dai tuoi follower)
-        </p>
-        {[...posts]
-          .sort((a, b) => b.engagement - a.engagement)
-          .map((p, i) => (
-            <div key={p.id} className="flex items-stretch gap-2">
-              <span className="shrink-0 self-stretch flex w-7 items-center justify-center rounded-xl bg-default-100 text-xs font-semibold text-default-500">
-                {i + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <PostCard
-                  followers={followers}
-                  post={p}
-                  tier={tiers.get(p.id)}
-                />
-              </div>
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold">
+            Engagement dei contenuti ({posts.length} totali)
+          </h3>
+        </div>
+        <div className="flex gap-1 justify-center">
+          {(
+            [
+              ["total", "Totale"],
+              ["rate", "Normalizzato"],
+            ] as ["total" | "rate", string][]
+          ).map(([key, label]) => (
+            <Button
+              key={key}
+              className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
+              size="sm"
+              variant={sortBy === key ? "danger" : "outline"}
+              onPress={() => setSortBy(key)}
+            >
+              <span className="truncate">{label}</span>
+            </Button>
           ))}
+        </div>
+        {ranked.map((p, i) => (
+          <div key={p.id} className="flex items-stretch gap-2">
+            <span className="shrink-0 self-stretch flex w-7 items-center justify-center rounded-xl bg-default-100 text-xs font-semibold text-default-500">
+              {i + 1}
+            </span>
+            <div className="min-w-0 flex-1">
+              <PostCard followers={followers} post={p} tier={tiers.get(p.id)} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -1556,10 +1694,6 @@ function FollowerView({
       <div className="border-t border-default-100 pt-5 flex flex-col gap-5">
         <div>
           <h3 className="text-sm font-semibold">Chi ha smesso di seguirti</h3>
-          <p className="text-xs text-default-400 mt-0.5">
-            Instagram non dà la lista follower via API: caricando l&apos;export
-            ZIP la confrontiamo con la precedente per scoprire gli unfollower.
-          </p>
         </div>
 
         <p className="text-sm text-default-500 leading-relaxed">
@@ -1573,8 +1707,7 @@ function FollowerView({
           >
             direttamente da qui
           </a>
-          , poi trascina qui lo ZIP. Il parsing avviene nel tuo browser: al
-          server arrivano solo username e date, mai il file.
+          , poi trascina qui lo ZIP.
         </p>
 
         <div className="relative">

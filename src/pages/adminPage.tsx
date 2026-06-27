@@ -15,7 +15,6 @@ import {
   TextField,
   Label,
   Input,
-  Description,
   Button,
   Checkbox,
   CheckboxControl,
@@ -28,8 +27,11 @@ import {
 } from "@heroui/react";
 import { Helmet } from "react-helmet-async";
 import clsx from "clsx";
-import RefreshIcon from "@/assets/icons/refresh.svg?react";
 
+import RefreshIcon from "@/assets/icons/refresh.svg?react";
+import InstagramTabIcon from "@/assets/icons/tab-instagram.svg?react";
+import NewsletterTabIcon from "@/assets/icons/tab-newsletter.svg?react";
+import TemplateTabIcon from "@/assets/icons/tab-template.svg?react";
 import RichTextEditor from "@/components/richTextEditor";
 import TemplateStudio from "@/components/admin/templateStudio";
 import InstagramSection from "@/components/admin/instagramSection";
@@ -67,6 +69,12 @@ const SOURCE_LABEL: Record<string, string> = {
 };
 
 const PAGE_SIZE_OPTIONS = [15, 30, 50, 100];
+
+const MAIN_TABS: [Section, string, typeof InstagramTabIcon][] = [
+  ["instagram", "Instagram", InstagramTabIcon],
+  ["newsletter", "Newsletter", NewsletterTabIcon],
+  ["template", "Template", TemplateTabIcon],
+];
 
 export default function AdminPage() {
   const [view, setView] = useState<View>("login");
@@ -655,12 +663,7 @@ export default function AdminPage() {
         <meta content="noindex, nofollow" name="robots" />
       </Helmet>
       <div className="py-8">
-        <div
-          className={clsx(
-            "mx-auto mb-2 flex justify-end",
-            section === "newsletter" ? "max-w-3xl" : "max-w-5xl",
-          )}
-        >
+        <div className="max-w-4xl mx-auto mb-2 flex justify-end">
           <Button
             className="rounded-xl"
             size="sm"
@@ -670,38 +673,22 @@ export default function AdminPage() {
             Esci
           </Button>
         </div>
-        <div
-          className={clsx(
-            "py-6 mx-auto flex flex-col gap-6",
-            section === "newsletter" ? "max-w-3xl" : "max-w-5xl",
-          )}
-        >
-          {/* Section bar: Instagram | Newsletter | Template */}
-          <div className="flex gap-1 sm:gap-2 overflow-x-auto">
-            <Button
-              className="rounded-xl font-semibold shrink-0"
-              size="sm"
-              variant={section === "instagram" ? "danger" : "outline"}
-              onPress={() => setSection("instagram")}
-            >
-              Instagram
-            </Button>
-            <Button
-              className="rounded-xl font-semibold shrink-0"
-              size="sm"
-              variant={section === "newsletter" ? "danger" : "outline"}
-              onPress={() => setSection("newsletter")}
-            >
-              Newsletter
-            </Button>
-            <Button
-              className="rounded-xl font-semibold shrink-0"
-              size="sm"
-              variant={section === "template" ? "danger" : "outline"}
-              onPress={() => setSection("template")}
-            >
-              Template
-            </Button>
+        <div className="max-w-4xl py-6 mx-auto flex flex-col gap-6">
+          {/* Section bar (main tabs): Instagram | Newsletter | Template
+              Su mobile solo icone, da sm in su icone + label. */}
+          <div className="flex gap-1.5 sm:gap-2 rounded-2xl bg-default-100 p-1.5">
+            {MAIN_TABS.map(([key, label, Icon]) => (
+              <Button
+                key={key}
+                aria-label={label}
+                className="flex-1 min-w-0 rounded-xl h-12 gap-1.5"
+                variant={section === key ? "primary" : "ghost"}
+                onPress={() => setSection(key)}
+              >
+                <Icon aria-hidden className="size-6 shrink-0" />
+                <span className="hidden truncate sm:inline">{label}</span>
+              </Button>
+            ))}
           </div>
 
           {section === "template" && <TemplateStudio />}
@@ -713,34 +700,36 @@ export default function AdminPage() {
           {section === "newsletter" && (
             <>
               {/* Tab bar */}
-              <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
+              <div className="flex gap-1 sm:gap-2 justify-center">
                 <Button
-                  className="rounded-xl font-semibold shrink-0"
+                  className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
                   size="sm"
                   variant={tab === "subscribers" ? "danger" : "outline"}
                   onPress={() => switchTab("subscribers")}
                 >
-                  Iscritti
+                  <span className="truncate">Iscritti</span>
                 </Button>
                 <Button
-                  className="rounded-xl font-semibold shrink-0"
+                  className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
                   size="sm"
                   variant={tab === "broadcast" ? "danger" : "outline"}
                   onPress={() => switchTab("broadcast")}
                 >
-                  Broadcast
+                  <span className="truncate">Broadcast</span>
                 </Button>
                 <Button
-                  className="rounded-xl font-semibold shrink-0"
+                  className="min-w-0 rounded-xl font-semibold px-2.5 sm:px-4"
                   size="sm"
                   variant={tab === "individuale" ? "danger" : "outline"}
                   onPress={() => switchTab("individuale")}
                 >
-                  <span className="hidden sm:inline">Invio singolo</span>
-                  <span className="sm:hidden">Singolo</span>
-                  {selectedSubscribers.length > 0
-                    ? ` (${selectedSubscribers.length})`
-                    : ""}
+                  <span className="truncate">
+                    <span className="hidden sm:inline">Invio singolo</span>
+                    <span className="sm:hidden">Singolo</span>
+                    {selectedSubscribers.length > 0
+                      ? ` (${selectedSubscribers.length})`
+                      : ""}
+                  </span>
                 </Button>
               </div>
 
@@ -1272,9 +1261,6 @@ export default function AdminPage() {
                           >
                             <Label>Testo bottone</Label>
                             <Input placeholder="Es: Ascolta ora" />
-                            <Description>
-                              Lascia vuoto per non includere bottone
-                            </Description>
                           </TextField>
                           <TextField
                             className="flex-1 min-w-0 sm:min-w-48 flex flex-col gap-1.5"

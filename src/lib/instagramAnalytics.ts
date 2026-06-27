@@ -49,6 +49,17 @@ export function engagementRate(
   };
 }
 
+/**
+ * Engagement rate su reach (in %), o `null` se il reach manca/0. È la stessa
+ * metrica usata da `engagementTiers` per i badge top/flop: normalizza sul reach
+ * per non penalizzare i post recenti né favorire quelli con più copertura.
+ */
+export function engagementRateOnReach(post: InstagramPost): number | null {
+  return post.reach && post.reach > 0
+    ? (post.engagement / post.reach) * 100
+    : null;
+}
+
 export function viralitySignals(
   post: InstagramPost,
   followers: number | null | undefined,
@@ -114,39 +125,44 @@ export function typeBreakdown(posts: InstagramPost[]): TypeStat[] {
 export type EngagementTier = "top" | "flop";
 
 /**
- * Classifica i post per engagement rispetto ai quartili del campione:
- * ≥ p75 = "top", ≤ p25 = "flop". Ritorna una mappa id → tier (solo i post
- * classificati). Con meno di 4 post il campione è troppo piccolo per quartili
+ * Classifica i post per engagement rate (engagement / reach) rispetto ai
+ * quartili del campione: ≥ p75 = "top", ≤ p25 = "flop". Ritorna una mappa
+ * id → tier (solo i post classificati).
+ *
+ * Si normalizza sul reach — non sull'engagement grezzo — per non penalizzare i
+ * post recenti (che hanno accumulato meno interazioni) né favorire quelli con
+ * più copertura: si confronta la qualità della reazione, non il volume. I post
+ * senza dato di reach non sono confrontabili equamente → restano senza badge.
+ * Con meno di 4 post normalizzabili il campione è troppo piccolo per quartili
  * sensati → mappa vuota (niente badge fuorvianti). Le storie sono escluse.
  */
 export function engagementTiers(
   posts: InstagramPost[],
 ): Map<string, EngagementTier> {
   const out = new Map<string, EngagementTier>();
-  const ranked = posts.filter((p) => p.mediaType !== "STORY");
+  const ranked = posts
+    .filter((p) => p.mediaType !== "STORY" && p.reach != null && p.reach > 0)
+    .map((p) => ({ post: p, rate: engagementRateOnReach(p)! }));
 
   if (ranked.length < 4) return out;
 
-  const sorted = [...ranked].sort((a, b) => a.engagement - b.engagement);
+  const sorted = [...ranked].sort((a, b) => a.rate - b.rate);
   const quantile = (q: number) => {
     const idx = (sorted.length - 1) * q;
     const lo = Math.floor(idx);
     const hi = Math.ceil(idx);
 
-    if (lo === hi) return sorted[lo].engagement;
+    if (lo === hi) return sorted[lo].rate;
 
-    return (
-      sorted[lo].engagement +
-      (sorted[hi].engagement - sorted[lo].engagement) * (idx - lo)
-    );
+    return sorted[lo].rate + (sorted[hi].rate - sorted[lo].rate) * (idx - lo);
   };
 
   const p25 = quantile(0.25);
   const p75 = quantile(0.75);
 
-  for (const p of ranked) {
-    if (p.engagement >= p75) out.set(p.id, "top");
-    else if (p.engagement <= p25) out.set(p.id, "flop");
+  for (const { post, rate } of ranked) {
+    if (rate >= p75) out.set(post.id, "top");
+    else if (rate <= p25) out.set(post.id, "flop");
   }
 
   return out;
@@ -602,6 +618,85 @@ export function postLifecycle(
 
 export type InsightTone = "good" | "warn" | "tip";
 export type Insight = { tone: InsightTone; text: string };
+
+/**
+ * Riassunto numerico compatto delle metriche IG, da inviare all'LLM che genera i
+ * consigli. Riusa le stesse derivazioni di `buildInsights` ma senza pre-comporre
+ * il testo: solo dati grezzi su cui il modello può ragionare e correlare.
+ */
+export type AdvicePayload = {
+  followers: number | null;
+  delta7d: number | null;
+  churnPct: number | null;
+  postsAnalysed: number;
+  daysSinceLastPost: number | null;
+  cadenceDeclining: boolean;
+  avgReachEfficiencyPct: number | null;
+  topContentTypes: { label: string; avgEngagement: number; count: number }[];
+  bestSlot: { day: string; bucket: string; avgEngagement: number } | null;
+  topHashtags: { tag: string; avgEngagement: number; count: number }[];
+  trend30d: { metric: string; deltaPct: number | null }[];
+};
+
+export function buildAdvicePayload(args: {
+  posts: InstagramPost[];
+  followers: number | null | undefined;
+  growth: InstagramGrowthPoint[];
+  unfollowersLast30: number | undefined;
+  delta7d: number | null | undefined;
+}): AdvicePayload {
+  const { posts, followers, growth, unfollowersLast30, delta7d } = args;
+  const nonStory = posts.filter((p) => p.mediaType !== "STORY");
+
+  const reachEffVals = nonStory
+    .map((p) => viralitySignals(p, followers).reachEfficiency)
+    .filter((v): v is number => v != null);
+  const avgReachEfficiencyPct = reachEffVals.length
+    ? Math.round(reachEffVals.reduce((s, v) => s + v, 0) / reachEffVals.length)
+    : null;
+
+  const lastPostedMs = Math.max(
+    0,
+    ...nonStory.map((p) => (p.postedAt ? new Date(p.postedAt).getTime() : 0)),
+  );
+  const daysSinceLastPost =
+    lastPostedMs > 0 ? Math.floor((Date.now() - lastPostedMs) / DAY_MS) : null;
+
+  const slot = bestSlot(nonStory);
+  const churn = churnRate(unfollowersLast30, followers);
+
+  return {
+    followers: followers ?? null,
+    delta7d: delta7d ?? null,
+    churnPct: churn != null ? Math.round(churn * 10) / 10 : null,
+    postsAnalysed: nonStory.length,
+    daysSinceLastPost,
+    cadenceDeclining: postingCadence(nonStory).declining,
+    avgReachEfficiencyPct,
+    topContentTypes: typeBreakdown(nonStory)
+      .slice(0, 3)
+      .map((t) => ({
+        label: t.label,
+        avgEngagement: t.avgEngagement,
+        count: t.count,
+      })),
+    bestSlot: slot
+      ? { day: slot.day, bucket: slot.bucket, avgEngagement: slot.avg }
+      : null,
+    topHashtags: extractHashtags(nonStory)
+      .filter((h) => h.count >= 2)
+      .slice(0, 5)
+      .map((h) => ({
+        tag: h.tag,
+        avgEngagement: h.avgEngagement,
+        count: h.count,
+      })),
+    trend30d: periodComparison(nonStory, growth, 30).map((m) => ({
+      metric: m.label,
+      deltaPct: m.deltaPct != null ? Math.round(m.deltaPct) : null,
+    })),
+  };
+}
 
 /** Sintesi azionabile che compone le derivazioni esistenti in poche frasi. */
 export function buildInsights(args: {
