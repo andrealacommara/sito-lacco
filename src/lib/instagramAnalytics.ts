@@ -49,6 +49,17 @@ export function engagementRate(
   };
 }
 
+/**
+ * Engagement rate su reach (in %), o `null` se il reach manca/0. È la stessa
+ * metrica usata da `engagementTiers` per i badge top/flop: normalizza sul reach
+ * per non penalizzare i post recenti né favorire quelli con più copertura.
+ */
+export function engagementRateOnReach(post: InstagramPost): number | null {
+  return post.reach && post.reach > 0
+    ? (post.engagement / post.reach) * 100
+    : null;
+}
+
 export function viralitySignals(
   post: InstagramPost,
   followers: number | null | undefined,
@@ -131,7 +142,7 @@ export function engagementTiers(
   const out = new Map<string, EngagementTier>();
   const ranked = posts
     .filter((p) => p.mediaType !== "STORY" && p.reach != null && p.reach > 0)
-    .map((p) => ({ post: p, rate: (p.engagement / p.reach!) * 100 }));
+    .map((p) => ({ post: p, rate: engagementRateOnReach(p)! }));
 
   if (ranked.length < 4) return out;
 

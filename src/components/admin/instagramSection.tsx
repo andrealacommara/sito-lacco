@@ -47,6 +47,7 @@ import {
   bucketOf,
   mediaTypeLabel,
   engagementRate,
+  engagementRateOnReach,
   viralitySignals,
   typeBreakdown,
   extractHashtags,
@@ -1105,8 +1106,27 @@ function ContentAnalytics({
   showAggregate: boolean;
   stats: InstagramStatsResponse | null;
 }) {
+  const [sortBy, setSortBy] = useState<"total" | "rate">("total");
   const types = useMemo(() => typeBreakdown(posts), [posts]);
   const tiers = useMemo(() => engagementTiers(posts), [posts]);
+  // Classifica del dettaglio: per engagement totale grezzo, oppure per
+  // engagement rate (eng/reach), la stessa metrica dei badge top/flop. I post
+  // senza reach non hanno un rate confrontabile → in fondo.
+  const ranked = useMemo(() => {
+    if (sortBy === "total")
+      return [...posts].sort((a, b) => b.engagement - a.engagement);
+
+    return [...posts].sort((a, b) => {
+      const ra = engagementRateOnReach(a);
+      const rb = engagementRateOnReach(b);
+
+      if (ra == null && rb == null) return b.engagement - a.engagement;
+      if (ra == null) return 1;
+      if (rb == null) return -1;
+
+      return rb - ra;
+    });
+  }, [posts, sortBy]);
   const cadence = useMemo(() => postingCadence(posts), [posts]);
   const hashtags = useMemo(() => extractHashtags(posts).slice(0, 12), [posts]);
   const byDay = useMemo(() => engagementByDay(posts), [posts]);
@@ -1221,30 +1241,39 @@ function ContentAnalytics({
       )}
 
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold">
-          Dettaglio contenuti ({posts.length})
-        </h3>
-        <p className="text-[10px] text-default-400 -mt-1">
-          Ordinati per engagement totale · ER = engagement / reach · Salv. =
-          salvataggi / reach · Reach = reach / follower (oltre 100% = uscito dai
-          tuoi follower)
-        </p>
-        {[...posts]
-          .sort((a, b) => b.engagement - a.engagement)
-          .map((p, i) => (
-            <div key={p.id} className="flex items-stretch gap-2">
-              <span className="shrink-0 self-stretch flex w-7 items-center justify-center rounded-xl bg-default-100 text-xs font-semibold text-default-500">
-                {i + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <PostCard
-                  followers={followers}
-                  post={p}
-                  tier={tiers.get(p.id)}
-                />
-              </div>
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold">
+            Engagement dei contenuti ({posts.length} totali)
+          </h3>
+        </div>
+        <div className="flex gap-1 justify-center">
+          {(
+            [
+              ["total", "Totale"],
+              ["rate", "Normalizzato"],
+            ] as ["total" | "rate", string][]
+          ).map(([key, label]) => (
+            <Button
+              key={key}
+              className="rounded-xl font-semibold shrink-0"
+              size="sm"
+              variant={sortBy === key ? "danger" : "outline"}
+              onPress={() => setSortBy(key)}
+            >
+              {label}
+            </Button>
           ))}
+        </div>
+        {ranked.map((p, i) => (
+          <div key={p.id} className="flex items-stretch gap-2">
+            <span className="shrink-0 self-stretch flex w-7 items-center justify-center rounded-xl bg-default-100 text-xs font-semibold text-default-500">
+              {i + 1}
+            </span>
+            <div className="min-w-0 flex-1">
+              <PostCard followers={followers} post={p} tier={tiers.get(p.id)} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
