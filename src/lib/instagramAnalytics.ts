@@ -114,39 +114,44 @@ export function typeBreakdown(posts: InstagramPost[]): TypeStat[] {
 export type EngagementTier = "top" | "flop";
 
 /**
- * Classifica i post per engagement rispetto ai quartili del campione:
- * ≥ p75 = "top", ≤ p25 = "flop". Ritorna una mappa id → tier (solo i post
- * classificati). Con meno di 4 post il campione è troppo piccolo per quartili
+ * Classifica i post per engagement rate (engagement / reach) rispetto ai
+ * quartili del campione: ≥ p75 = "top", ≤ p25 = "flop". Ritorna una mappa
+ * id → tier (solo i post classificati).
+ *
+ * Si normalizza sul reach — non sull'engagement grezzo — per non penalizzare i
+ * post recenti (che hanno accumulato meno interazioni) né favorire quelli con
+ * più copertura: si confronta la qualità della reazione, non il volume. I post
+ * senza dato di reach non sono confrontabili equamente → restano senza badge.
+ * Con meno di 4 post normalizzabili il campione è troppo piccolo per quartili
  * sensati → mappa vuota (niente badge fuorvianti). Le storie sono escluse.
  */
 export function engagementTiers(
   posts: InstagramPost[],
 ): Map<string, EngagementTier> {
   const out = new Map<string, EngagementTier>();
-  const ranked = posts.filter((p) => p.mediaType !== "STORY");
+  const ranked = posts
+    .filter((p) => p.mediaType !== "STORY" && p.reach != null && p.reach > 0)
+    .map((p) => ({ post: p, rate: (p.engagement / p.reach!) * 100 }));
 
   if (ranked.length < 4) return out;
 
-  const sorted = [...ranked].sort((a, b) => a.engagement - b.engagement);
+  const sorted = [...ranked].sort((a, b) => a.rate - b.rate);
   const quantile = (q: number) => {
     const idx = (sorted.length - 1) * q;
     const lo = Math.floor(idx);
     const hi = Math.ceil(idx);
 
-    if (lo === hi) return sorted[lo].engagement;
+    if (lo === hi) return sorted[lo].rate;
 
-    return (
-      sorted[lo].engagement +
-      (sorted[hi].engagement - sorted[lo].engagement) * (idx - lo)
-    );
+    return sorted[lo].rate + (sorted[hi].rate - sorted[lo].rate) * (idx - lo);
   };
 
   const p25 = quantile(0.25);
   const p75 = quantile(0.75);
 
-  for (const p of ranked) {
-    if (p.engagement >= p75) out.set(p.id, "top");
-    else if (p.engagement <= p25) out.set(p.id, "flop");
+  for (const { post, rate } of ranked) {
+    if (rate >= p75) out.set(post.id, "top");
+    else if (rate <= p25) out.set(post.id, "flop");
   }
 
   return out;

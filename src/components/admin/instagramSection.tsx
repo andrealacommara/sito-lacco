@@ -982,6 +982,11 @@ function PostCard({
             <Chip
               color={tier === "top" ? "success" : "warning"}
               size="sm"
+              title={
+                tier === "top"
+                  ? "Tra i migliori per engagement rate (interazioni sul reach)"
+                  : "Tra i più bassi per engagement rate (interazioni sul reach)"
+              }
               variant="soft"
             >
               {tier === "top" ? "Top" : "Flop"}
