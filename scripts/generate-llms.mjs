@@ -49,7 +49,7 @@ const eventLinks = [...events]
     link(
       e.title,
       e.url,
-      `live ${e.venue}, ${e.city} — ${dateFmt.format(new Date(e.date))}.`,
+      `concerto live ${e.venue}, ${e.city} — ${dateFmt.format(new Date(e.date))}.`,
     ),
   );
 

@@ -16,7 +16,7 @@ import {
   TikTokIcon,
   YouTubeIcon,
 } from "@/components/icons";
-import { siteConfig } from "@/config/site";
+import { siteConfig, ARTIST_ID, artistSameAs } from "@/config/site";
 import { albums, isAlbum, singles } from "@/config/catalog";
 import { getUpcomingLiveEvents } from "@/config/liveEvents";
 import LiveEventCard from "@/components/liveEventCard";
@@ -77,6 +77,7 @@ export default function HomePage() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "MusicGroup",
+            "@id": ARTIST_ID,
             name: "Lacco",
             description:
               "Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire.",
@@ -89,13 +90,7 @@ export default function HomePage() {
               jobTitle: ["Cantante", "Cantautore"],
               url: "https://lacco.it",
             },
-            sameAs: [
-              siteConfig.links.spotify,
-              siteConfig.links.tiktok,
-              siteConfig.links.instagram,
-              siteConfig.links.appleMusic,
-              siteConfig.links.youtube,
-            ],
+            sameAs: artistSameAs,
           })}
         </script>
       </Helmet>

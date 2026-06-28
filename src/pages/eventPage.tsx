@@ -13,6 +13,7 @@ import {
   isPastLiveEvent,
 } from "@/config/liveEvents";
 import { formatLongDate } from "@/config/date";
+import { ARTIST_ID, artistSameAs } from "@/config/site";
 import SmartImage, { resolveImageSource } from "@/components/smartImage";
 import Countdown from "@/components/countdown";
 import LiveEventRow from "@/components/liveEventRow";
@@ -165,6 +166,7 @@ function buildEventJsonLd(
     url: pageUrl,
     image: imageUrl,
     description,
+    keywords: "concerti, concerto, live, Lacco, musica dal vivo",
     location: {
       "@type": "Place",
       name: event.venue,
@@ -172,8 +174,10 @@ function buildEventJsonLd(
     },
     performer: {
       "@type": "MusicGroup",
+      "@id": ARTIST_ID,
       name: "Lacco",
       url: "https://lacco.it",
+      sameAs: artistSameAs,
     },
     ...(event.ticketUrl
       ? {
@@ -484,7 +488,7 @@ export default function EventPage() {
   const bgUrl = resolveImageSource(event.poster ?? heroLacco);
   const metaDescription =
     event.description?.replace(/\n/g, " ").trim() ||
-    `${event.title} — live di Lacco a ${event.venue}, ${event.city} il ${formatLongDate(event.date)}.`;
+    `${event.title} — concerto live di Lacco a ${event.venue}, ${event.city} il ${formatLongDate(event.date)}.`;
   const pageUrl = `https://lacco.it/live/${event.slug}`;
   // OG dedicata generata da generate-og-events.mjs quando esiste il poster
   // (stesso criterio: poster su disco → og-<slug>.jpg). Altrimenti la generica.
