@@ -104,6 +104,7 @@ scripts/                      # Build-time tooling (run via postbuild)
 ├── prerender.mjs             # Static HTML snapshots per route (Playwright)
 ├── generate-og-images.js     # OG 1200×630 per release
 ├── generate-og-events.mjs    # OG 1200×630 per live event
+├── generate-sitemap.mjs      # Generates dist/sitemap.xml from routes.mjs
 ├── generate-llms.mjs         # Generates dist/llms.txt from routes.mjs
 ├── make-presskit-zip.js      # Bundles the downloadable press kit
 ├── generate-email-assets.mjs # Email image assets
@@ -198,11 +199,12 @@ npm run build
 Optimized files are generated in the `/dist` folder. A `postbuild` step then runs automatically:
 
 1. `generate-og-images` / `generate-og-events` — per-release and per-event OG images;
-2. `prerender` — static HTML snapshots of every indexable route (requires Chromium for Playwright);
-3. `generate-llms` — `dist/llms.txt` from the shared route source;
-4. `make-presskit-zip` — the downloadable press kit archive.
+2. `generate-sitemap` — `dist/sitemap.xml` from the shared route source;
+3. `prerender` — static HTML snapshots of every indexable route (requires Chromium for Playwright);
+4. `generate-llms` — `dist/llms.txt` from the shared route source;
+5. `make-presskit-zip` — the downloadable press kit archive.
 
-`sitemap.xml` is produced during the Vite build by `vite-plugin-sitemap`, also from `scripts/routes.mjs`.
+`sitemap.xml` and `llms.txt` are both derived from a single source of truth (`scripts/routes.mjs`).
 
 ---
 
