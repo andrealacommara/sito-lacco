@@ -11,6 +11,7 @@ import {
   getReleaseBySlug,
   isAlbum,
 } from "@/config/catalog";
+import { ARTIST_ID, artistSameAs } from "@/config/site";
 import { resolveImageSource } from "@/components/smartImage";
 import SmartImage from "@/components/smartImage";
 import Countdown from "@/components/countdown";
@@ -28,11 +29,15 @@ const fadeUp = (delay: number) => ({
   transition: { duration: 0.6, ease: "easeOut" as const, delay },
 });
 
-// Artista come entità coerente con il MusicGroup dichiarato in index.html.
+// Artista come entità coerente con il MusicGroup dichiarato in index.html / home.
+// Lo stesso @id + sameAs su ogni pagina permette a Google di consolidare tutte le
+// dichiarazioni in un'unica entità verificata (evita la confusione con omonimi).
 const ARTIST_ENTITY = {
   "@type": "MusicGroup",
+  "@id": ARTIST_ID,
   name: "Lacco",
   url: "https://lacco.it",
+  sameAs: artistSameAs,
 };
 
 // Structured data Schema.org: MusicAlbum (EP/Album, con tracklist) o
@@ -45,6 +50,13 @@ function buildReleaseJsonLd(
   const url = `https://lacco.it/${release.slug}`;
   const datePublished = release.releaseDate.toISOString().slice(0, 10);
 
+  // sameAs verso la traccia/album esatti sulle piattaforme: lega la pagina alla
+  // release ufficiale e riduce la misattribuzione dei brani da parte di Google.
+  const platformSameAs = [
+    release.streamingLinks?.spotify,
+    release.streamingLinks?.appleMusic,
+  ].filter(Boolean);
+
   if (isAlbum(release)) {
     const tracks = getAlbumTracks(release);
 
@@ -55,9 +67,11 @@ function buildReleaseJsonLd(
       url,
       image: imageUrl,
       description,
+      inLanguage: "it",
       datePublished,
       albumReleaseType: release.kind === "EP" ? "EPRelease" : "AlbumRelease",
       byArtist: ARTIST_ENTITY,
+      ...(platformSameAs.length ? { sameAs: platformSameAs } : {}),
       numTracks: tracks.length,
       track: tracks.map((song, i) => ({
         "@type": "MusicRecording",
@@ -77,8 +91,10 @@ function buildReleaseJsonLd(
     url,
     image: imageUrl,
     description,
+    inLanguage: "it",
     datePublished,
     byArtist: ARTIST_ENTITY,
+    ...(platformSameAs.length ? { sameAs: platformSameAs } : {}),
     ...(album
       ? {
           inAlbum: {

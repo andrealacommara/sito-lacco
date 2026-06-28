@@ -147,7 +147,7 @@ supabase/
 - **Contatti:** Contact form submitted to the `send-contact-email` Supabase Edge Function, which delivers the message via Resend.
 - **PressKit:** Dedicated private page (lazy-loaded, noindex) with official media assets, extended bio, press photos, and professional contacts; the downloadable kit is zipped at build time.
 - **Privacy Policy (`/privacy`):** GDPR-compliant privacy policy in Italian.
-- **SEO & crawlers:** Each page ships per-route head tags (title, description, Open Graph, canonical) via `react-helmet-async`, plus Schema.org JSON-LD on home/release/event pages. At build time every indexable route is statically prerendered (Playwright) so crawlers see baked-in tags, and `sitemap.xml` + `llms.txt` are generated from a single source of truth (`scripts/routes.mjs`).
+- **SEO & crawlers:** Each page ships per-route head tags (title, description, Open Graph, canonical) via `react-helmet-async`, plus Schema.org JSON-LD on home/release/event pages. The artist is declared as a single shared entity (stable `@id` + `sameAs` to the official Spotify/Apple/social profiles, from `src/config/site.ts`) reused across home, release and event pages so search engines consolidate everything into one verified entity; release/event JSON-LD also links each track to its exact Spotify/Apple URL. At build time every indexable route is statically prerendered (Playwright) so crawlers see baked-in tags, and `sitemap.xml` + `llms.txt` are generated from a single source of truth (`scripts/routes.mjs`).
 - **Route preloading:** Navigation links prefetch their chunks on hover/touch for near-instant transitions.
 
 ---

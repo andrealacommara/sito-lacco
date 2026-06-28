@@ -41,3 +41,19 @@ export const siteConfig = {
     youtube: "https://www.youtube.com/@Laccoverse",
   },
 };
+
+// ========================== ARTIST ENTITY (SEO) ========================== //
+// Identità unica dell'artista per la disambiguazione delle entità Schema.org.
+// Lo stesso @id viene riusato in home/release/evento così Google consolida tutte
+// le dichiarazioni in un'unica entità verificata (evita la confusione con omonimi).
+export const ARTIST_ID = "https://lacco.it/#artist";
+
+// URL canonici PULITI (senza parametri di tracking) dei profili ufficiali:
+// è il segnale `sameAs` che lega l'entità "Lacco" ai suoi account verificati.
+export const artistSameAs = [
+  "https://open.spotify.com/artist/6viihrUFd4eGCfv9w61tL7",
+  "https://music.apple.com/it/artist/lacco/1773060241",
+  "https://instagram.com/laccoverse",
+  "https://tiktok.com/@laccoverse",
+  "https://www.youtube.com/@Laccoverse",
+];

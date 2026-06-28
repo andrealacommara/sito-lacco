@@ -80,7 +80,7 @@ export default function LivePage() {
         <meta content="summary_large_image" name="twitter:card" />
         <meta content="Lacco | Live" name="twitter:title" />
         <meta
-          content="Le prossime date live di Lacco, cantante e cantautore R&B e Hip-Hop."
+          content="Le prossime date dei concerti live di Lacco, cantante e cantautore R&B e Hip-Hop."
           name="twitter:description"
         />
         <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
@@ -91,7 +91,7 @@ export default function LivePage() {
       </section>
 
       <div className="flex flex-row items-center justify-center py-4 md:py-4">
-        <h2 className={subtitle()}>Prossimi live</h2>
+        <h2 className={subtitle()}>Prossimi concerti</h2>
       </div>
 
       {upcoming.length > 0 ? (
@@ -148,7 +148,7 @@ export default function LivePage() {
       {past.length > 0 && (
         <>
           <div className="flex flex-row items-center justify-center py-4 md:py-4">
-            <h2 className={subtitle()}>Live passati</h2>
+            <h2 className={subtitle()}>Concerti passati</h2>
           </div>
           <div className="flex flex-col gap-3 mx-auto w-full max-w-4xl">
             {past.map((event) => (
