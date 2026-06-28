@@ -16,7 +16,14 @@ import {
   TikTokIcon,
   YouTubeIcon,
 } from "@/components/icons";
-import { siteConfig, ARTIST_ID, artistSameAs } from "@/config/site";
+import {
+  siteConfig,
+  ARTIST_ID,
+  artistSameAs,
+  ARTIST_ALTERNATE_NAMES,
+  ARTIST_DISAMBIGUATION,
+  ARTIST_NATIONALITY,
+} from "@/config/site";
 import { albums, isAlbum, singles } from "@/config/catalog";
 import { getUpcomingLiveEvents } from "@/config/liveEvents";
 import LiveEventCard from "@/components/liveEventCard";
@@ -49,6 +56,8 @@ export default function HomePage() {
         />
         <meta content="index, follow" name="robots" />
         <link href="https://lacco.it" rel="canonical" />
+        <link href="https://lacco.it" hrefLang="it" rel="alternate" />
+        <link href="https://lacco.it" hrefLang="x-default" rel="alternate" />
 
         {/* Open Graph */}
         <meta content="profile" property="og:type" />
@@ -79,15 +88,21 @@ export default function HomePage() {
             "@type": "MusicGroup",
             "@id": ARTIST_ID,
             name: "Lacco",
+            alternateName: ARTIST_ALTERNATE_NAMES,
             description:
               "Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire.",
+            disambiguatingDescription: ARTIST_DISAMBIGUATION,
             genre: ["Pop", "R&B", "Hip-Hop"],
+            knowsLanguage: "it",
+            foundingLocation: { "@type": "Place", name: ARTIST_NATIONALITY },
             url: "https://lacco.it",
             image: "https://lacco.it/og-image.jpg",
             member: {
               "@type": "Person",
               name: "Lacco",
+              alternateName: ARTIST_ALTERNATE_NAMES,
               jobTitle: ["Cantante", "Cantautore"],
+              nationality: { "@type": "Country", name: ARTIST_NATIONALITY },
               url: "https://lacco.it",
             },
             sameAs: artistSameAs,
@@ -132,9 +147,8 @@ export default function HomePage() {
             className="text-base lg:text-lg text-default-500 leading-relaxed font-hero"
             style={{ animation: "fadeInUp 0.5s ease 0.5s both" }}
           >
-            Lacco è un cantante e cantautore che trasforma emozioni, esperienze e
-            frammenti
-            di vita in storie da ascoltare.
+            Lacco è un cantante e cantautore che trasforma emozioni, esperienze
+            e frammenti di vita in storie da ascoltare.
           </p>
         </div>
       </section>

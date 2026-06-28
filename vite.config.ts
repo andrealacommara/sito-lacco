@@ -7,18 +7,10 @@ import { defineConfig, type Rolldown } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import svgr from "vite-plugin-svgr";
-import VitePluginSitemap from "vite-plugin-sitemap";
 import { imagetools } from "vite-imagetools";
 import { createHtmlPlugin } from "vite-plugin-html";
 
-// @ts-expect-error — sorgente route build-time in ESM puro, niente type declarations
-import { getSitemapRoutes } from "./scripts/routes.mjs";
-
 export default defineConfig(async () => {
-  // Route indicizzabili (statiche + release + live) da un'unica fonte di verità,
-  // condivisa con lo script di prerender.
-  const sitemapRoutes = await getSitemapRoutes();
-
   return {
     plugins: [
       // React support with Fast Refresh
@@ -68,13 +60,6 @@ export default defineConfig(async () => {
             };
           })(),
         },
-      }),
-
-      // Automatic sitemap generation for SEO
-      VitePluginSitemap({
-        hostname: "https://lacco.it",
-        dynamicRoutes: sitemapRoutes,
-        generateRobotsTxt: false, // Prevents the plugin from probing dist/ for robots.txt
       }),
 
       // TailwindCSS integration

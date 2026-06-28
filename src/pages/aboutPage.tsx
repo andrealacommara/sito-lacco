@@ -25,6 +25,12 @@ export default function AboutPage() {
         />
         <meta content="index, follow" name="robots" />
         <link href="https://lacco.it/chi-sono" rel="canonical" />
+        <link href="https://lacco.it/chi-sono" hrefLang="it" rel="alternate" />
+        <link
+          href="https://lacco.it/chi-sono"
+          hrefLang="x-default"
+          rel="alternate"
+        />
         <meta content="profile" property="og:type" />
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Chi sono" property="og:title" />

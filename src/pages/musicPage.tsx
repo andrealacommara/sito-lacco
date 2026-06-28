@@ -23,6 +23,12 @@ export default function MusicPage() {
         />
         <meta content="index, follow" name="robots" />
         <link href="https://lacco.it/musica" rel="canonical" />
+        <link href="https://lacco.it/musica" hrefLang="it" rel="alternate" />
+        <link
+          href="https://lacco.it/musica"
+          hrefLang="x-default"
+          rel="alternate"
+        />
         <meta content="music.musician" property="og:type" />
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Musica" property="og:title" />

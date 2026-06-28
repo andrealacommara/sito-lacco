@@ -130,22 +130,32 @@
     />
 
     <!-- ========================== STRUCTURED DATA (JSON-LD) ========================== -->
-    <!-- Helps Google recognize the artist as a verified brand entity -->
+    <!-- Helps Google recognize the artist as a verified brand entity.
+         alternateName / disambiguatingDescription / nationality dicono a Google che
+         "Lacco" è una PERSONA / artista italiano, non un toponimo (es. Lacco Ameno).
+         MIRROR di src/config/site.ts (ARTIST_ALTERNATE_NAMES / ARTIST_DISAMBIGUATION /
+         ARTIST_NATIONALITY) e del MusicGroup in src/pages/homePage.tsx — tenere allineati. -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "MusicGroup",
         "@id": "https://lacco.it/#artist",
         "name": "Lacco",
+        "alternateName": ["Laccoverse"],
         "url": "https://lacco.it",
         "logo": "https://lacco.it/favicon-512.png",
         "image": "https://lacco.it/og-image.jpg",
         "description": "Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire.",
+        "disambiguatingDescription": "Cantante e cantautore italiano (Pop, R&B, Hip-Hop). Progetto musicale, da non confondere con la località Lacco Ameno.",
         "genre": ["Pop", "R&B", "Hip-Hop"],
+        "knowsLanguage": "it",
+        "foundingLocation": { "@type": "Place", "name": "Italia" },
         "member": {
           "@type": "Person",
           "name": "Lacco",
+          "alternateName": ["Laccoverse"],
           "jobTitle": ["Cantante", "Cantautore"],
+          "nationality": { "@type": "Country", "name": "Italia" },
           "url": "https://lacco.it"
         },
         "sameAs": [
@@ -155,6 +165,19 @@
           "https://music.apple.com/it/artist/lacco/1773060241",
           "https://www.youtube.com/@Laccoverse"
         ]
+      }
+    </script>
+
+    <!-- WebSite: lega l'entità "sito" a quella "artista" (publisher) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://lacco.it/#website",
+        "url": "https://lacco.it",
+        "name": "Lacco",
+        "inLanguage": "it",
+        "publisher": { "@id": "https://lacco.it/#artist" }
       }
     </script>
   </head>

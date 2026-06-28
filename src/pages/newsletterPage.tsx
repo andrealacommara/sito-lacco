@@ -15,6 +15,16 @@ export default function NewsletterPage() {
         />
         <meta content="index, follow" name="robots" />
         <link href="https://lacco.it/newsletter" rel="canonical" />
+        <link
+          href="https://lacco.it/newsletter"
+          hrefLang="it"
+          rel="alternate"
+        />
+        <link
+          href="https://lacco.it/newsletter"
+          hrefLang="x-default"
+          rel="alternate"
+        />
         <meta content="website" property="og:type" />
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Newsletter" property="og:title" />
