@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "node scripts/generate-og-images.js && node scripts/generate-og-events.mjs && node scripts/prerender.mjs && node scripts/generate-llms.mjs && node scripts/make-presskit-zip.js",
+    "postbuild": "node scripts/generate-og-images.js && node scripts/generate-og-events.mjs && node scripts/generate-sitemap.mjs && node scripts/prerender.mjs && node scripts/generate-llms.mjs && node scripts/make-presskit-zip.js",
     "preview": "vite preview",
     "lint": "eslint --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
@@ -72,7 +72,6 @@
     "vite": "^8.1.0",
     "vite-imagetools": "^10.0.1",
     "vite-plugin-html": "^3.2.2",
-    "vite-plugin-sitemap": "^0.8.2",
     "vite-plugin-svgr": "^5.2.0"
   }
 }

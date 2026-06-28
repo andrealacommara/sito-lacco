@@ -11,7 +11,7 @@ import {
   getReleaseBySlug,
   isAlbum,
 } from "@/config/catalog";
-import { ARTIST_ID, artistSameAs } from "@/config/site";
+import { ARTIST_ID, artistSameAs, buildBreadcrumbJsonLd } from "@/config/site";
 import { resolveImageSource } from "@/components/smartImage";
 import SmartImage from "@/components/smartImage";
 import Countdown from "@/components/countdown";
@@ -120,7 +120,13 @@ export default function ReleasePage() {
   const metaDescription = release.description.replace(/\n/g, " ").trim();
   const ogImageUrl = `https://lacco.it${release.ogImage}`;
   const ogType = isAlbum(release) ? "music.album" : "music.song";
+  const canonicalUrl = `https://lacco.it/${release.slug}`;
   const jsonLd = buildReleaseJsonLd(release, ogImageUrl, metaDescription);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Musica", path: "/musica" },
+    { name: release.title },
+  ]);
 
   return (
     <>
@@ -128,20 +134,29 @@ export default function ReleasePage() {
         <title>{`${release.title} | Lacco`}</title>
         <meta content={metaDescription} name="description" />
         <meta content="index, follow" name="robots" />
-        <link href={`https://lacco.it/${release.slug}`} rel="canonical" />
+        <link href={canonicalUrl} rel="canonical" />
+        <link href={canonicalUrl} hrefLang="it" rel="alternate" />
+        <link href={canonicalUrl} hrefLang="x-default" rel="alternate" />
         <meta content={ogType} property="og:type" />
         <meta content="Lacco" property="og:site_name" />
         <meta content={`${release.title} | Lacco`} property="og:title" />
         <meta content={metaDescription} property="og:description" />
         <meta content={ogImageUrl} property="og:image" />
         <meta content={`${release.title} — Lacco`} property="og:image:alt" />
-        <meta content={`https://lacco.it/${release.slug}`} property="og:url" />
+        <meta content="1200" property="og:image:width" />
+        <meta content="630" property="og:image:height" />
+        <meta content="image/jpeg" property="og:image:type" />
+        <meta content={canonicalUrl} property="og:url" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content={`${release.title} | Lacco`} name="twitter:title" />
         <meta content={metaDescription} name="twitter:description" />
         <meta content={ogImageUrl} name="twitter:image" />
+        <meta content={`${release.title} — Lacco`} name="twitter:image:alt" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbJsonLd)}
+        </script>
       </Helmet>
 
       {/* Background blur: cover artwork a tutto schermo */}

@@ -119,6 +119,12 @@ export default function ContactPage() {
         />
         <meta content="index, follow" name="robots" />
         <link href="https://lacco.it/contatti" rel="canonical" />
+        <link href="https://lacco.it/contatti" hrefLang="it" rel="alternate" />
+        <link
+          href="https://lacco.it/contatti"
+          hrefLang="x-default"
+          rel="alternate"
+        />
         <meta content="website" property="og:type" />
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Contatti" property="og:title" />

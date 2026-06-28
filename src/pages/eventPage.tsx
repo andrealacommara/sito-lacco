@@ -13,7 +13,7 @@ import {
   isPastLiveEvent,
 } from "@/config/liveEvents";
 import { formatLongDate } from "@/config/date";
-import { ARTIST_ID, artistSameAs } from "@/config/site";
+import { ARTIST_ID, artistSameAs, buildBreadcrumbJsonLd } from "@/config/site";
 import SmartImage, { resolveImageSource } from "@/components/smartImage";
 import Countdown from "@/components/countdown";
 import LiveEventRow from "@/components/liveEventRow";
@@ -496,6 +496,11 @@ export default function EventPage() {
     ? `https://lacco.it/og-${event.slug}.jpg`
     : "https://lacco.it/og-image.jpg";
   const jsonLd = buildEventJsonLd(event, pageUrl, ogImageUrl, metaDescription);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Live", path: "/live" },
+    { name: event.title },
+  ]);
 
   return (
     <>
@@ -504,19 +509,28 @@ export default function EventPage() {
         <meta content={metaDescription} name="description" />
         <meta content="index, follow" name="robots" />
         <link href={pageUrl} rel="canonical" />
+        <link href={pageUrl} hrefLang="it" rel="alternate" />
+        <link href={pageUrl} hrefLang="x-default" rel="alternate" />
         <meta content="website" property="og:type" />
         <meta content="Lacco" property="og:site_name" />
         <meta content={`${event.title} | Live | Lacco`} property="og:title" />
         <meta content={metaDescription} property="og:description" />
         <meta content={ogImageUrl} property="og:image" />
         <meta content={`${event.title} — Lacco`} property="og:image:alt" />
+        <meta content="1200" property="og:image:width" />
+        <meta content="630" property="og:image:height" />
+        <meta content="image/jpeg" property="og:image:type" />
         <meta content={pageUrl} property="og:url" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content={`${event.title} | Live | Lacco`} name="twitter:title" />
         <meta content={metaDescription} name="twitter:description" />
         <meta content={ogImageUrl} name="twitter:image" />
+        <meta content={`${event.title} — Lacco`} name="twitter:image:alt" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbJsonLd)}
+        </script>
       </Helmet>
 
       {/* Background blur: poster a tutto schermo */}

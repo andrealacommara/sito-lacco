@@ -378,7 +378,10 @@ export function ChronoEngagementChart({
   return (
     <div className="text-default-300">
       <ResponsiveContainer height={240} width="100%">
-        <BarChart data={bars} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+        <BarChart
+          data={bars}
+          margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
+        >
           <CartesianGrid
             opacity={0.12}
             stroke="currentColor"

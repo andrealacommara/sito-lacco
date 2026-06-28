@@ -66,6 +66,12 @@ export default function LivePage() {
         />
         <meta content="index, follow" name="robots" />
         <link href="https://lacco.it/live" rel="canonical" />
+        <link href="https://lacco.it/live" hrefLang="it" rel="alternate" />
+        <link
+          href="https://lacco.it/live"
+          hrefLang="x-default"
+          rel="alternate"
+        />
         <meta content="website" property="og:type" />
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Live" property="og:title" />

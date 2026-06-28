@@ -57,3 +57,38 @@ export const artistSameAs = [
   "https://tiktok.com/@laccoverse",
   "https://www.youtube.com/@Laccoverse",
 ];
+
+// ===================== DISAMBIGUAZIONE ENTITÀ (vs "Lacco Ameno") ===================== //
+// Segnali espliciti per dire a Google che "Lacco" qui è una PERSONA / artista italiano,
+// non un toponimo (es. Lacco Ameno, Ischia). Usati nel MusicGroup/Person JSON-LD.
+// IMPORTANTE: questi valori sono rispecchiati a mano anche nel MusicGroup statico di
+// index.html (HTML statico, non può importare) — tenere le due copie allineate.
+export const ARTIST_ALTERNATE_NAMES = ["Laccoverse"];
+
+export const ARTIST_DISAMBIGUATION =
+  "Cantante e cantautore italiano (Pop, R&B, Hip-Hop). Progetto musicale, da non confondere con la località Lacco Ameno.";
+
+export const ARTIST_NATIONALITY = "Italia";
+
+// Origine canonica del sito (senza slash finale), riusata per costruire URL assoluti.
+export const SITE_URL = "https://lacco.it";
+
+// ========================== BREADCRUMB JSON-LD ========================== //
+// Costruisce un BreadcrumbList Schema.org per abilitare i breadcrumb nei
+// risultati Google. `items` è la catena ordinata Home → … → pagina corrente;
+// ogni voce è { name, path } con path relativo (es. "/musica"). L'ultima voce
+// (pagina corrente) può omettere il path.
+export function buildBreadcrumbJsonLd(
+  items: { name: string; path?: string }[],
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      ...(item.path ? { item: `${SITE_URL}${item.path}` } : {}),
+    })),
+  };
+}

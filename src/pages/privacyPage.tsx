@@ -14,6 +14,12 @@ export default function PrivacyPage() {
         />
         <meta content="index, follow" name="robots" />
         <link href="https://lacco.it/privacy" rel="canonical" />
+        <link href="https://lacco.it/privacy" hrefLang="it" rel="alternate" />
+        <link
+          href="https://lacco.it/privacy"
+          hrefLang="x-default"
+          rel="alternate"
+        />
         <meta content="website" property="og:type" />
         <meta content="Lacco" property="og:site_name" />
         <meta content="Lacco | Privacy Policy" property="og:title" />
