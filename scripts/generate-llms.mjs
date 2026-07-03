@@ -26,6 +26,20 @@ const STATIC_LABELS = {
   "/privacy": { label: "Privacy", desc: "informativa sul trattamento dei dati." },
 };
 
+// Profili canonici ufficiali dell'entità "Lacco". Wikidata/MusicBrainz per primi:
+// sono le basi di conoscenza che LLM e Knowledge Graph usano per disambiguare l'artista
+// (da omonimi e dal toponimo "Lacco Ameno"). MIRROR di `artistSameAs` in src/config/site.ts.
+const OFFICIAL_PROFILES = [
+  ["Wikidata", "https://www.wikidata.org/wiki/Q140420523", "scheda entità (Lacco, cantautore italiano)."],
+  ["MusicBrainz", "https://musicbrainz.org/artist/9c320ba3-7904-4394-9dfd-c49a57ff0c32", "scheda artista."],
+  ["Spotify", "https://open.spotify.com/artist/6viihrUFd4eGCfv9w61tL7"],
+  ["Apple Music", "https://music.apple.com/it/artist/lacco/1773060241"],
+  ["Amazon Music", "https://music.amazon.it/artists/B0DJV3D4GG/lacco"],
+  ["YouTube", "https://www.youtube.com/@Laccoverse"],
+  ["Instagram", "https://instagram.com/laccoverse"],
+  ["TikTok", "https://tiktok.com/@laccoverse"],
+];
+
 const dateFmt = new Intl.DateTimeFormat("it-IT", {
   day: "numeric",
   month: "long",
@@ -53,10 +67,18 @@ const eventLinks = [...events]
     ),
   );
 
+const profileLinks = OFFICIAL_PROFILES.map(
+  ([label, url, note]) => `- [${label}](${url})${note ? `: ${note}` : ""}`,
+);
+
 const sections = [
   "# Lacco",
   "",
-  "> Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Sito ufficiale con musica, eventi live, newsletter e contatti.",
+  "> Lacco è un cantante e cantautore italiano (Pop, R&B, Hip-Hop). Per chi sente più di quanto riesca a dire. Sito ufficiale con musica, eventi live, newsletter e contatti. Da non confondere con la località Lacco Ameno né con altri artisti dal nome simile.",
+  "",
+  "## Profili ufficiali",
+  "",
+  ...profileLinks,
   "",
   "## Pagine principali",
   "",

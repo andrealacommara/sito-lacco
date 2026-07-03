@@ -54,6 +54,11 @@ export const ARTIST_ID = "https://lacco.it/#artist";
 // URL canonici PULITI (senza parametri di tracking) dei profili ufficiali:
 // è il segnale `sameAs` che lega l'entità "Lacco" ai suoi account verificati.
 export const artistSameAs = [
+  // Basi di conoscenza autorevoli: sono le fonti primarie del Knowledge Graph di
+  // Google e di ciò che leggono le AI Overview per riconoscere/disambiguare l'entità.
+  "https://www.wikidata.org/wiki/Q140420523",
+  "https://musicbrainz.org/artist/9c320ba3-7904-4394-9dfd-c49a57ff0c32",
+  // Piattaforme e social ufficiali.
   "https://open.spotify.com/artist/6viihrUFd4eGCfv9w61tL7",
   "https://music.apple.com/it/artist/lacco/1773060241",
   "https://music.amazon.it/artists/B0DJV3D4GG/lacco",
@@ -74,6 +79,12 @@ export const ARTIST_DISAMBIGUATION =
   "Cantante e cantautore italiano (Pop, R&B, Hip-Hop). Progetto musicale, da non confondere con la località Lacco Ameno.";
 
 export const ARTIST_NATIONALITY = "Italia";
+
+// Dati anagrafici pubblici (coerenti con Wikidata Q140420523): rafforzano la
+// disambiguazione dell'entità-persona verso omonimi. Usati nel Person JSON-LD.
+export const ARTIST_LEGAL_NAME = "Andrea La Commara";
+export const ARTIST_BIRTH_DATE = "1999-07-21";
+export const ARTIST_BIRTH_PLACE = "Torino";
 
 // Origine canonica del sito (senza slash finale), riusata per costruire URL assoluti.
 export const SITE_URL = "https://lacco.it";

@@ -25,6 +25,9 @@ import {
   ARTIST_ALTERNATE_NAMES,
   ARTIST_DISAMBIGUATION,
   ARTIST_NATIONALITY,
+  ARTIST_LEGAL_NAME,
+  ARTIST_BIRTH_DATE,
+  ARTIST_BIRTH_PLACE,
 } from "@/config/site";
 import { albums, isAlbum, singles } from "@/config/catalog";
 import { getUpcomingLiveEvents } from "@/config/liveEvents";
@@ -102,9 +105,12 @@ export default function HomePage() {
             member: {
               "@type": "Person",
               name: "Lacco",
+              legalName: ARTIST_LEGAL_NAME,
               alternateName: ARTIST_ALTERNATE_NAMES,
               jobTitle: ["Cantante", "Cantautore"],
               nationality: { "@type": "Country", name: ARTIST_NATIONALITY },
+              birthDate: ARTIST_BIRTH_DATE,
+              birthPlace: { "@type": "Place", name: ARTIST_BIRTH_PLACE },
               url: "https://lacco.it",
             },
             sameAs: artistSameAs,
