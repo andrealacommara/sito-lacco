@@ -6,11 +6,13 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/navbar";
 import { BackgroundPattern } from "@/components/backgroundPattern";
 import {
+  AmazonMusicIcon,
   AppleMusicIcon,
   InstagramIcon,
   SpotifyIcon,
   TikTokIcon,
   YouTubeIcon,
+  YouTubeMusicIcon,
 } from "@/components/icons.tsx";
 import { siteConfig } from "@/config/site.ts";
 
@@ -81,6 +83,20 @@ export default function DefaultLayout({
             onClick={() => window.open(siteConfig.links.appleMusic, "_blank")}
           >
             <AppleMusicIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
+          </button>
+          <button
+            aria-label="Vai al profilo Amazon Music di Lacco"
+            title="Amazon Music"
+            onClick={() => window.open(siteConfig.links.amazonMusic, "_blank")}
+          >
+            <AmazonMusicIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
+          </button>
+          <button
+            aria-label="Vai al profilo YouTube Music di Lacco"
+            title="YouTube Music"
+            onClick={() => window.open(siteConfig.links.youtubeMusic, "_blank")}
+          >
+            <YouTubeMusicIcon className="text-default-500 transition-colors duration-300 hover:text-danger dark:hover:text-danger" />
           </button>
           <button
             aria-label="Vai al canale YouTube di Lacco"

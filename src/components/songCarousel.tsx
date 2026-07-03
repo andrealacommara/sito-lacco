@@ -10,7 +10,17 @@ const orderedSingles = [...singles].sort(
   (a, b) => b.releaseDate.getTime() - a.releaseDate.getTime(),
 );
 
-export default function SongCarousel() {
+export default function SongCarousel({
+  excludeSlug,
+}: {
+  excludeSlug?: string;
+} = {}) {
+  // Esclude il brano della pagina corrente (es. nella release page di un singolo
+  // non ha senso riproporre il brano che si sta già guardando).
+  const songs = excludeSlug
+    ? orderedSingles.filter((song) => song.slug !== excludeSlug)
+    : orderedSingles;
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const startSpacerRef = useRef<HTMLDivElement>(null);
   const endSpacerRef = useRef<HTMLDivElement>(null);
@@ -126,7 +136,7 @@ export default function SongCarousel() {
           className="flex py-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-grab active:cursor-grabbing max-w-full touch-pan-x"
         >
           <div ref={startSpacerRef} className="shrink-0" />
-          {orderedSingles.map((song) => (
+          {songs.map((song) => (
             <div
               key={song.slug}
               className="card-song shrink-0 snap-center px-2 w-[min(280px,80vw)] transition-transform hover:scale-105 active:scale-95"
@@ -138,10 +148,12 @@ export default function SongCarousel() {
                 kind={song.kind}
                 preSaveMode={song.presaveMode}
                 releaseDate={song.releaseDate}
+                songAmazonMusicLink={song.streamingLinks?.amazonMusic ?? ""}
                 songAppleMusicLink={song.streamingLinks?.appleMusic ?? ""}
                 songDescription={song.description}
                 songSpotifyLink={song.streamingLinks?.spotify ?? ""}
                 songTitle={song.title}
+                songYouTubeMusicLink={song.streamingLinks?.youtubeMusic ?? ""}
                 year={song.year}
               />
             </div>

@@ -17,7 +17,12 @@ import {
 } from "@heroui/react";
 import { useEffect, useState } from "react"; // React hooks for local state and side effects
 
-import { AppleMusicIcon, SpotifyIcon } from "./icons"; // Custom Spotify icon component
+import {
+  AmazonMusicIcon,
+  AppleMusicIcon,
+  SpotifyIcon,
+  YouTubeMusicIcon,
+} from "./icons"; // Custom platform icon components
 import PresaveButton from "./presaveButton";
 import SmartImage, { type ImageLikeImport } from "./smartImage"; // Optimized image component with automatic loading
 
@@ -30,6 +35,8 @@ interface CardSongExposerProps {
   songDescription: string; // Short description of the song
   songSpotifyLink: string; // External link to the song on Spotify
   songAppleMusicLink: string; // External link to the song on Apple Music
+  songAmazonMusicLink: string; // External link to the song on Amazon Music
+  songYouTubeMusicLink: string; // External link to the song on YouTube Music
   preSaveMode: boolean; // Flag indicating if "pre-save" mode is active
   hyperfollowUrl?: string; // DistroKid hyperfollow URL for pre-save mode
   releaseDate: Date; // Release date, used to switch the pre-save CTA once the song is out
@@ -70,6 +77,8 @@ export default function CardSongExposer({
   songDescription,
   songSpotifyLink,
   songAppleMusicLink,
+  songAmazonMusicLink,
+  songYouTubeMusicLink,
   preSaveMode,
   hyperfollowUrl,
   releaseDate,
@@ -201,16 +210,16 @@ export default function CardSongExposer({
                   </p>
                 </div>
               )}
-              <div className="flex flex-col md:flex-row gap-2 w-full md:justify-between md:items-stretch">
+              <div className="w-full">
                 {preSaveMode ? (
-                  <div className="flex-1 min-w-0 flex justify-center">
+                  <div className="flex justify-center">
                     <PresaveButton
                       hyperfollowUrl={hyperfollowUrl ?? ""}
                       releaseDate={releaseDate}
                     />
                   </div>
                 ) : (
-                  <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {/* Spotify */}
                     <div className="flex-1 min-w-0">
                       <Button
@@ -250,7 +259,51 @@ export default function CardSongExposer({
                         Apple Music
                       </Button>
                     </div>
-                  </>
+
+                    {/* Amazon Music */}
+                    {songAmazonMusicLink && (
+                      <div className="flex-1 min-w-0">
+                        <Button
+                          fullWidth
+                          aria-label="Vai al brano su Amazon Music"
+                          className="rounded-xl min-w-0 bg-[#00A8E1] text-white hover:bg-[#00A8E1]/90"
+                          variant="primary"
+                          onPress={() =>
+                            window.open(
+                              songAmazonMusicLink,
+                              "_blank",
+                              "noopener,noreferrer",
+                            )
+                          }
+                        >
+                          <AmazonMusicIcon />
+                          Amazon Music
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* YouTube Music */}
+                    {songYouTubeMusicLink && (
+                      <div className="flex-1 min-w-0">
+                        <Button
+                          fullWidth
+                          aria-label="Vai al brano su YouTube Music"
+                          className="rounded-xl min-w-0 bg-[#FF0000] text-white hover:bg-[#FF0000]/90"
+                          variant="primary"
+                          onPress={() =>
+                            window.open(
+                              songYouTubeMusicLink,
+                              "_blank",
+                              "noopener,noreferrer",
+                            )
+                          }
+                        >
+                          <YouTubeMusicIcon />
+                          YouTube Music
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </ModalFooter>

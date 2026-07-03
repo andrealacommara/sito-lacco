@@ -2,7 +2,12 @@
 // HeroUI card plus shared icon and image utilities.
 import { Card } from "@heroui/react";
 
-import { SpotifyIcon, AppleMusicIcon } from "@/components/icons"; // Platform icons
+import {
+  SpotifyIcon,
+  AppleMusicIcon,
+  AmazonMusicIcon,
+  YouTubeMusicIcon,
+} from "@/components/icons"; // Platform icons
 import {
   resolveImageSource,
   type ImageLikeImport,
@@ -16,6 +21,8 @@ interface PressKitSongCardProps {
   artwork: ImageLikeImport;
   spotify: string;
   appleMusic?: string;
+  amazonMusic?: string;
+  youtubeMusic?: string;
   description?: string; // Optional press-kit description
 }
 
@@ -30,6 +37,8 @@ export default function PressKitSongCard({
   artwork,
   spotify,
   appleMusic,
+  amazonMusic,
+  youtubeMusic,
   description,
 }: PressKitSongCardProps) {
   const artworkSrc = resolveImageSource(artwork);
@@ -75,6 +84,32 @@ export default function PressKitSongCard({
               size={22}
             />
           </a>
+          {amazonMusic && (
+            <a
+              aria-label="Apri su Amazon Music"
+              href={amazonMusic}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <AmazonMusicIcon
+                className="text-default-500 hover:text-danger transition-colors"
+                size={22}
+              />
+            </a>
+          )}
+          {youtubeMusic && (
+            <a
+              aria-label="Apri su YouTube Music"
+              href={youtubeMusic}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <YouTubeMusicIcon
+                className="text-default-500 hover:text-danger transition-colors"
+                size={22}
+              />
+            </a>
+          )}
         </div>
       </div>
     </Card>

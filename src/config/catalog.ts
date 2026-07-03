@@ -32,6 +32,8 @@ type ReleaseBase = {
   streamingLinks?: {
     spotify?: string;
     appleMusic?: string;
+    amazonMusic?: string;
+    youtubeMusic?: string;
     hyperfollow?: string;
   };
 };
@@ -62,8 +64,14 @@ export const catalog: Release[] = [
     year: 2026,
     streamingLinks: {
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/bella-al-buio",
-      spotify: "https://open.spotify.com/intl-it/track/39sakdCdS6STeZpXwfI86Z?si=49d6220f1d454a4c",
-      appleMusic: "https://music.apple.com/it/album/bella-al-buio/6769377876?i=6769377877",
+      spotify:
+        "https://open.spotify.com/intl-it/track/39sakdCdS6STeZpXwfI86Z?si=49d6220f1d454a4c",
+      appleMusic:
+        "https://music.apple.com/it/album/bella-al-buio/6769377876?i=6769377877",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0H1QHRSTX?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_svZyp4UFyUAZ6G9HO2IuwRcQy",
+      youtubeMusic:
+        "https://music.youtube.com/playlist?list=OLAK5uy_k2cqnnRd1xS3j3C23XZaO6Bhw7gW0_8MI&si=iS7OFxfKg8oDFIXN",
     },
   },
   {
@@ -82,6 +90,10 @@ export const catalog: Release[] = [
       spotify:
         "https://open.spotify.com/intl-it/track/6Mi4URZPZcXVi5YiI0mGdb?si=e37446cb3ee94378",
       appleMusic: "https://music.apple.com/us/song/tu-x-tu/1879807616",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0GPNBPBFT?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_Lc6EOAvQ1sOtY37rtgRHEjWKD",
+      youtubeMusic:
+        "https://music.youtube.com/playlist?list=OLAK5uy_kHVLL2Y-Z--nzhzbgyOyWnbxGT1z5FlyA&si=SW9iOl0oEkJQGpkU",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/tu-x-tu",
     },
   },
@@ -102,6 +114,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/intl-it/track/5S0ApCxwF8aAGQlZCSTdLN?si=1611719cbb0c4efc",
       appleMusic:
         "https://music.apple.com/it/album/per-gli-altri/1863599627?i=1863599635",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0GBYMP9CG?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_l3K8SL64pMAEKkkMeQvJo5uKS&trackAsin=B0GBZJWDGD",
+      youtubeMusic:
+        "https://music.youtube.com/watch?v=9uCztjupVeU&si=wVH0Cpz2anwOTAcx",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
     },
   },
@@ -122,6 +138,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/intl-it/track/5wU9L1yBhk6TZlv74ImyUB?si=fde0a6895f2040d7",
       appleMusic:
         "https://music.apple.com/it/album/davvero/1863599627?i=1863599634",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0GBYMP9CG?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_PBIYZucHPBZNuSe9aOVnHWtoj&trackAsin=B0GBZGD2VJ",
+      youtubeMusic:
+        "https://music.youtube.com/watch?v=iQByJlOMuAA&si=-Mc2zSZ5TKG1H6eG",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
     },
   },
@@ -142,6 +162,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/intl-it/track/14pzWWmgbj8czymiOLGnPu?si=b7851a1ac18a4494",
       appleMusic:
         "https://music.apple.com/it/album/ricordo/1863599627?i=1863599631",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0GBYMP9CG?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_mqatuGbDUlhhYRJwPmOVIl5u6&trackAsin=B0GBZ891JQ",
+      youtubeMusic:
+        "https://music.youtube.com/watch?v=oK3RUE6RNzY&si=8w7PQ8LZGR4riX2H",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
     },
   },
@@ -162,6 +186,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/track/3jAwmZHALqFWxy8pTMRmA6?si=s_2WH0IfTNO1E7UvEdbm7A&context=spotify%3Aalbum%3A1xO8LEQFfQSD0ZzJSQfDh8",
       appleMusic:
         "https://music.apple.com/it/album/rumore-di-fondo/1845625900?i=1845625902",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0FVHGXX36?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_ccShKucCyNCMAq2QmVKbOSzpv&trackAsin=B0FVHGGTHV",
+      youtubeMusic:
+        "https://music.youtube.com/playlist?list=OLAK5uy_nZZmAlqnr2KN7O2ad9rt5AJKZlRO4gnuM&si=OGAs8mTuwCJK_Xsa",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/rumore-di-fondo",
     },
   },
@@ -182,6 +210,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/intl-it/track/5PAjwZaJEGiw3JymgkxWRT?si=7e0972d6ee6e4aee",
       appleMusic:
         "https://music.apple.com/it/album/cercami/1836640192?i=1836640193",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0FP5MT7YQ?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_w5ycqYJFt17vUi56NUzYt2nrQ",
+      youtubeMusic:
+        "https://music.youtube.com/playlist?list=OLAK5uy_mthw_Ju4zls-ciyernNqe_BfZQVJq_3P8&si=S_HCtI1BJ1OCN51e",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/cercami",
     },
   },
@@ -202,6 +234,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/intl-it/track/45CEyfLKXPZON36PyevLDA?si=e378c4663b90499d",
       appleMusic:
         "https://music.apple.com/it/album/tra-le-nuvole-sunset-version/1829063940?i=1829063941",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0FJYDPZF6?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_J2wNEhWONMl58KejvEB6mR5Xv",
+      youtubeMusic:
+        "https://music.youtube.com/playlist?list=OLAK5uy_m3Bj87TcveNpcW-mUK90E6u0_BByfwrm8&si=69Ir_H6W6Q1UwHau",
       hyperfollow:
         "https://distrokid.com/hyperfollow/lacco/tra-le-nuvole-sunset-version",
     },
@@ -223,6 +259,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/intl-it/track/2dJJQune4W5JR5tOxQCIr6?si=ee0c536bf39f4952",
       appleMusic:
         "https://music.apple.com/it/album/tra-le-nuvole/1815213555?i=1815213556",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0F92W8RKZ?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_LqjaUzcle6krZJ8TMI7eKB9bo",
+      youtubeMusic:
+        "https://music.youtube.com/playlist?list=OLAK5uy_mOpz-g6ekcIR2SczAx2MCwBqw8O2E1vJw&si=1KiXtCCstUqV3X5n",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/tra-le-nuvole",
     },
   },
@@ -243,6 +283,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/intl-it/track/4UgUDDPg1QVNP6XI9x4eWL?si=fd8cef6bab354b46",
       appleMusic:
         "https://music.apple.com/it/album/mondo-dentro/1778959317?i=1778959318",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0DMKL7DNV?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_uPZ2RhQPyR9q61FMQGdEUk7Ox",
+      youtubeMusic:
+        "https://music.youtube.com/playlist?list=OLAK5uy_kd3jLSwU6IJntPIQJEnXYOKcYZCWOlfnw&si=HZHvRXTi_H4nFalI",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/mondo-dentro",
     },
   },
@@ -263,6 +307,10 @@ export const catalog: Release[] = [
         "https://open.spotify.com/intl-it/track/4NJvJAcd0hn8Azs0yJZH3b?si=cc24527676e1438a",
       appleMusic:
         "https://music.apple.com/it/album/tempo-perso/1773232687?i=1773232688",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0DJRJDMLJ?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_o8RDMr9aF0yVsQUF09HEmEmO6",
+      youtubeMusic:
+        "https://music.youtube.com/watch?v=nhz1m99VDpQ&si=SAO2E7Oc1GOhNk7h",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/tempo-perso",
     },
   },
@@ -288,6 +336,10 @@ export const catalog: Release[] = [
       spotify:
         "https://open.spotify.com/intl-it/album/03t1vGNiDM9ORxsVWSnp8E?si=G7J5EBWJTNm3QMXpQytV1Q",
       appleMusic: "https://music.apple.com/it/album/nokoru-mono/1863599627",
+      amazonMusic:
+        "https://music.amazon.it/albums/B0GBYMP9CG?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_2FF2BkMxVEFhZGYB85uQrupvc",
+      youtubeMusic:
+        "https://music.youtube.com/playlist?list=OLAK5uy_nKuNsOLYktJBLXepttZFs5JsSOGkOlWHA&si=I3Mb_6fssGowyKE2",
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/nokoru-mono",
     },
     trackSlugs: [

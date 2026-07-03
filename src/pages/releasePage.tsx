@@ -19,7 +19,13 @@ import PresaveButton from "@/components/presaveButton";
 import ReleaseDateBadge from "@/components/releaseDateBadge";
 import SongCarousel from "@/components/songCarousel";
 import SubscribeForm from "@/components/subscribeForm";
-import { AppleMusicIcon, Logo, SpotifyIcon } from "@/components/icons";
+import {
+  AmazonMusicIcon,
+  AppleMusicIcon,
+  Logo,
+  SpotifyIcon,
+  YouTubeMusicIcon,
+} from "@/components/icons";
 import { useThemeColor } from "@/lib/themeColor";
 import NotFoundPage from "@/pages/notFoundPage";
 
@@ -55,6 +61,8 @@ function buildReleaseJsonLd(
   const platformSameAs = [
     release.streamingLinks?.spotify,
     release.streamingLinks?.appleMusic,
+    release.streamingLinks?.amazonMusic,
+    release.streamingLinks?.youtubeMusic,
   ].filter(Boolean);
 
   if (isAlbum(release)) {
@@ -376,6 +384,44 @@ function LiveSection({ release }: SectionProps) {
                 Apple Music
               </Button>
             )}
+            {release.streamingLinks?.amazonMusic && (
+              <Button
+                fullWidth
+                aria-label={`Ascolta su Amazon Music`}
+                className="rounded-xl font-semibold bg-[#00A8E1] text-white hover:bg-[#00A8E1]/90"
+                size="lg"
+                variant="primary"
+                onPress={() =>
+                  window.open(
+                    release.streamingLinks?.amazonMusic,
+                    "_blank",
+                    "noopener,noreferrer",
+                  )
+                }
+              >
+                <AmazonMusicIcon />
+                Amazon Music
+              </Button>
+            )}
+            {release.streamingLinks?.youtubeMusic && (
+              <Button
+                fullWidth
+                aria-label={`Ascolta su YouTube Music`}
+                className="rounded-xl font-semibold bg-[#FF0000] text-white hover:bg-[#FF0000]/90"
+                size="lg"
+                variant="primary"
+                onPress={() =>
+                  window.open(
+                    release.streamingLinks?.youtubeMusic,
+                    "_blank",
+                    "noopener,noreferrer",
+                  )
+                }
+              >
+                <YouTubeMusicIcon />
+                YouTube Music
+              </Button>
+            )}
             {!release.streamingLinks?.spotify &&
               release.streamingLinks?.hyperfollow && (
                 <Button
@@ -405,7 +451,7 @@ function LiveSection({ release }: SectionProps) {
         <h2 className="text-center text-white font-semibold text-lg mb-4">
           Scopri gli altri miei brani
         </h2>
-        <SongCarousel />
+        <SongCarousel excludeSlug={release.slug} />
       </div>
     </div>
   );
@@ -488,6 +534,44 @@ function AlbumSection({ album }: { album: Album }) {
                 Apple Music
               </Button>
             )}
+            {album.streamingLinks?.amazonMusic && (
+              <Button
+                fullWidth
+                aria-label="Ascolta su Amazon Music"
+                className="rounded-xl font-semibold bg-[#00A8E1] text-white hover:bg-[#00A8E1]/90"
+                size="lg"
+                variant="primary"
+                onPress={() =>
+                  window.open(
+                    album.streamingLinks?.amazonMusic,
+                    "_blank",
+                    "noopener,noreferrer",
+                  )
+                }
+              >
+                <AmazonMusicIcon />
+                Amazon Music
+              </Button>
+            )}
+            {album.streamingLinks?.youtubeMusic && (
+              <Button
+                fullWidth
+                aria-label="Ascolta su YouTube Music"
+                className="rounded-xl font-semibold bg-[#FF0000] text-white hover:bg-[#FF0000]/90"
+                size="lg"
+                variant="primary"
+                onPress={() =>
+                  window.open(
+                    album.streamingLinks?.youtubeMusic,
+                    "_blank",
+                    "noopener,noreferrer",
+                  )
+                }
+              >
+                <YouTubeMusicIcon />
+                YouTube Music
+              </Button>
+            )}
           </motion.div>
 
           {/* Tracklist — ordine dell'album, ogni brano linka alla sua pagina */}
@@ -518,6 +602,14 @@ function AlbumSection({ album }: { album: Album }) {
           )}
         </CardContent>
       </Card>
+
+      {/* Carousel */}
+      <div className="py-6">
+        <h2 className="text-center text-white font-semibold text-lg mb-4">
+          Scopri gli altri miei brani
+        </h2>
+        <SongCarousel />
+      </div>
     </div>
   );
 }

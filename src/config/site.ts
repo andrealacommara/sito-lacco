@@ -38,7 +38,10 @@ export const siteConfig = {
     tiktok: "https://tiktok.com/@laccoverse",
     instagram: "https://instagram.com/laccoverse",
     appleMusic: "https://music.apple.com/it/artist/lacco/1773060241",
+    amazonMusic:
+      "https://music.amazon.it/artists/B0DJV3D4GG/lacco?marketplaceId=APJ6JRA9NG5V4&musicTerritory=IT&ref=dm_sh_OPaDFsPTGhqbOiKBxbZ5ioI7G",
     youtube: "https://www.youtube.com/@Laccoverse",
+    youtubeMusic: "https://music.youtube.com/@laccoverse?si=B5MPaEDGMMYCgmCz",
   },
 };
 
@@ -53,9 +56,11 @@ export const ARTIST_ID = "https://lacco.it/#artist";
 export const artistSameAs = [
   "https://open.spotify.com/artist/6viihrUFd4eGCfv9w61tL7",
   "https://music.apple.com/it/artist/lacco/1773060241",
+  "https://music.amazon.it/artists/B0DJV3D4GG/lacco",
   "https://instagram.com/laccoverse",
   "https://tiktok.com/@laccoverse",
   "https://www.youtube.com/@Laccoverse",
+  "https://music.youtube.com/@laccoverse",
 ];
 
 // ===================== DISAMBIGUAZIONE ENTITÀ (vs "Lacco Ameno") ===================== //
