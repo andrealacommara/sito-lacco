@@ -6,12 +6,14 @@ import { useState } from "react"; // React hook for local state management
 
 import heroLacco from "@/assets/images/lacco/heroLacco.avif"; // Main artist image
 import {
+  AmazonMusicIcon,
   AppleMusicIcon,
   InstagramIcon,
   Logo,
   SpotifyIcon,
   TikTokIcon,
   YouTubeIcon,
+  YouTubeMusicIcon,
 } from "@/components/icons"; // Artist logo
 import { title, subtitle } from "@/components/primitives"; // Dynamic typography styles for titles and subtitles
 import SmartImage from "@/components/smartImage"; // Optimized image component with automatic loading
@@ -396,12 +398,14 @@ export default function PressKitPage() {
             .map((song) => (
               <PressKitSongCard
                 key={song.slug}
+                amazonMusic={song.streamingLinks?.amazonMusic ?? ""}
                 appleMusic={song.streamingLinks?.appleMusic ?? ""}
                 artwork={song.artwork}
                 description={song.pressKitDescription}
                 spotify={song.streamingLinks?.spotify ?? ""}
                 title={song.title}
                 year={song.year}
+                youtubeMusic={song.streamingLinks?.youtubeMusic ?? ""}
               />
             ))}
         </div>
@@ -546,82 +550,118 @@ export default function PressKitPage() {
                   Social &amp; Streaming
                 </h3>
 
-                <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center mx-auto w-full max-w-4xl gap-4">
-                  <button
-                    className="w-full md:flex-1"
-                    onClick={() =>
-                      window.open(
-                        siteConfig.links.spotify,
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                  >
-                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
-                      <SpotifyIcon />
-                      Spotify
-                    </Card>
-                  </button>
-                  <button
-                    className="w-full md:flex-1"
-                    onClick={() =>
-                      window.open(
-                        siteConfig.links.instagram,
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                  >
-                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
-                      <InstagramIcon />
-                      Instagram
-                    </Card>
-                  </button>
-                  <button
-                    className="w-full md:flex-1"
-                    onClick={() =>
-                      window.open(
-                        siteConfig.links.tiktok,
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                  >
-                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
-                      <TikTokIcon />
-                      TikTok
-                    </Card>
-                  </button>
-                  <button
-                    className="w-full md:flex-1"
-                    onClick={() =>
-                      window.open(
-                        siteConfig.links.appleMusic,
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                  >
-                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white text-nowrap">
-                      <AppleMusicIcon />
-                      Apple Music
-                    </Card>
-                  </button>
-                  <button
-                    className="w-full md:flex-1"
-                    onClick={() =>
-                      window.open(
-                        siteConfig.links.youtube,
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                  >
-                    <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
-                      <YouTubeIcon />
-                      YouTube
-                    </Card>
-                  </button>
+                <div className="flex flex-col gap-4 mx-auto w-full max-w-4xl">
+                  {/* Riga 1 — piattaforme musicali */}
+                  <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center w-full gap-4">
+                    <button
+                      className="w-full md:flex-1"
+                      onClick={() =>
+                        window.open(
+                          siteConfig.links.spotify,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                        <SpotifyIcon />
+                        Spotify
+                      </Card>
+                    </button>
+                    <button
+                      className="w-full md:flex-1"
+                      onClick={() =>
+                        window.open(
+                          siteConfig.links.appleMusic,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white text-nowrap">
+                        <AppleMusicIcon />
+                        Apple Music
+                      </Card>
+                    </button>
+                    <button
+                      className="w-full md:flex-1"
+                      onClick={() =>
+                        window.open(
+                          siteConfig.links.amazonMusic,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white text-nowrap">
+                        <AmazonMusicIcon />
+                        Amazon Music
+                      </Card>
+                    </button>
+                    <button
+                      className="w-full md:flex-1"
+                      onClick={() =>
+                        window.open(
+                          siteConfig.links.youtubeMusic,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white text-nowrap">
+                        <YouTubeMusicIcon />
+                        YouTube Music
+                      </Card>
+                    </button>
+                  </div>
+                  {/* Riga 2 — social */}
+                  <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center w-full gap-4">
+                    <button
+                      className="w-full md:flex-1"
+                      onClick={() =>
+                        window.open(
+                          siteConfig.links.instagram,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                        <InstagramIcon />
+                        Instagram
+                      </Card>
+                    </button>
+                    <button
+                      className="w-full md:flex-1"
+                      onClick={() =>
+                        window.open(
+                          siteConfig.links.tiktok,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                        <TikTokIcon />
+                        TikTok
+                      </Card>
+                    </button>
+                    <button
+                      className="w-full md:flex-1"
+                      onClick={() =>
+                        window.open(
+                          siteConfig.links.youtube,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      <Card className="flex w-full flex-row items-center justify-center p-4 gap-2 hover:bg-danger hover:text-white">
+                        <YouTubeIcon />
+                        YouTube
+                      </Card>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

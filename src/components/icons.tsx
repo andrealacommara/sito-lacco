@@ -6,7 +6,9 @@ import logoSpotify from "../assets/icons/logo-spotify.svg?raw";
 import logoInstagram from "../assets/icons/logo-instagram.svg?raw";
 import logoTikTok from "../assets/icons/logo-tiktok.svg?raw";
 import logoAppleMusic from "../assets/icons/logo-apple-music.svg?raw";
+import logoAmazonMusic from "../assets/icons/logo-amazon-music.svg?raw";
 import logoYouTube from "../assets/icons/logo-youtube.svg?raw";
+import logoYouTubeMusic from "../assets/icons/logo-youtube-music.svg?raw";
 
 import { createIcon } from "@/utils/createIcon"; // Icon creation helper
 import { IconSvgProps } from "@/types"; // TypeScript props definitions
@@ -32,7 +34,9 @@ const spotifyPath = extractPath(logoSpotify);
 const instagramPath = extractPath(logoInstagram);
 const tikTokPath = extractPath(logoTikTok);
 const appleMusicPath = extractPath(logoAppleMusic);
+const amazonMusicPath = extractPath(logoAmazonMusic);
 const youtubePath = extractPath(logoYouTube);
+const youtubeMusicPath = extractPath(logoYouTubeMusic);
 
 // ================== ICON DEFINITIONS ================== //
 
@@ -72,7 +76,9 @@ export const InstagramIcon = createIcon(instagramPath);
 export const TikTokIcon = createIcon(tikTokPath);
 export const SpotifyIcon = createIcon(spotifyPath);
 export const AppleMusicIcon = createIcon(appleMusicPath);
+export const AmazonMusicIcon = createIcon(amazonMusicPath);
 export const YouTubeIcon = createIcon(youtubePath);
+export const YouTubeMusicIcon = createIcon(youtubeMusicPath);
 
 /**
  * “Moon” icon — used for dark mode.

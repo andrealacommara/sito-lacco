@@ -6,7 +6,12 @@ import { Button, Card } from "@heroui/react";
 import Countdown from "@/components/countdown";
 import PresaveButton from "@/components/presaveButton";
 import ReleaseDateBadge from "@/components/releaseDateBadge";
-import { AppleMusicIcon, SpotifyIcon } from "@/components/icons";
+import {
+  AmazonMusicIcon,
+  AppleMusicIcon,
+  SpotifyIcon,
+  YouTubeMusicIcon,
+} from "@/components/icons";
 import SmartImage, { resolveImageSource } from "@/components/smartImage";
 
 function TracklistIcon() {
@@ -151,8 +156,10 @@ export default function AlbumCard({ album }: Props) {
           </div>
         ) : (
           (album.streamingLinks?.spotify ||
-            album.streamingLinks?.appleMusic) && (
-            <div className="flex flex-col lg:flex-row md:flex-row gap-2 w-full">
+            album.streamingLinks?.appleMusic ||
+            album.streamingLinks?.amazonMusic ||
+            album.streamingLinks?.youtubeMusic) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
               {album.streamingLinks?.spotify && (
                 <div className="flex-1 min-w-0">
                   <Button
@@ -190,6 +197,46 @@ export default function AlbumCard({ album }: Props) {
                   >
                     <AppleMusicIcon />
                     Apple Music
+                  </Button>
+                </div>
+              )}
+              {album.streamingLinks?.amazonMusic && (
+                <div className="flex-1 min-w-0">
+                  <Button
+                    fullWidth
+                    aria-label={`Ascolta ${album.title} su Amazon Music`}
+                    className="rounded-xl min-w-0 bg-[#00A8E1] text-white hover:bg-[#00A8E1]/90"
+                    variant="primary"
+                    onPress={() =>
+                      window.open(
+                        album.streamingLinks?.amazonMusic,
+                        "_blank",
+                        "noopener,noreferrer",
+                      )
+                    }
+                  >
+                    <AmazonMusicIcon />
+                    Amazon Music
+                  </Button>
+                </div>
+              )}
+              {album.streamingLinks?.youtubeMusic && (
+                <div className="flex-1 min-w-0">
+                  <Button
+                    fullWidth
+                    aria-label={`Ascolta ${album.title} su YouTube Music`}
+                    className="rounded-xl min-w-0 bg-[#FF0000] text-white hover:bg-[#FF0000]/90"
+                    variant="primary"
+                    onPress={() =>
+                      window.open(
+                        album.streamingLinks?.youtubeMusic,
+                        "_blank",
+                        "noopener,noreferrer",
+                      )
+                    }
+                  >
+                    <YouTubeMusicIcon />
+                    YouTube Music
                   </Button>
                 </div>
               )}
