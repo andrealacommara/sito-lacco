@@ -53,7 +53,7 @@ export const catalog: Release[] = [
     slug: "bella-al-buio",
     title: "bella al buio",
     releaseDate: d("2026-07-03"),
-    presaveMode: true,
+    presaveMode: false,
     artwork: bellaAlBuioArtwork,
     alt: "Cover artwork di 'bella al buio'",
     ogImage: "/og-bella-al-buio.jpg",
@@ -62,6 +62,8 @@ export const catalog: Release[] = [
     year: 2026,
     streamingLinks: {
       hyperfollow: "https://distrokid.com/hyperfollow/lacco/bella-al-buio",
+      spotify: "https://open.spotify.com/intl-it/track/39sakdCdS6STeZpXwfI86Z?si=49d6220f1d454a4c",
+      appleMusic: "https://music.apple.com/it/album/bella-al-buio/6769377876?i=6769377877",
     },
   },
   {
