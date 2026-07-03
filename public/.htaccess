@@ -12,6 +12,11 @@ Redirect 301 /applemusic https://music.apple.com/it/artist/lacco/1773060241
 Redirect 301 /youtube https://www.youtube.com/@Laccoverse
 Redirect 301 /preview-nokoru-mono https://on.soundcloud.com/u3ZP1Y26moVlmrQSIO
 
+# Vecchie route rinominate → nuove (preservano il ranking e evitano il 404
+# sui link ancora indicizzati da Google).
+Redirect 301 /la-mia-musica /musica
+Redirect 301 /su-di-me /chi-sono
+
 # ============= STATIC FILES, PRERENDER SNAPSHOT & SPA FALLBACK =============
 
 # Serve static files if they exist (sitemap, OG images, assets, …)
