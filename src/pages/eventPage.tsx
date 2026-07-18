@@ -176,7 +176,7 @@ function buildEventJsonLd(
       "@type": "MusicGroup",
       "@id": ARTIST_ID,
       name: "Lacco",
-      url: "https://lacco.it",
+      url: "https://www.lacco.it",
       sameAs: artistSameAs,
     },
     ...(event.ticketUrl
@@ -489,12 +489,12 @@ export default function EventPage() {
   const metaDescription =
     event.description?.replace(/\n/g, " ").trim() ||
     `${event.title} — concerto live di Lacco a ${event.venue}, ${event.city} il ${formatLongDate(event.date)}.`;
-  const pageUrl = `https://lacco.it/live/${event.slug}`;
+  const pageUrl = `https://www.lacco.it/live/${event.slug}`;
   // OG dedicata generata da generate-og-events.mjs quando esiste il poster
   // (stesso criterio: poster su disco → og-<slug>.jpg). Altrimenti la generica.
   const ogImageUrl = event.poster
-    ? `https://lacco.it/og-${event.slug}.jpg`
-    : "https://lacco.it/og-image.jpg";
+    ? `https://www.lacco.it/og-${event.slug}.jpg`
+    : "https://www.lacco.it/og-image.jpg";
   const jsonLd = buildEventJsonLd(event, pageUrl, ogImageUrl, metaDescription);
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: "Home", path: "/" },

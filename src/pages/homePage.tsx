@@ -60,9 +60,9 @@ export default function HomePage() {
           name="description"
         />
         <meta content="index, follow" name="robots" />
-        <link href="https://lacco.it" rel="canonical" />
-        <link href="https://lacco.it" hrefLang="it" rel="alternate" />
-        <link href="https://lacco.it" hrefLang="x-default" rel="alternate" />
+        <link href="https://www.lacco.it" rel="canonical" />
+        <link href="https://www.lacco.it" hrefLang="it" rel="alternate" />
+        <link href="https://www.lacco.it" hrefLang="x-default" rel="alternate" />
 
         {/* Open Graph */}
         <meta content="profile" property="og:type" />
@@ -72,8 +72,8 @@ export default function HomePage() {
           content="Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire. Ascolta la sua musica, scopri i live e rimani aggiornato."
           property="og:description"
         />
-        <meta content="https://lacco.it" property="og:url" />
-        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content="https://www.lacco.it" property="og:url" />
+        <meta content="https://www.lacco.it/og-image.jpg" property="og:image" />
         <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
 
@@ -84,7 +84,7 @@ export default function HomePage() {
           content="Lacco è un cantante e cantautore Pop, R&B e Hip-Hop. Per chi sente più di quanto riesca a dire."
           name="twitter:description"
         />
-        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
+        <meta content="https://www.lacco.it/og-image.jpg" name="twitter:image" />
 
         {/* Structured data */}
         <script type="application/ld+json">
@@ -100,8 +100,8 @@ export default function HomePage() {
             genre: ["Pop", "R&B", "Hip-Hop"],
             knowsLanguage: "it",
             foundingLocation: { "@type": "Place", name: ARTIST_NATIONALITY },
-            url: "https://lacco.it",
-            image: "https://lacco.it/og-image.jpg",
+            url: "https://www.lacco.it",
+            image: "https://www.lacco.it/og-image.jpg",
             member: {
               "@type": "Person",
               name: "Lacco",
@@ -111,7 +111,7 @@ export default function HomePage() {
               nationality: { "@type": "Country", name: ARTIST_NATIONALITY },
               birthDate: ARTIST_BIRTH_DATE,
               birthPlace: { "@type": "Place", name: ARTIST_BIRTH_PLACE },
-              url: "https://lacco.it",
+              url: "https://www.lacco.it",
             },
             sameAs: artistSameAs,
           })}

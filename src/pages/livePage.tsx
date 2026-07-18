@@ -65,10 +65,10 @@ export default function LivePage() {
           name="description"
         />
         <meta content="index, follow" name="robots" />
-        <link href="https://lacco.it/live" rel="canonical" />
-        <link href="https://lacco.it/live" hrefLang="it" rel="alternate" />
+        <link href="https://www.lacco.it/live" rel="canonical" />
+        <link href="https://www.lacco.it/live" hrefLang="it" rel="alternate" />
         <link
-          href="https://lacco.it/live"
+          href="https://www.lacco.it/live"
           hrefLang="x-default"
           rel="alternate"
         />
@@ -79,8 +79,8 @@ export default function LivePage() {
           content="Scopri le prossime date live di Lacco, cantante e cantautore italiano di R&B e Hip-Hop. Biglietti e info sui concerti."
           property="og:description"
         />
-        <meta content="https://lacco.it/live" property="og:url" />
-        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content="https://www.lacco.it/live" property="og:url" />
+        <meta content="https://www.lacco.it/og-image.jpg" property="og:image" />
         <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
@@ -89,7 +89,7 @@ export default function LivePage() {
           content="Le prossime date dei concerti live di Lacco, cantante e cantautore R&B e Hip-Hop."
           name="twitter:description"
         />
-        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
+        <meta content="https://www.lacco.it/og-image.jpg" name="twitter:image" />
       </Helmet>
 
       <section className="flex flex-row text-center justify-center gap-4 py-8 md:py-10">
