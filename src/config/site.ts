@@ -49,7 +49,7 @@ export const siteConfig = {
 // Identità unica dell'artista per la disambiguazione delle entità Schema.org.
 // Lo stesso @id viene riusato in home/release/evento così Google consolida tutte
 // le dichiarazioni in un'unica entità verificata (evita la confusione con omonimi).
-export const ARTIST_ID = "https://lacco.it/#artist";
+export const ARTIST_ID = "https://www.lacco.it/#artist";
 
 // URL canonici PULITI (senza parametri di tracking) dei profili ufficiali:
 // è il segnale `sameAs` che lega l'entità "Lacco" ai suoi account verificati.
@@ -87,7 +87,7 @@ export const ARTIST_BIRTH_DATE = "1999-07-21";
 export const ARTIST_BIRTH_PLACE = "Torino";
 
 // Origine canonica del sito (senza slash finale), riusata per costruire URL assoluti.
-export const SITE_URL = "https://lacco.it";
+export const SITE_URL = "https://www.lacco.it";
 
 // ========================== BREADCRUMB JSON-LD ========================== //
 // Costruisce un BreadcrumbList Schema.org per abilitare i breadcrumb nei

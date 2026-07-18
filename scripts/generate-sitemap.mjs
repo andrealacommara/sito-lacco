@@ -12,7 +12,7 @@ import fs from "fs";
 
 import { STATIC_ROUTES, getContentEntries } from "./routes.mjs";
 
-const HOSTNAME = "https://lacco.it";
+const HOSTNAME = "https://www.lacco.it";
 const OUTPUT_PATH = path.join("dist", "sitemap.xml");
 const DIST_DIR = "dist";
 

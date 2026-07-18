@@ -42,7 +42,7 @@ const ARTIST_ENTITY = {
   "@type": "MusicGroup",
   "@id": ARTIST_ID,
   name: "Lacco",
-  url: "https://lacco.it",
+  url: "https://www.lacco.it",
   sameAs: artistSameAs,
 };
 
@@ -53,7 +53,7 @@ function buildReleaseJsonLd(
   imageUrl: string,
   description: string,
 ) {
-  const url = `https://lacco.it/${release.slug}`;
+  const url = `https://www.lacco.it/${release.slug}`;
   const datePublished = release.releaseDate.toISOString().slice(0, 10);
 
   // sameAs verso la traccia/album esatti sulle piattaforme: lega la pagina alla
@@ -85,7 +85,7 @@ function buildReleaseJsonLd(
         "@type": "MusicRecording",
         position: i + 1,
         name: song.title,
-        url: `https://lacco.it/${song.slug}`,
+        url: `https://www.lacco.it/${song.slug}`,
       })),
     };
   }
@@ -108,7 +108,7 @@ function buildReleaseJsonLd(
           inAlbum: {
             "@type": "MusicAlbum",
             name: album.title,
-            url: `https://lacco.it/${album.slug}`,
+            url: `https://www.lacco.it/${album.slug}`,
           },
         }
       : {}),
@@ -126,9 +126,9 @@ export default function ReleasePage() {
 
   const bgUrl = resolveImageSource(release.artwork);
   const metaDescription = release.description.replace(/\n/g, " ").trim();
-  const ogImageUrl = `https://lacco.it${release.ogImage}`;
+  const ogImageUrl = `https://www.lacco.it${release.ogImage}`;
   const ogType = isAlbum(release) ? "music.album" : "music.song";
-  const canonicalUrl = `https://lacco.it/${release.slug}`;
+  const canonicalUrl = `https://www.lacco.it/${release.slug}`;
   const jsonLd = buildReleaseJsonLd(release, ogImageUrl, metaDescription);
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: "Home", path: "/" },

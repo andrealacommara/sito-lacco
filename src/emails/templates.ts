@@ -6,7 +6,7 @@
 // header-email.png composites waves + logo into a single image — avoids position:absolute
 // which many email clients ignore, causing waves and logo to render sequentially.
 // Always absolute URL: email clients can't resolve relative paths, even in dev.
-const HEADER_IMG = `<img class="header-img" src="https://lacco.it/header-email.png" width="520" height="128" alt="Lacco" style="display:block;width:100%;height:auto;border:0;">`;
+const HEADER_IMG = `<img class="header-img" src="https://www.lacco.it/header-email.png" width="520" height="128" alt="Lacco" style="display:block;width:100%;height:auto;border:0;">`;
 
 function baseTemplate(
   content: string,

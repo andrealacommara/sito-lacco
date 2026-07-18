@@ -13,10 +13,10 @@ export default function PrivacyPage() {
           name="description"
         />
         <meta content="index, follow" name="robots" />
-        <link href="https://lacco.it/privacy" rel="canonical" />
-        <link href="https://lacco.it/privacy" hrefLang="it" rel="alternate" />
+        <link href="https://www.lacco.it/privacy" rel="canonical" />
+        <link href="https://www.lacco.it/privacy" hrefLang="it" rel="alternate" />
         <link
-          href="https://lacco.it/privacy"
+          href="https://www.lacco.it/privacy"
           hrefLang="x-default"
           rel="alternate"
         />
@@ -27,8 +27,8 @@ export default function PrivacyPage() {
           content="Informativa sul trattamento dei dati personali raccolti tramite la newsletter di Lacco."
           property="og:description"
         />
-        <meta content="https://lacco.it/privacy" property="og:url" />
-        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content="https://www.lacco.it/privacy" property="og:url" />
+        <meta content="https://www.lacco.it/og-image.jpg" property="og:image" />
         <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
           content="Informativa sul trattamento dei dati personali raccolti tramite la newsletter di Lacco."
           name="twitter:description"
         />
-        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
+        <meta content="https://www.lacco.it/og-image.jpg" name="twitter:image" />
       </Helmet>
 
       <div className="flex flex-col items-center py-8 md:py-10 mx-auto w-full max-w-4xl px-4">

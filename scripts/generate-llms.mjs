@@ -10,7 +10,7 @@ import fs from "fs";
 
 import { STATIC_ROUTES, getContentEntries } from "./routes.mjs";
 
-const HOSTNAME = "https://lacco.it";
+const HOSTNAME = "https://www.lacco.it";
 const OUTPUT_PATH = path.join("dist", "llms.txt");
 
 // Label + descrizione per le route statiche indicizzabili (vedi STATIC_ROUTES).

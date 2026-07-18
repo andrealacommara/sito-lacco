@@ -24,10 +24,10 @@ export default function AboutPage() {
           name="description"
         />
         <meta content="index, follow" name="robots" />
-        <link href="https://lacco.it/chi-sono" rel="canonical" />
-        <link href="https://lacco.it/chi-sono" hrefLang="it" rel="alternate" />
+        <link href="https://www.lacco.it/chi-sono" rel="canonical" />
+        <link href="https://www.lacco.it/chi-sono" hrefLang="it" rel="alternate" />
         <link
-          href="https://lacco.it/chi-sono"
+          href="https://www.lacco.it/chi-sono"
           hrefLang="x-default"
           rel="alternate"
         />
@@ -38,8 +38,8 @@ export default function AboutPage() {
           content="Scopri chi è Lacco: cantante e cantautore italiano di R&B e Hip-Hop. La sua storia, il percorso musicale e la filosofia dietro ogni canzone."
           property="og:description"
         />
-        <meta content="https://lacco.it/chi-sono" property="og:url" />
-        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content="https://www.lacco.it/chi-sono" property="og:url" />
+        <meta content="https://www.lacco.it/og-image.jpg" property="og:image" />
         <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
@@ -48,7 +48,7 @@ export default function AboutPage() {
           content="Scopri chi è Lacco: cantante e cantautore italiano di R&B e Hip-Hop."
           name="twitter:description"
         />
-        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
+        <meta content="https://www.lacco.it/og-image.jpg" name="twitter:image" />
       </Helmet>
 
       <div>

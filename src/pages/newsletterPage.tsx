@@ -14,14 +14,14 @@ export default function NewsletterPage() {
           name="description"
         />
         <meta content="index, follow" name="robots" />
-        <link href="https://lacco.it/newsletter" rel="canonical" />
+        <link href="https://www.lacco.it/newsletter" rel="canonical" />
         <link
-          href="https://lacco.it/newsletter"
+          href="https://www.lacco.it/newsletter"
           hrefLang="it"
           rel="alternate"
         />
         <link
-          href="https://lacco.it/newsletter"
+          href="https://www.lacco.it/newsletter"
           hrefLang="x-default"
           rel="alternate"
         />
@@ -32,8 +32,8 @@ export default function NewsletterPage() {
           content="Iscriviti per ricevere aggiornamenti su nuove uscite, date live e novità da Lacco, cantante e cantautore R&B e Hip-Hop."
           property="og:description"
         />
-        <meta content="https://lacco.it/newsletter" property="og:url" />
-        <meta content="https://lacco.it/og-image.jpg" property="og:image" />
+        <meta content="https://www.lacco.it/newsletter" property="og:url" />
+        <meta content="https://www.lacco.it/og-image.jpg" property="og:image" />
         <meta content="Lacco — Cantante e Cantautore" property="og:image:alt" />
         <meta content="it_IT" property="og:locale" />
         <meta content="summary_large_image" name="twitter:card" />
@@ -42,7 +42,7 @@ export default function NewsletterPage() {
           content="Iscriviti per ricevere aggiornamenti su nuove uscite, date live e novità da Lacco."
           name="twitter:description"
         />
-        <meta content="https://lacco.it/og-image.jpg" name="twitter:image" />
+        <meta content="https://www.lacco.it/og-image.jpg" name="twitter:image" />
       </Helmet>
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 mx-auto w-full max-w-4xl px-4">
         <div className="w-full max-w-md mx-auto text-center">
