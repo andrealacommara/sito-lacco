@@ -458,3 +458,34 @@ async function fetchMediaInsights(
     return {};
   }
 }
+
+// ── Normalizzazione username ─────────────────────────────────────────────────
+// L'export Instagram non è uniforme: lo username può arrivare da `value`, da
+// `title` o ricavato dall'href, con case e decorazioni diverse tra il file
+// follower e quello dei seguiti. Le tabelle hanno la chiave sullo username, quindi
+// senza una forma canonica la stessa persona compare due volte e resta per sempre
+// nella lista "non ti ricambia". Forma canonica = minuscolo, senza @ né slash.
+// Stessa normalizzazione applicata lato client in `parseExportZip`.
+export function normalizeUsername(raw: unknown): string {
+  if (typeof raw !== "string") return "";
+
+  return raw
+    .trim()
+    .replace(/^@+/, "")
+    .replace(/^\/+|\/+$/g, "")
+    .toLowerCase();
+}
+
+// Soglia di completezza dell'export follower: sotto questa frazione del conteggio
+// reale dell'account il file è troncato (export richiesto con periodo ristretto) e
+// il diff produrrebbe centinaia di falsi unfollow.
+export const EXPORT_RELIABLE_RATIO = 0.85;
+
+export function isExportReliable(
+  exportedCount: number,
+  accountFollowers: number | null | undefined,
+): boolean {
+  if (!accountFollowers || accountFollowers <= 0) return true;
+
+  return exportedCount >= accountFollowers * EXPORT_RELIABLE_RATIO;
+}

@@ -1,6 +1,7 @@
 import { corsHeaders, jsonResponse } from "../_shared/clients.ts";
 import { requireAdmin } from "../_shared/auth.ts";
 import { getSql } from "../_shared/db.ts";
+import { normalizeUsername } from "../_shared/instagram.ts";
 
 // Assegna/rimuove un tag manuale su un username della lista "Non ti ricambiano".
 // POST { username, tag }. tag ∈ {persona, vip, pagina} per assegnare, null/"" per
@@ -30,7 +31,7 @@ Deno.serve(async (req) => {
       tag?: string | null;
     };
 
-    username = (body.username ?? "").trim();
+    username = normalizeUsername(body.username);
     tag = body.tag ? String(body.tag).trim().toLowerCase() : null;
     if (!username) throw new Error("username mancante");
     if (tag && !ALLOWED_TAGS.includes(tag)) throw new Error("tag non valido");

@@ -161,13 +161,18 @@ export type InstagramFollowingChanges = {
   startedFollowing: string[];
 };
 
-// Non-mutuals persistenti (ultimo snapshot follower ↔ seguiti).
-// available = false se non c'è ancora uno snapshot dei seguiti.
-export type InstagramNonMutuals = {
+// Relazioni dall'ultimo export: le tre liste vengono dallo snapshot follower e dal
+// following snapshot ACCOPPIATO (stesso upload). available = false finché non c'è
+// un export che includa anche la lista "Seguiti".
+export type InstagramRelationships = {
   available: boolean;
-  reliable: boolean; // false se l'export follower è incompleto (periodo ristretto)
-  notFollowingBack: string[]; // segui ma non ti seguono
+  reliable: boolean; // false se l'export follower era incompleto (periodo ristretto)
+  capturedAt: string | null; // quando è stato caricato l'export: le liste sono ferme lì
+  followingCapturedAt: string | null;
+  mutuals: string[]; // vi seguite a vicenda
+  notFollowingBack: string[]; // li segui ma non ti seguono
   fans: string[]; // ti seguono ma non li segui
+  overrides: string[]; // corretti a mano con "ora mi segue", in attesa del prossimo export
 };
 
 // Tag manuale assegnato a un account nella lista "Non ti ricambiano".
@@ -211,7 +216,7 @@ export type InstagramStatsResponse = {
   flow?: InstagramFlowPoint[];
   velocity?: InstagramVelocity[];
   followingChanges?: InstagramFollowingChanges;
-  nonMutuals?: InstagramNonMutuals;
+  relationships?: InstagramRelationships;
   markedUnfollowed?: string[];
   // Tag manuali per account: username → tag (persona | vip | pagina).
   tags?: Record<string, InstagramAccountTag>;
@@ -238,6 +243,10 @@ export type InstagramExportResponse = {
   isFirstSnapshot?: boolean;
   total?: number;
   gained?: number;
+  // true se l'export era troncato: snapshot salvato ma diff/eventi non scritti.
+  partial?: boolean;
+  expected?: number | null; // follower reali dell'account
+  got?: number | null; // nomi trovati nell'export
   unfollowers?: { username: string; since: string | null }[];
   error?: string;
 };
