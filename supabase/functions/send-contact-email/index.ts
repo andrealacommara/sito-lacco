@@ -1,8 +1,22 @@
 import { corsHeaders, jsonResponse } from "../_shared/clients.ts";
 import { sendContactEmail } from "../_shared/email.ts";
+import {
+  enforceBodySize,
+  enforceRateLimit,
+  PUBLIC_BODY_LIMIT,
+  type RateLimitRule,
+} from "../_shared/rateLimit.ts";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_MESSAGE_LENGTH = 10;
+
+// Una email all'admin per richiesta. È protetto solo dalla anon key, che essendo
+// nel bundle è pubblica: di fatto è un endpoint aperto, e senza tetto è un
+// secondo canale di mail bombing accanto a send-magic-link.
+const RULES: RateLimitRule[] = [
+  { name: "contact-ip", limit: 3, windowSeconds: 3600, scope: "ip" },
+  { name: "contact", limit: 30, windowSeconds: 3600, scope: "global" },
+];
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
@@ -17,6 +31,14 @@ Deno.serve(async (req) => {
       origin,
     );
   }
+
+  const tooBig = enforceBodySize(req, PUBLIC_BODY_LIMIT, origin);
+
+  if (tooBig) return tooBig;
+
+  const limited = await enforceRateLimit(req, RULES, origin);
+
+  if (limited) return limited;
 
   let body: Record<string, unknown>;
 

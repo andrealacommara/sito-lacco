@@ -1,31 +1,9 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 import {
   corsHeaders,
   getSupabaseAdmin,
   jsonResponse,
 } from "../_shared/clients.ts";
-
-const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "";
-
-async function verifyAdmin(req: Request): Promise<boolean> {
-  const authHeader = req.headers.get("authorization");
-
-  if (!authHeader?.startsWith("Bearer ")) return false;
-  const token = authHeader.slice(7);
-  const supabaseAnon = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_ANON_KEY")!,
-  );
-  const {
-    data: { user },
-    error,
-  } = await supabaseAnon.auth.getUser(token);
-
-  if (error || !user || user.email !== ADMIN_EMAIL) return false;
-
-  return true;
-}
+import { requireAdmin } from "../_shared/auth.ts";
 
 const STATUSES = ["confirmed", "unsubscribed", "bounced"] as const;
 
@@ -38,9 +16,9 @@ Deno.serve(async (req) => {
   if (req.method !== "GET") {
     return jsonResponse({ ok: false }, 405, origin);
   }
-  if (!(await verifyAdmin(req))) {
-    return jsonResponse({ ok: false, error: "Non autorizzato" }, 401, origin);
-  }
+  const denied = await requireAdmin(req, origin);
+
+  if (denied) return denied;
 
   const supabase = getSupabaseAdmin();
 

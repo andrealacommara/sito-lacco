@@ -1,5 +1,6 @@
 import { corsHeaders, jsonResponse } from "../_shared/clients.ts";
-import { verifyAdmin } from "../_shared/auth.ts";
+import { requireAdmin } from "../_shared/auth.ts";
+import { enforceBodySize } from "../_shared/rateLimit.ts";
 import { getSql } from "../_shared/db.ts";
 import { sendInstagramDigest } from "../_shared/email.ts";
 
@@ -11,6 +12,11 @@ type ExportFollower = { username: string; followedYouAt: string | null };
 
 const CHUNK = 1000;
 
+// L'export IG di un account con decine di migliaia di follower resta ben sotto
+// questa soglia. Serve solo a impedire che un corpo arbitrariamente grande venga
+// bufferizzato e trasformato in insert bulk.
+const MAX_BODY_BYTES = 10 * 1024 * 1024;
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
 
@@ -20,9 +26,13 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return jsonResponse({ ok: false, error: "Metodo non valido" }, 405, origin);
   }
-  if (!(await verifyAdmin(req))) {
-    return jsonResponse({ ok: false, error: "Non autorizzato" }, 401, origin);
-  }
+  const denied = await requireAdmin(req, origin);
+
+  if (denied) return denied;
+
+  const tooBig = enforceBodySize(req, MAX_BODY_BYTES, origin);
+
+  if (tooBig) return tooBig;
 
   let followers: ExportFollower[];
   let following: string[] = [];

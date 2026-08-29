@@ -5,9 +5,27 @@ import {
   RESEND_AUDIENCE_ID,
 } from "../_shared/clients.ts";
 import { sendWelcomeEmail } from "../_shared/email.ts";
+import {
+  enforceBodySize,
+  enforceRateLimit,
+  PUBLIC_BODY_LIMIT,
+  type RateLimitRule,
+} from "../_shared/rateLimit.ts";
 import { isValidEmail } from "../_shared/validation.ts";
 
 const SITE_URL = Deno.env.get("SITE_URL") ?? "https://lacco.it";
+
+// Endpoint pubblico che invia una welcome email a un indirizzo preso dal body.
+// Senza tetto è utilizzabile come relay: si spedisce posta brandizzata Lacco a
+// vittime arbitrarie, inquinando nel frattempo `subscribers` e l'audience Resend.
+// L'honeypot `_hp` più sotto ferma i bot ingenui ma non un curl.
+//
+// Il tetto globale è generoso di proposito: deve reggere un picco reale di
+// iscrizioni dopo un'uscita o un post, non solo il traffico ordinario.
+const RULES: RateLimitRule[] = [
+  { name: "subscribe-ip", limit: 5, windowSeconds: 3600, scope: "ip" },
+  { name: "subscribe", limit: 100, windowSeconds: 3600, scope: "global" },
+];
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
@@ -22,6 +40,14 @@ Deno.serve(async (req) => {
       origin,
     );
   }
+
+  const tooBig = enforceBodySize(req, PUBLIC_BODY_LIMIT, origin);
+
+  if (tooBig) return tooBig;
+
+  const limited = await enforceRateLimit(req, RULES, origin);
+
+  if (limited) return limited;
 
   let body: Record<string, unknown>;
 

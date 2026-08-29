@@ -1,5 +1,5 @@
 import { corsHeaders, jsonResponse } from "../_shared/clients.ts";
-import { verifyAdmin } from "../_shared/auth.ts";
+import { requireAdmin } from "../_shared/auth.ts";
 import { getSql } from "../_shared/db.ts";
 
 // Assegna/rimuove un tag manuale su un username della lista "Non ti ricambiano".
@@ -17,9 +17,9 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return jsonResponse({ ok: false, error: "Metodo non valido" }, 405, origin);
   }
-  if (!(await verifyAdmin(req))) {
-    return jsonResponse({ ok: false, error: "Non autorizzato" }, 401, origin);
-  }
+  const denied = await requireAdmin(req, origin);
+
+  if (denied) return denied;
 
   let username: string;
   let tag: string | null;
