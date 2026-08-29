@@ -1,35 +1,10 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 import {
   corsHeaders,
   getSupabaseAdmin,
   jsonResponse,
   RESEND_AUDIENCE_ID,
 } from "../_shared/clients.ts";
-
-const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "";
-
-async function verifyAdmin(req: Request): Promise<string | null> {
-  const authHeader = req.headers.get("authorization");
-
-  if (!authHeader?.startsWith("Bearer ")) return null;
-  const token = authHeader.slice(7);
-
-  // Verifica il JWT con il client anon (auth non bypassa RLS per verificare il token)
-  const supabaseAnon = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_ANON_KEY")!,
-  );
-  const {
-    data: { user },
-    error,
-  } = await supabaseAnon.auth.getUser(token);
-
-  if (error || !user) return null;
-  if (user.email !== ADMIN_EMAIL) return null;
-
-  return user.id;
-}
+import { requireAdmin } from "../_shared/auth.ts";
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
@@ -38,11 +13,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders(origin) });
   }
 
-  const adminId = await verifyAdmin(req);
+  const denied = await requireAdmin(req, origin);
 
-  if (!adminId) {
-    return jsonResponse({ ok: false, error: "Non autorizzato" }, 401, origin);
-  }
+  if (denied) return denied;
 
   const supabase = getSupabaseAdmin();
 

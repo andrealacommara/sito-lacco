@@ -1,5 +1,6 @@
 import { corsHeaders, jsonResponse } from "../_shared/clients.ts";
 import { verifyAdmin } from "../_shared/auth.ts";
+import { enforceRateLimit, type RateLimitRule } from "../_shared/rateLimit.ts";
 import { getSql } from "../_shared/db.ts";
 import {
   fetchAccount,
@@ -41,12 +42,28 @@ async function authorized(
   return verifyAdmin(req);
 }
 
+// `authorized()` interroga il Vault appena vede un `x-cron-secret`, quindi ogni
+// richiesta con un header inventato costa una decrypt sul pooler. Il limiter va
+// perciò PRIMA dell'auth, non dopo. La soglia è larghissima rispetto all'uso reale:
+// il cron passa di qui due volte al giorno, i trigger manuali sono sporadici.
+const RULES: RateLimitRule[] = [
+  { name: "ig-snapshot-ip", limit: 30, windowSeconds: 3600, scope: "ip" },
+];
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders(origin) });
   }
+  // Sia il cron (pg_net) sia il trigger manuale usano POST.
+  if (req.method !== "POST") {
+    return jsonResponse({ ok: false, error: "Metodo non valido" }, 405, origin);
+  }
+
+  const limited = await enforceRateLimit(req, RULES, origin);
+
+  if (limited) return limited;
 
   const sql = getSql();
 

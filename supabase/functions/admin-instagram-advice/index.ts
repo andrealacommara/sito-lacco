@@ -1,5 +1,6 @@
 import { corsHeaders, jsonResponse } from "../_shared/clients.ts";
-import { verifyAdmin } from "../_shared/auth.ts";
+import { requireAdmin } from "../_shared/auth.ts";
+import { enforceBodySize, PUBLIC_BODY_LIMIT } from "../_shared/rateLimit.ts";
 
 // Genera consigli IG con un LLM (Google Gemini 2.5 Flash, free tier). Riceve in
 // POST il riassunto numerico calcolato dal frontend (buildAdvicePayload) e
@@ -44,9 +45,15 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return jsonResponse({ ok: false, error: "Metodo non valido" }, 405, origin);
   }
-  if (!(await verifyAdmin(req))) {
-    return jsonResponse({ ok: false, error: "Non autorizzato" }, 401, origin);
-  }
+  const denied = await requireAdmin(req, origin);
+
+  if (denied) return denied;
+
+  // Il payload è un riassunto numerico di poche centinaia di byte: un corpo più
+  // grande finirebbe inoltrato a Gemini, che si paga a token.
+  const tooBig = enforceBodySize(req, PUBLIC_BODY_LIMIT, origin);
+
+  if (tooBig) return tooBig;
 
   const apiKey = Deno.env.get("GEMINI_API_KEY");
 
