@@ -2,10 +2,17 @@ import { corsHeaders, jsonResponse } from "../_shared/clients.ts";
 import { verifyAdmin } from "../_shared/auth.ts";
 import { getSql } from "../_shared/db.ts";
 import { sendInstagramDigest } from "../_shared/email.ts";
+import { isExportReliable, normalizeUsername } from "../_shared/instagram.ts";
 
 // POST on-demand dall'admin. Riceve il JSON GIÀ parsato dal client (lo ZIP non
-// arriva mai al server). Crea un nuovo follower_snapshot, fa il diff con il
-// precedente, scrive unfollow/follow events, notifica gli unfollower.
+// arriva mai al server). Crea un nuovo follower_snapshot accoppiato al relativo
+// following_snapshot, fa il diff col precedente, scrive unfollow/follow events,
+// notifica gli unfollower.
+//
+// Se l'export è troncato (molti meno nomi dei follower reali, tipico di un export
+// richiesto con periodo ristretto) lo snapshot viene salvato ma il diff NON viene
+// scritto: altrimenti centinaia di falsi unfollow finirebbero per sempre in churn,
+// fedeltà e grafici.
 
 type ExportFollower = { username: string; followedYouAt: string | null };
 
@@ -33,12 +40,19 @@ Deno.serve(async (req) => {
       following?: { username: string }[];
     };
 
-    followers = (body.followers ?? []).filter((f) => f?.username);
+    // Forma canonica lato server: il client normalizza già, ma la chiave delle
+    // tabelle è lo username e un solo record fuori forma rompe il diff per sempre.
+    followers = (body.followers ?? [])
+      .map((f) => ({
+        username: normalizeUsername(f?.username),
+        followedYouAt: f?.followedYouAt ?? null,
+      }))
+      .filter((f) => f.username);
     following = [
       ...new Set(
         (body.following ?? [])
-          .map((f) => f?.username)
-          .filter((u): u is string => !!u),
+          .map((f) => normalizeUsername(f?.username))
+          .filter((u) => !!u),
       ),
     ];
   } catch {
@@ -56,24 +70,74 @@ Deno.serve(async (req) => {
   const sql = getSql();
 
   try {
+    // Dedup per username (l'export può avere duplicati); vince chi ha la data.
+    const seen = new Map<string, ExportFollower>();
+
+    for (const f of followers) {
+      const prevEntry = seen.get(f.username);
+
+      if (!prevEntry || (!prevEntry.followedYouAt && f.followedYouAt)) {
+        seen.set(f.username, f);
+      }
+    }
+    const unique = [...seen.values()];
+
+    // Completezza dell'export, valutata PRIMA di scrivere qualsiasi evento e
+    // congelata sullo snapshot: a read-time non va più confrontata con un
+    // conteggio live, che crescendo invaliderebbe da solo la fotografia.
+    const account = await sql<{ followers_count: number }[]>`
+      select followers_count from instagram.account_snapshots
+      order by captured_at desc limit 1
+    `;
+    const accountFollowers = account[0]?.followers_count ?? null;
+    const reliable = isExportReliable(unique.length, accountFollowers);
+
     const prev = await sql<{ id: number }[]>`
       select id from instagram.follower_snapshots
       order by captured_at desc limit 1
     `;
     const prevId = prev[0]?.id ?? null;
 
+    // Lista "seguiti" (following): snapshot a parte, accoppiato a quello follower
+    // così il confronto non-mutuals non mescola mai fotografie di date diverse.
+    // Se l'export non porta i seguiti, riporto l'ultimo snapshot esistente.
+    let followingSnapshotId: number | null = null;
+
+    if (following.length > 0) {
+      const fsnap = await sql<{ id: number }[]>`
+        insert into instagram.following_snapshots (total_count)
+        values (${following.length})
+        returning id
+      `;
+
+      followingSnapshotId = fsnap[0].id;
+
+      for (let i = 0; i < following.length; i += CHUNK) {
+        const rows = following
+          .slice(i, i + CHUNK)
+          .map((username) => ({ snapshot_id: followingSnapshotId, username }));
+
+        await sql`
+          insert into instagram.following ${sql(rows, "snapshot_id", "username")}
+          on conflict (snapshot_id, username) do nothing
+        `;
+      }
+    } else {
+      const lastFollowing = await sql<{ id: number }[]>`
+        select id from instagram.following_snapshots
+        order by captured_at desc limit 1
+      `;
+
+      followingSnapshotId = lastFollowing[0]?.id ?? null;
+    }
+
     const created = await sql<{ id: number }[]>`
-      insert into instagram.follower_snapshots (source, total_count)
-      values ('export', ${followers.length})
+      insert into instagram.follower_snapshots
+        (source, total_count, reliable, following_snapshot_id)
+      values ('export', ${unique.length}, ${reliable}, ${followingSnapshotId})
       returning id
     `;
     const newId = created[0].id;
-
-    // Dedup per username (l'export può avere duplicati teorici); l'ultima vince.
-    const seen = new Map<string, ExportFollower>();
-
-    for (const f of followers) seen.set(f.username, f);
-    const unique = [...seen.values()];
 
     for (let i = 0; i < unique.length; i += CHUNK) {
       const rows = unique.slice(i, i + CHUNK).map((f) => ({
@@ -93,32 +157,12 @@ Deno.serve(async (req) => {
       `;
     }
 
-    // Lista "seguiti" (following): snapshot a parte, alimenta lo studio
-    // "chi ho smesso di seguire" (diff calcolato a read-time in admin-stats).
-    if (following.length > 0) {
-      const fsnap = await sql<{ id: number }[]>`
-        insert into instagram.following_snapshots (total_count)
-        values (${following.length})
-        returning id
-      `;
-      const fsnapId = fsnap[0].id;
-
-      for (let i = 0; i < following.length; i += CHUNK) {
-        const rows = following
-          .slice(i, i + CHUNK)
-          .map((username) => ({ snapshot_id: fsnapId, username }));
-
-        await sql`
-          insert into instagram.following ${sql(rows, "snapshot_id", "username")}
-          on conflict (snapshot_id, username) do nothing
-        `;
-      }
-    }
-
     let lost: { username: string; was_following_since: string | null }[] = [];
     let gained = 0;
 
-    if (prevId) {
+    // Diff solo su export completi: da uno troncato uscirebbero centinaia di
+    // falsi unfollow, permanenti e impossibili da distinguere a posteriori.
+    if (prevId && reliable) {
       lost = await sql<
         { username: string; was_following_since: string | null }[]
       >`
@@ -148,6 +192,26 @@ Deno.serve(async (req) => {
       gained = gainedRows.length;
     }
 
+    if (reliable) {
+      // L'export è ora la fonte di verità: le correzioni manuali "ora mi segue"
+      // hanno esaurito il loro scopo.
+      await sql`delete from instagram.relationship_overrides`;
+
+      // Le spunte "tolto" su profili che non segui più (o che ora ti ricambiano)
+      // non significano più niente: senza questa pulizia riemergono già barrate
+      // se il profilo rientra nella lista.
+      if (followingSnapshotId != null) {
+        await sql`
+          delete from instagram.marked_unfollowed m
+          where not exists (
+            select 1 from instagram.following f
+            where f.snapshot_id = ${followingSnapshotId}
+              and f.username = m.username
+          )
+        `;
+      }
+    }
+
     const fmt = (d: string | null) =>
       d ? new Date(d).toLocaleDateString("it-IT") : null;
 
@@ -170,6 +234,9 @@ Deno.serve(async (req) => {
         isFirstSnapshot: prevId === null,
         total: unique.length,
         gained,
+        partial: !reliable,
+        expected: accountFollowers,
+        got: unique.length,
         unfollowers: lost.map((u) => ({
           username: u.username,
           since: fmt(u.was_following_since),

@@ -7,6 +7,7 @@ import type {
   InstagramExportResponse,
   InstagramGrowthPoint,
   InstagramPost,
+  InstagramRelationships,
   InstagramSnapshotResponse,
   InstagramStatsResponse,
   InstagramVelocity,
@@ -113,6 +114,22 @@ type ParsedExport = {
 
 type SldEntry = { value: string; timestamp: number | null };
 
+// Forma canonica dello username: minuscolo, senza @ né slash. L'export non è
+// uniforme (lo username arriva da `value`, da `title` o dall'href, con case
+// diverso tra il file follower e quello dei seguiti) e le tabelle hanno la chiave
+// sullo username: senza questa normalizzazione la stessa persona conta due volte
+// e resta per sempre in "non ti ricambiano". Gemella di `normalizeUsername` in
+// supabase/functions/_shared/instagram.ts.
+function normalizeUsername(raw: unknown): string {
+  if (typeof raw !== "string") return "";
+
+  return raw
+    .trim()
+    .replace(/^@+/, "")
+    .replace(/^\/+|\/+$/g, "")
+    .toLowerCase();
+}
+
 // Ricava lo username dall'href Instagram (es. ".../_u/mario.rossi" → "mario.rossi").
 function hrefUsername(href: unknown): string | null {
   if (typeof href !== "string") return null;
@@ -146,10 +163,11 @@ function deepStringListValues(node: unknown, out: SldEntry[]): void {
       href?: string;
       timestamp?: number;
     }[]) {
-      const value =
+      const value = normalizeUsername(
         (typeof s?.value === "string" && s.value) ||
-        title ||
-        hrefUsername(s?.href);
+          title ||
+          hrefUsername(s?.href),
+      );
 
       if (value) out.push({ value, timestamp: s?.timestamp ?? null });
     }
@@ -160,9 +178,10 @@ function deepStringListValues(node: unknown, out: SldEntry[]): void {
 }
 
 // Estrae follower (con data) e seguiti da uno ZIP export Instagram, lato client.
-// Classifica i file come followers/following per nome O per chiave JSON
-// (relationships_followers / relationships_following), poi estrae gli username
-// con uno scan profondo (robusto a chiavi e annidamenti diversi).
+// Un file conta solo se è riconosciuto ESPLICITAMENTE come followers o following,
+// per nome file o per chiave JSON (relationships_followers/relationships_following):
+// la cartella `followers_and_following/` contiene anche close_friends, blocked,
+// restricted, pending_requests… che non devono finire nelle liste.
 async function parseExportZip(file: File): Promise<ParsedExport> {
   const zip = await JSZip.loadAsync(file);
 
@@ -172,13 +191,13 @@ async function parseExportZip(file: File): Promise<ParsedExport> {
   for (const path of Object.keys(zip.files)) {
     if (zip.files[path].dir || !/\.json$/i.test(path)) continue;
 
-    const isFollowing = /(^|\/)following(_\d+)?\.json$/i.test(path);
-    const isFollowers = /(^|\/)followers(_\d+)?\.json$/i.test(path);
+    const isFollowingFile = /(^|\/)following(_\d+)?\.json$/i.test(path);
+    const isFollowersFile = /(^|\/)followers(_\d+)?\.json$/i.test(path);
 
-    // Parsa solo i file rilevanti (evita media/ads pesanti).
+    // Parsa solo i file plausibili (evita media/ads pesanti).
     if (
-      !isFollowing &&
-      !isFollowers &&
+      !isFollowingFile &&
+      !isFollowersFile &&
       !/followers_and_following/i.test(path)
     ) {
       continue;
@@ -198,20 +217,28 @@ async function parseExportZip(file: File): Promise<ParsedExport> {
         : null;
     const followingArr = obj?.relationships_following;
     const followersArr = obj?.relationships_followers;
+
+    const isFollowing = isFollowingFile || Array.isArray(followingArr);
+    const isFollowers = isFollowersFile || Array.isArray(followersArr);
+
+    // Né l'uno né l'altro: è uno degli altri file della cartella, si ignora.
+    if (!isFollowing && !isFollowers) continue;
+
     const values: SldEntry[] = [];
 
-    // Following: per nome file o per chiave. Estrae dalla chiave se presente,
-    // altrimenti scandaglia l'intero file (es. followers/following sono soli).
-    if (isFollowing || Array.isArray(followingArr)) {
+    if (isFollowing) {
       deepStringListValues(followingArr ?? json, values);
       for (const e of values) followingSet.add(e.value);
-    } else if (isFollowers || Array.isArray(followersArr)) {
+    } else {
       deepStringListValues(followersArr ?? json, values);
       for (const e of values) {
-        followerMap.set(
-          e.value,
-          e.timestamp ? new Date(e.timestamp * 1000).toISOString() : null,
-        );
+        // Se lo stesso username compare più volte tengo la data, non il null.
+        const prev = followerMap.get(e.value);
+        const next = e.timestamp
+          ? new Date(e.timestamp * 1000).toISOString()
+          : null;
+
+        if (prev == null) followerMap.set(e.value, next);
       }
     }
   }
@@ -242,12 +269,19 @@ export default function InstagramSection({ session }: { session: Session }) {
   const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [marked, setMarked] = useState<Set<string>>(new Set());
   const [tags, setTags] = useState<Record<string, InstagramAccountTag>>({});
+  const [overrides, setOverrides] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Sincronizza le spunte "tolto" con la verità del server a ogni fetch.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMarked(new Set(stats?.markedUnfollowed ?? []));
   }, [stats?.markedUnfollowed]);
+
+  useEffect(() => {
+    // Idem per le correzioni manuali "ora mi segue".
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOverrides(new Set(stats?.relationships?.overrides ?? []));
+  }, [stats?.relationships?.overrides]);
 
   useEffect(() => {
     // Idem per i tag manuali (username → persona/vip/pagina).
@@ -331,6 +365,50 @@ export default function InstagramSection({ session }: { session: Session }) {
     [session.access_token],
   );
 
+  // "Ora mi segue": correzione manuale del buco tra due export. La Graph API non
+  // espone la lista follower, quindi finché non ricarichi lo ZIP nessuno può
+  // sapere che quel profilo ha ricominciato a seguirti. Il prossimo export
+  // completo azzera l'override e torna a essere la fonte di verità.
+  const toggleOverride = useCallback(
+    async (username: string, value: boolean) => {
+      setOverrides((prev) => {
+        const next = new Set(prev);
+
+        if (value) next.add(username);
+        else next.delete(username);
+
+        return next;
+      });
+      try {
+        const res = await fetch(`${EF_BASE}/admin-instagram-mark`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            username,
+            override: value ? "follows_you" : null,
+          }),
+        });
+        const data = (await res.json()) as { ok?: boolean };
+
+        if (!data.ok) throw new Error();
+      } catch {
+        toast.danger("Errore nel salvataggio della correzione");
+        setOverrides((prev) => {
+          const next = new Set(prev);
+
+          if (value) next.delete(username);
+          else next.add(username);
+
+          return next;
+        });
+      }
+    },
+    [session.access_token],
+  );
+
   const fetchStats = useCallback(async () => {
     try {
       const res = await fetch(`${EF_BASE}/admin-instagram-stats`, {
@@ -363,10 +441,11 @@ export default function InstagramSection({ session }: { session: Session }) {
       }
 
       // I non-mutuals vengono calcolati lato server (persistenti) dopo l'upload.
-      // Qui avvisiamo soltanto se l'export non conteneva la lista "Seguiti".
+      // Senza la lista "Seguiti" il server riusa quella dell'ultimo export: le
+      // relazioni restano calcolabili, ma il lato "chi segui" è vecchio.
       if (following.length === 0) {
         toast.danger(
-          "Lista 'Seguiti' non trovata nell'export: il confronto non-mutuals resta vuoto. Riscarica includendo anche i Seguiti.",
+          "Lista 'Seguiti' non trovata nell'export: le relazioni useranno i seguiti dell'export precedente. Riscarica includendo anche i Seguiti.",
         );
       }
 
@@ -386,11 +465,17 @@ export default function InstagramSection({ session }: { session: Session }) {
 
       if (data.ok) {
         setExportResult(data);
-        toast.success(
-          data.isFirstSnapshot
-            ? `Primo snapshot salvato (${data.total} follower)`
-            : `Diff completato: ${data.unfollowers?.length ?? 0} unfollower`,
-        );
+        if (data.partial) {
+          toast.danger(
+            `Export incompleto (${data.got} nomi su ${data.expected} follower): snapshot salvato, diff non calcolato.`,
+          );
+        } else {
+          toast.success(
+            data.isFirstSnapshot
+              ? `Primo snapshot salvato (${data.total} follower)`
+              : `Diff completato: ${data.unfollowers?.length ?? 0} unfollower`,
+          );
+        }
         fetchStats();
       } else {
         toast.danger(data.error ?? "Errore durante l'upload");
@@ -469,6 +554,7 @@ export default function InstagramSection({ session }: { session: Session }) {
           dragOver={dragOver}
           exportResult={exportResult}
           marked={marked}
+          overrides={overrides}
           parsing={parsing}
           setDragOver={setDragOver}
           stats={stats}
@@ -477,6 +563,7 @@ export default function InstagramSection({ session }: { session: Session }) {
           onPick={handleZip}
           onSetTag={setTag}
           onToggleMark={toggleMark}
+          onToggleOverride={toggleOverride}
         />
       )}
 
@@ -1552,8 +1639,10 @@ function FollowerView({
   exportResult,
   stats,
   marked,
+  overrides,
   tags,
   onToggleMark,
+  onToggleOverride,
   onSetTag,
 }: {
   parsing: boolean;
@@ -1564,14 +1653,16 @@ function FollowerView({
   exportResult: InstagramExportResponse | null;
   stats: InstagramStatsResponse | null;
   marked: Set<string>;
+  overrides: Set<string>;
   tags: Record<string, InstagramAccountTag>;
   onToggleMark: (username: string, value: boolean) => void;
+  onToggleOverride: (username: string, value: boolean) => void;
   onSetTag: (username: string, tag: InstagramAccountTag | null) => void;
 }) {
   const recentUnfollowers = stats?.recentUnfollowers ?? [];
   const flow = stats?.flow ?? [];
   const changes = stats?.followingChanges;
-  const nonMutuals = stats?.nonMutuals;
+  const relationships = stats?.relationships;
   const demo = stats?.demographics;
   const tenureDays = useMemo(
     () => unfollowerTenure(recentUnfollowers),
@@ -1758,7 +1849,17 @@ function FollowerView({
 
         {exportResult && (
           <div className="rounded-xl border border-default-100 bg-default-50 p-4 flex flex-col gap-3">
-            {exportResult.isFirstSnapshot ? (
+            {exportResult.partial ? (
+              <p className="text-sm text-warning leading-relaxed">
+                Export incompleto: <strong>{exportResult.got}</strong> nomi
+                trovati a fronte di <strong>{exportResult.expected}</strong>{" "}
+                follower reali. Lo snapshot è stato salvato, ma il confronto con
+                il precedente <strong>non</strong> è stato calcolato: da un file
+                troncato uscirebbero centinaia di falsi unfollower, permanenti.
+                Riscarica l&apos;export su{" "}
+                <strong>&quot;Da sempre&quot;</strong> e ricaricalo.
+              </p>
+            ) : exportResult.isFirstSnapshot ? (
               <p className="text-sm text-default-600">
                 Primo snapshot salvato con <strong>{exportResult.total}</strong>{" "}
                 follower. Carica un nuovo export più avanti per vedere il diff.
@@ -1793,37 +1894,17 @@ function FollowerView({
           </div>
         )}
 
-        {/* Lista principale: chi non ricambia il tuo follow (persistente) */}
-        {nonMutuals?.available ? (
-          nonMutuals.reliable ? (
-            <UnfollowManager
-              marked={marked}
-              tags={tags}
-              users={nonMutuals.notFollowingBack}
-              onSetTag={onSetTag}
-              onToggle={onToggleMark}
-            />
-          ) : (
-            <div className="rounded-xl border border-warning/40 bg-warning-soft/30 p-4">
-              <h3 className="text-sm font-semibold text-warning">
-                Export follower incompleto
-              </h3>
-              <p className="text-xs text-default-500 mt-1 leading-relaxed">
-                Il file follower caricato contiene molti meno nomi dei tuoi
-                follower reali: probabilmente l&apos;export è stato richiesto
-                con un <strong>periodo ristretto</strong>. La lista &quot;Non ti
-                ricambiano&quot; sarebbe piena di falsi positivi, quindi è
-                nascosta. Riscarica l&apos;export su{" "}
-                <strong>&quot;Da sempre&quot;</strong> e ricaricalo.
-              </p>
-            </div>
-          )
-        ) : (
-          <p className="text-xs text-default-400 text-center">
-            Per vedere chi segui che non ti ricambia, carica un export che
-            includa anche la lista <strong>Seguiti</strong>.
-          </p>
-        )}
+        {/* Card relazioni: sempre presente, non dipende dall'upload */}
+        <RelationshipsCard
+          marked={marked}
+          overrides={overrides}
+          relationships={relationships}
+          serverMarked={stats?.markedUnfollowed}
+          tags={tags}
+          onSetTag={onSetTag}
+          onToggle={onToggleMark}
+          onToggleOverride={onToggleOverride}
+        />
 
         {/* Studio storico (richiede ≥2 export) */}
         {changes &&
@@ -1907,38 +1988,121 @@ function FollowerView({
   );
 }
 
-// Lista "Non ti ricambiano": tutti gli username, con spunta "tolto" persistente
-// e tag manuale (persona/vip/pagina) per filtrare.
-function UnfollowManager({
-  users,
+// Card "Relazioni": la fotografia dell'ultimo export in tre liste (reciproci /
+// non ti ricambiano / ti seguono). È SEMPRE renderizzata — anche senza nessun
+// export ancora caricato — perché è una sezione stabile della pagina, non l'esito
+// di un upload.
+//
+// Le liste sono ferme all'ultimo export: la Graph API non espone la lista
+// follower, quindi tra un upload e l'altro non c'è modo di accorgersi che
+// qualcuno ha ricominciato a seguirti. Per questo la testata mostra sempre l'età
+// dell'export e "Non ti ricambiano" ha l'azione "ora mi segue" (override manuale,
+// azzerato dal prossimo export completo).
+
+type RelationList = "mutuals" | "notFollowingBack" | "fans";
+
+const RELATION_LABELS: Record<RelationList, string> = {
+  mutuals: "Reciproci",
+  notFollowingBack: "Non ricambiano",
+  fans: "Ti seguono",
+};
+
+// Oltre questa età l'export è troppo vecchio per fidarsi delle liste (il cron
+// manda già un promemoria settimanale).
+const STALE_EXPORT_DAYS = 14;
+
+const daysSince = (iso: string | null | undefined): number | null => {
+  if (!iso) return null;
+  const ms = Date.now() - new Date(iso).getTime();
+
+  return ms > 0 ? Math.floor(ms / 86_400_000) : 0;
+};
+
+function RelationshipsCard({
+  relationships,
   marked,
+  serverMarked,
+  overrides,
   tags,
   onToggle,
+  onToggleOverride,
   onSetTag,
 }: {
-  users: string[];
+  relationships: InstagramRelationships | undefined;
   marked: Set<string>;
+  // Verità del server sulle spunte: cambia solo a ogni fetch, non ai toggle
+  // ottimistici. Serve a congelare l'ordinamento senza farlo reagire ai click.
+  serverMarked: string[] | undefined;
+  overrides: Set<string>;
   tags: Record<string, InstagramAccountTag>;
   onToggle: (username: string, value: boolean) => void;
+  onToggleOverride: (username: string, value: boolean) => void;
   onSetTag: (username: string, tag: InstagramAccountTag | null) => void;
 }) {
-  // Filtro (come il filtro stato negli iscritti). "none" = senza tag,
-  // "eliminati" = quelli già spuntati come tolti.
-  // Default automatico: "senza tag" finché ci sono profili ancora da taggare
-  // (così li triaggi), poi "persona" (i profili da controllare). La scelta
-  // manuale dell'utente (pickedFilter) ha sempre la precedenza.
+  const [list, setList] = useState<RelationList>("notFollowingBack");
   const [pickedFilter, setPickedFilter] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+
+  // Le liste dal server hanno già applicato gli override noti al momento del
+  // fetch; qui riapplico quelli cambiati DOPO, così "ora mi segue" (e il suo
+  // annullamento) sposta la riga all'istante invece che al prossimo caricamento.
+  const serverOverrides = useMemo(
+    () => new Set(relationships?.overrides ?? []),
+    [relationships?.overrides],
+  );
+
+  const mutuals = useMemo(() => {
+    const base = (relationships?.mutuals ?? []).filter(
+      (u) => !serverOverrides.has(u) || overrides.has(u),
+    );
+    const added = (relationships?.notFollowingBack ?? []).filter((u) =>
+      overrides.has(u),
+    );
+
+    return [...base, ...added].sort((a, b) => a.localeCompare(b));
+  }, [relationships, serverOverrides, overrides]);
+
+  const notFollowingBack = useMemo(() => {
+    const base = (relationships?.notFollowingBack ?? []).filter(
+      (u) => !overrides.has(u),
+    );
+    const restored = (relationships?.mutuals ?? []).filter(
+      (u) => serverOverrides.has(u) && !overrides.has(u),
+    );
+
+    return [...base, ...restored].sort((a, b) => a.localeCompare(b));
+  }, [relationships, serverOverrides, overrides]);
+
+  const fans = relationships?.fans ?? [];
+
+  const counts = {
+    mutuals: mutuals.length,
+    notFollowingBack: notFollowingBack.length,
+    fans: fans.length,
+  };
+  const users =
+    list === "mutuals"
+      ? mutuals
+      : list === "notFollowingBack"
+        ? notFollowingBack
+        : fans;
+
+  // Spunta "tolto" e tag hanno senso solo su chi non ti ricambia: è l'unica lista
+  // su cui stai decidendo se togliere il follow.
+  const manageable = list === "notFollowingBack";
+
+  // Default: "senza tag" solo se ci sono davvero profili da triare, altrimenti
+  // "tutti". Prima saltava da solo su "persona" nascondendo vip e pagine.
   const autoFilter = useMemo(
-    () => (users.some((u) => !tags[u]) ? "none" : "persona"),
+    () => (users.some((u) => !tags[u]) ? "none" : "all"),
     [users, tags],
   );
-  const tagFilter = pickedFilter ?? autoFilter;
+  const tagFilter = manageable ? (pickedFilter ?? autoFilter) : "all";
 
-  // Base filtrata per tag: NON dipende da `marked`, così spuntare "tolto" non
-  // riordina/rimuove la riga all'istante (vedi sotto). "all"/"eliminati"
-  // partono da tutti.
-  const tagFiltered = useMemo(() => {
+  const filtered = useMemo(() => {
     if (tagFilter === "none") return users.filter((u) => !tags[u]);
+    if (tagFilter === "eliminati") return users.filter((u) => marked.has(u));
     if (
       tagFilter === "persona" ||
       tagFilter === "vip" ||
@@ -1948,53 +2112,53 @@ function UnfollowManager({
     }
 
     return users;
-  }, [users, tags, tagFilter]);
+    // `marked` serve solo al filtro "eliminati"; per gli altri l'ordine e il
+    // contenuto non devono cambiare quando spunti una riga.
+  }, [users, tags, tagFilter, tagFilter === "eliminati" ? marked : null]);
 
-  // Solo "eliminati" filtra per `marked` (e quindi si aggiorna subito quando
-  // spunti/togli). Negli altri filtri ritorna lo STESSO riferimento di
-  // tagFiltered, così `sorted` non ricalcola e l'ordine resta congelato.
-  const filtered = useMemo(
-    () =>
-      tagFilter === "eliminati"
-        ? tagFiltered.filter((u) => marked.has(u))
-        : tagFiltered,
-    [tagFiltered, tagFilter, marked],
+  const listKey = `${list}|${filtered.length}|${tagFilter}`;
+
+  // Da gestire in cima (alfabetico), già tolti in fondo. L'ordine è "congelato":
+  // spuntare un nome NON lo fa saltare in fondo all'istante (sarebbe disorientante
+  // in una lista lunga), viene solo barrato sul posto — si riordina quando cambia
+  // la lista mostrata o quando arrivano dati nuovi dal server.
+  //
+  // Il congelamento parte da `serverMarked`, non dallo stato ottimistico `marked`:
+  // quest'ultimo è impostato da un effect del componente padre, che React esegue
+  // DOPO quelli dei figli, quindi qui arriverebbe sempre un giro in ritardo — è la
+  // ragione per cui al caricamento pagina i profili già spuntati non finivano mai
+  // in fondo.
+  const frozenMarked = useMemo(
+    () => new Set(serverMarked ?? []),
+    // `listKey` riordina al cambio di lista/filtro; `serverMarked` al refetch.
+    [listKey, serverMarked],
   );
 
-  // Da gestire in cima (alfabetico), già tolti in fondo. L'ordine è "congelato"
-  // sulla lista corrente: spuntare un nome NON lo fa saltare in fondo all'istante
-  // (sarebbe disorientante in una lista lunga), viene solo barrato sul posto. Si
-  // riordina quando cambia la lista filtrata (nuovo upload o cambio filtro).
   const sorted = useMemo(
     () =>
       [...filtered].sort((a, b) => {
-        const ma = marked.has(a);
-        const mb = marked.has(b);
+        const ma = frozenMarked.has(a);
+        const mb = frozenMarked.has(b);
 
         if (ma !== mb) return ma ? 1 : -1;
 
         return a.localeCompare(b);
       }),
-    [filtered],
+    [filtered, frozenMarked],
   );
-
-  // Paginazione come la lista newsletter: niente scroll interno infinito, la
-  // pagina resta corta. Reset a pagina 1 quando cambia la lista (nuovo upload).
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(15);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPage(1);
-  }, [users]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
   const current = Math.min(page, totalPages);
   const pageItems = sorted.slice((current - 1) * pageSize, current * pageSize);
 
+  // Torna a pagina 1 quando cambia davvero la lista mostrata, non a ogni refetch
+  // delle statistiche (`users` è una nuova reference ogni volta).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(1);
+  }, [listKey]);
+
   // Seleziona-tutti come negli iscritti: agisce sui soli elementi in pagina.
-  // La checkbox per riga È lo stato "tolto", quindi il select-all spunta o
-  // toglie la spunta a tutti i profili della pagina corrente.
   const allOnPageSelected =
     pageItems.length > 0 && pageItems.every((u) => marked.has(u));
   const someOnPageSelected =
@@ -2007,186 +2171,329 @@ function UnfollowManager({
     }
   };
 
+  const age = daysSince(relationships?.capturedAt);
+  const stale = age != null && age > STALE_EXPORT_DAYS;
+
   return (
-    <div className="rounded-xl border border-default-100 bg-default-50 p-4 flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h3 className="text-sm font-semibold">
-            Non ti ricambiano ({users.length})
-          </h3>
+    <div className="rounded-xl border border-default-100 bg-default-50 p-4 flex flex-col gap-3">
+      {/* Testata: cosa stai guardando e a che data è ferma */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold">Relazioni</h3>
+          <p className="text-[10px] text-default-400">
+            {relationships?.capturedAt
+              ? `Fotografia dell'ultimo export · ${dateFmt(
+                  relationships.capturedAt,
+                )}${age != null ? ` (${age === 0 ? "oggi" : `${age}gg fa`})` : ""}`
+              : "Nessun export ancora caricato"}
+          </p>
         </div>
-        {users.length > 0 && (
-          <AdminSelect
-            aria-label="Filtra per tag"
-            className="w-auto min-w-28 shrink-0"
-            options={[
-              { key: "all", label: "Tutti" },
-              ...TAG_OPTIONS.map((t) => ({ key: t.key, label: t.label })),
-              { key: "none", label: "Senza tag" },
-              { key: "eliminati", label: "Eliminati" },
-            ]}
-            selectedKey={tagFilter}
-            onSelectionChange={(key) => {
-              if (key != null) {
-                setPickedFilter(String(key));
-                setPage(1);
-              }
-            }}
-          />
-        )}
+        <div className="flex flex-wrap gap-1.5">
+          {stale && (
+            <Chip color="warning" size="sm" variant="soft">
+              Export vecchio
+            </Chip>
+          )}
+          {relationships?.available && !relationships.reliable && (
+            <Chip color="danger" size="sm" variant="soft">
+              Export incompleto
+            </Chip>
+          )}
+          {overrides.size > 0 && (
+            <Chip color="default" size="sm" variant="soft">
+              {overrides.size} corretti a mano
+            </Chip>
+          )}
+        </div>
       </div>
 
-      {users.length === 0 ? (
-        <p className="text-xs text-default-400 py-4 text-center">
-          Tutti i tuoi seguiti ti ricambiano 🎉
-        </p>
-      ) : sorted.length === 0 ? (
-        <p className="text-xs text-default-400 py-4 text-center">
-          Nessun profilo con questo filtro.
+      {!relationships?.available ? (
+        <p className="text-xs text-default-400 py-6 text-center leading-relaxed">
+          Carica un export che includa <strong>Follower</strong> e{" "}
+          <strong>Seguiti</strong> per vedere chi ti ricambia, chi no e chi ti
+          segue senza essere ricambiato.
         </p>
       ) : (
         <>
-          {/* Header colonne con seleziona-tutti, come la lista iscritti */}
-          <div className="flex items-center gap-3 px-2 pb-2 border-b border-default-200 text-xs font-medium text-default-400 uppercase tracking-wide">
-            <Checkbox
-              aria-label="Spunta tutti i profili in pagina"
-              isIndeterminate={someOnPageSelected}
-              isSelected={allOnPageSelected}
-              onChange={toggleSelectAllOnPage}
-            >
-              <CheckboxContent>
-                <CheckboxControl>
-                  <CheckboxIndicator />
-                </CheckboxControl>
-              </CheckboxContent>
-            </Checkbox>
-            <span className="flex-1">Profilo</span>
+          {!relationships.reliable && (
+            <p className="text-xs text-default-500 leading-relaxed rounded-lg bg-warning-soft/30 border border-warning/40 p-3">
+              L&apos;ultimo export conteneva molti meno follower di quelli reali
+              (probabilmente richiesto con un <strong>periodo ristretto</strong>
+              ): le liste qui sotto contengono falsi positivi. Riscarica
+              l&apos;export su <strong>&quot;Da sempre&quot;</strong> e
+              ricaricalo.
+            </p>
+          )}
+
+          {/* Selettore lista + filtro tag */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex gap-1.5 flex-wrap">
+              {(Object.keys(RELATION_LABELS) as RelationList[]).map((key) => (
+                <Button
+                  key={key}
+                  className="rounded-xl font-semibold px-3"
+                  size="sm"
+                  variant={list === key ? "danger" : "outline"}
+                  onPress={() => setList(key)}
+                >
+                  {RELATION_LABELS[key]} {counts[key]}
+                </Button>
+              ))}
+            </div>
+            {manageable && users.length > 0 && (
+              <AdminSelect
+                aria-label="Filtra per tag"
+                className="w-auto min-w-28 shrink-0"
+                options={[
+                  { key: "all", label: "Tutti" },
+                  ...TAG_OPTIONS.map((t) => ({ key: t.key, label: t.label })),
+                  { key: "none", label: "Senza tag" },
+                  { key: "eliminati", label: "Eliminati" },
+                ]}
+                selectedKey={tagFilter}
+                onSelectionChange={(key) => {
+                  if (key != null) {
+                    setPickedFilter(String(key));
+                    setPage(1);
+                  }
+                }}
+              />
+            )}
           </div>
 
-          <div className="flex flex-col">
-            {pageItems.map((u) => {
-              const isMarked = marked.has(u);
+          {users.length === 0 ? (
+            <p className="text-xs text-default-400 py-4 text-center">
+              {list === "notFollowingBack"
+                ? "Tutti i tuoi seguiti ti ricambiano 🎉"
+                : list === "fans"
+                  ? "Segui tutti quelli che ti seguono."
+                  : "Nessun profilo reciproco."}
+            </p>
+          ) : sorted.length === 0 ? (
+            <p className="text-xs text-default-400 py-4 text-center">
+              Nessun profilo con questo filtro.
+            </p>
+          ) : (
+            <>
+              {manageable && (
+                <div className="flex items-center gap-3 px-2 pb-2 border-b border-default-200 text-xs font-medium text-default-400 uppercase tracking-wide">
+                  <Checkbox
+                    aria-label="Spunta tutti i profili in pagina"
+                    isIndeterminate={someOnPageSelected}
+                    isSelected={allOnPageSelected}
+                    onChange={toggleSelectAllOnPage}
+                  >
+                    <CheckboxContent>
+                      <CheckboxControl>
+                        <CheckboxIndicator />
+                      </CheckboxControl>
+                    </CheckboxContent>
+                  </Checkbox>
+                  <span className="flex-1">Profilo</span>
+                </div>
+              )}
 
-              // Stesso pattern della lista newsletter: la riga gestisce il
-              // click (checkbox solo visiva), il nome è un link che apre il
-              // profilo. Il click/tasto su username e tendina categoria NON deve
-              // togglare la spunta: lo escludiamo controllando il target.
-              const fromControl = (target: EventTarget) =>
-                (target as HTMLElement).closest("[data-no-row-toggle]") != null;
+              <div className="flex flex-col">
+                {pageItems.map((u) =>
+                  manageable ? (
+                    <ManageableRow
+                      key={u}
+                      isMarked={marked.has(u)}
+                      tag={tags[u]}
+                      username={u}
+                      onSetTag={onSetTag}
+                      onToggle={onToggle}
+                      onToggleOverride={onToggleOverride}
+                    />
+                  ) : overrides.has(u) ? (
+                    <OverrideRow
+                      key={u}
+                      username={u}
+                      onUndo={onToggleOverride}
+                    />
+                  ) : (
+                    <UserRow key={u} username={u} />
+                  ),
+                )}
+              </div>
 
-              return (
-                <div
-                  key={u}
-                  aria-pressed={isMarked}
-                  className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-xl border-b border-default-100 text-sm hover:bg-default-50 transition-colors cursor-pointer select-none"
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    if (!fromControl(e.target)) onToggle(u, !isMarked);
-                  }}
-                  onKeyDown={(e) => {
-                    if (fromControl(e.target)) return;
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      onToggle(u, !isMarked);
+              <div className="flex items-center justify-center gap-2 pt-1">
+                <Button
+                  isIconOnly
+                  aria-label="Pagina precedente"
+                  className="rounded-xl"
+                  isDisabled={current <= 1}
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => setPage(current - 1)}
+                >
+                  ←
+                </Button>
+                <span className="text-sm text-default-500 whitespace-nowrap px-1">
+                  {current} / {totalPages}
+                </span>
+                <Button
+                  isIconOnly
+                  aria-label="Pagina successiva"
+                  className="rounded-xl"
+                  isDisabled={current >= totalPages}
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => setPage(current + 1)}
+                >
+                  →
+                </Button>
+                <AdminSelect
+                  aria-label="Profili per pagina"
+                  className="w-16 sm:w-20 ml-1"
+                  options={PAGE_SIZE_OPTIONS.map((n) => ({
+                    key: String(n),
+                    label: String(n),
+                  }))}
+                  selectedKey={String(pageSize)}
+                  onSelectionChange={(key) => {
+                    if (key != null) {
+                      setPageSize(Number(key));
+                      setPage(1);
                     }
                   }}
-                >
-                  <Checkbox
-                    aria-label={`Segna ${u} come tolto`}
-                    className="pointer-events-none"
-                    isSelected={isMarked}
-                  >
-                    <CheckboxControl>
-                      <CheckboxIndicator />
-                    </CheckboxControl>
-                  </Checkbox>
-                  <a
-                    data-no-row-toggle
-                    className={clsx(
-                      "flex-1 min-w-0 truncate font-medium hover:underline",
-                      isMarked && "line-through text-default-400",
-                    )}
-                    href={`https://instagram.com/${u}`}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    @{u}
-                  </a>
-                  <div data-no-row-toggle>
-                    <AdminSelect
-                      aria-label={`Categoria di ${u}`}
-                      className="w-28 shrink-0"
-                      options={[
-                        { key: "none", label: "Categoria" },
-                        ...TAG_OPTIONS.map((t) => ({
-                          key: t.key,
-                          label: t.label,
-                        })),
-                      ]}
-                      selectedKey={tags[u] ?? "none"}
-                      triggerClassName={
-                        tags[u] ? TAG_TRIGGER_CLASS[tags[u]] : undefined
-                      }
-                      onSelectionChange={(key) =>
-                        onSetTag(
-                          u,
-                          key && key !== "none"
-                            ? (String(key) as InstagramAccountTag)
-                            : null,
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center justify-center gap-2 pt-1">
-            <Button
-              isIconOnly
-              aria-label="Pagina precedente"
-              className="rounded-xl"
-              isDisabled={current <= 1}
-              size="sm"
-              variant="secondary"
-              onPress={() => setPage(current - 1)}
-            >
-              ←
-            </Button>
-            <span className="text-sm text-default-500 whitespace-nowrap px-1">
-              {current} / {totalPages}
-            </span>
-            <Button
-              isIconOnly
-              aria-label="Pagina successiva"
-              className="rounded-xl"
-              isDisabled={current >= totalPages}
-              size="sm"
-              variant="secondary"
-              onPress={() => setPage(current + 1)}
-            >
-              →
-            </Button>
-            <AdminSelect
-              aria-label="Profili per pagina"
-              className="w-16 sm:w-20 ml-1"
-              options={PAGE_SIZE_OPTIONS.map((n) => ({
-                key: String(n),
-                label: String(n),
-              }))}
-              selectedKey={String(pageSize)}
-              onSelectionChange={(key) => {
-                if (key != null) {
-                  setPageSize(Number(key));
-                  setPage(1);
-                }
-              }}
-            />
-          </div>
+                />
+              </div>
+            </>
+          )}
         </>
       )}
+    </div>
+  );
+}
+
+// Riga di un profilo spostato a mano tra i reciproci con "ora mi segue": resta
+// distinguibile e annullabile finché il prossimo export non conferma.
+function OverrideRow({
+  username,
+  onUndo,
+}: {
+  username: string;
+  onUndo: (username: string, value: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-2 px-2 border-b border-default-100 text-sm">
+      <a
+        className="min-w-0 truncate font-medium hover:underline"
+        href={`https://instagram.com/${username}`}
+        rel="noreferrer"
+        target="_blank"
+      >
+        @{username}
+      </a>
+      <div className="flex items-center gap-2 shrink-0">
+        <span className="text-[10px] text-default-400 hidden sm:inline">
+          corretto a mano · da confermare al prossimo export
+        </span>
+        <Button
+          aria-label={`Annulla la correzione su ${username}`}
+          className="rounded-xl"
+          size="sm"
+          variant="outline"
+          onPress={() => onUndo(username, false)}
+        >
+          Annulla
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Riga della lista "Non ti ricambiano": spunta "tolto", tag manuale e la
+// correzione "ora mi segue". La riga intera toggla la spunta; username, tendina e
+// pulsante di correzione sono esclusi via `data-no-row-toggle`.
+function ManageableRow({
+  username,
+  isMarked,
+  tag,
+  onToggle,
+  onToggleOverride,
+  onSetTag,
+}: {
+  username: string;
+  isMarked: boolean;
+  tag: InstagramAccountTag | undefined;
+  onToggle: (username: string, value: boolean) => void;
+  onToggleOverride: (username: string, value: boolean) => void;
+  onSetTag: (username: string, tag: InstagramAccountTag | null) => void;
+}) {
+  const fromControl = (target: EventTarget) =>
+    (target as HTMLElement).closest("[data-no-row-toggle]") != null;
+
+  return (
+    <div
+      aria-pressed={isMarked}
+      className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-xl border-b border-default-100 text-sm hover:bg-default-50 transition-colors cursor-pointer select-none"
+      role="button"
+      tabIndex={0}
+      onClick={(e) => {
+        if (!fromControl(e.target)) onToggle(username, !isMarked);
+      }}
+      onKeyDown={(e) => {
+        if (fromControl(e.target)) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onToggle(username, !isMarked);
+        }
+      }}
+    >
+      <Checkbox
+        aria-label={`Segna ${username} come tolto`}
+        className="pointer-events-none"
+        isSelected={isMarked}
+      >
+        <CheckboxControl>
+          <CheckboxIndicator />
+        </CheckboxControl>
+      </Checkbox>
+      <a
+        data-no-row-toggle
+        className={clsx(
+          "flex-1 min-w-0 truncate font-medium hover:underline",
+          isMarked && "line-through text-default-400",
+        )}
+        href={`https://instagram.com/${username}`}
+        rel="noreferrer"
+        target="_blank"
+      >
+        @{username}
+      </a>
+      <div data-no-row-toggle className="shrink-0">
+        <Button
+          aria-label={`${username} ora ti segue`}
+          className="rounded-xl"
+          size="sm"
+          variant="outline"
+          onPress={() => onToggleOverride(username, true)}
+        >
+          Ora mi segue
+        </Button>
+      </div>
+      <div data-no-row-toggle>
+        <AdminSelect
+          aria-label={`Categoria di ${username}`}
+          className="w-28 shrink-0"
+          options={[
+            { key: "none", label: "Categoria" },
+            ...TAG_OPTIONS.map((t) => ({ key: t.key, label: t.label })),
+          ]}
+          selectedKey={tag ?? "none"}
+          triggerClassName={tag ? TAG_TRIGGER_CLASS[tag] : undefined}
+          onSelectionChange={(key) =>
+            onSetTag(
+              username,
+              key && key !== "none"
+                ? (String(key) as InstagramAccountTag)
+                : null,
+            )
+          }
+        />
+      </div>
     </div>
   );
 }

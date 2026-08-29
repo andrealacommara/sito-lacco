@@ -187,69 +187,122 @@ Deno.serve(async (req) => {
       startedFollowing = started.map((r) => r.username);
     }
 
-    // Non-mutuals persistenti: confronto ultimo snapshot follower ↔ ultimo
-    // snapshot seguiti. Solo se esiste almeno uno snapshot dei seguiti (altrimenti
-    // tutti i follower risulterebbero erroneamente "non ricambiati").
-    let nonMutuals: {
-      available: boolean;
-      reliable: boolean;
-      notFollowingBack: string[];
-      fans: string[];
-    } = { available: false, reliable: true, notFollowingBack: [], fans: [] };
-
-    const hasFollowing = await sql<{ c: number }[]>`
-      select count(*)::int as c from instagram.following_snapshots
+    // Relazioni: reciproci / non ti ricambiano / ti seguono, dall'ultimo snapshot
+    // follower e dal following snapshot ACCOPPIATO (stesso upload), non da due
+    // "order by captured_at desc" indipendenti che potevano puntare a date diverse.
+    // `reliable` è letto dalla colonna congelata all'upload: ricalcolarlo contro il
+    // conteggio live faceva sparire la lista da sola man mano che i follower
+    // crescevano.
+    const snap = await sql<
+      {
+        id: number;
+        captured_at: string;
+        reliable: boolean;
+        following_snapshot_id: number | null;
+        following_captured_at: string | null;
+      }[]
+    >`
+      select fs.id, fs.captured_at, fs.reliable, fs.following_snapshot_id,
+             gs.captured_at as following_captured_at
+      from instagram.follower_snapshots fs
+      left join instagram.following_snapshots gs on gs.id = fs.following_snapshot_id
+      order by fs.captured_at desc limit 1
     `;
 
-    if ((hasFollowing[0]?.c ?? 0) > 0) {
+    const overrideRows = await sql<{ username: string }[]>`
+      select username from instagram.relationship_overrides where state = 'follows_you'
+    `;
+    const overrides = overrideRows.map((r) => r.username);
+
+    let relationships: {
+      available: boolean;
+      reliable: boolean;
+      capturedAt: string | null;
+      followingCapturedAt: string | null;
+      mutuals: string[];
+      notFollowingBack: string[];
+      fans: string[];
+      overrides: string[];
+    } = {
+      available: false,
+      reliable: true,
+      capturedAt: snap[0]?.captured_at ?? null,
+      followingCapturedAt: null,
+      mutuals: [],
+      notFollowingBack: [],
+      fans: [],
+      overrides,
+    };
+
+    const followerSnapId = snap[0]?.id ?? null;
+    const followingSnapId = snap[0]?.following_snapshot_id ?? null;
+
+    if (followerSnapId != null && followingSnapId != null) {
       const diff = await sql<
-        { not_following_back: string[]; fans: string[] }[]
+        { mutuals: string[]; not_following_back: string[]; fans: string[] }[]
       >`
-        with lf as (
-          select id from instagram.follower_snapshots order by captured_at desc limit 1
-        ), lg as (
-          select id from instagram.following_snapshots order by captured_at desc limit 1
-        )
         select
           (
             select coalesce(array_agg(f.username order by f.username), '{}')
             from instagram.following f
-            where f.snapshot_id = (select id from lg)
+            where f.snapshot_id = ${followingSnapId}
+              and exists (
+                select 1 from instagram.followers fo
+                where fo.snapshot_id = ${followerSnapId} and fo.username = f.username
+              )
+          ) as mutuals,
+          (
+            select coalesce(array_agg(f.username order by f.username), '{}')
+            from instagram.following f
+            where f.snapshot_id = ${followingSnapId}
               and not exists (
                 select 1 from instagram.followers fo
-                where fo.snapshot_id = (select id from lf) and fo.username = f.username
+                where fo.snapshot_id = ${followerSnapId} and fo.username = f.username
               )
           ) as not_following_back,
           (
             select coalesce(array_agg(fo.username order by fo.username), '{}')
             from instagram.followers fo
-            where fo.snapshot_id = (select id from lf)
+            where fo.snapshot_id = ${followerSnapId}
               and not exists (
                 select 1 from instagram.following f
-                where f.snapshot_id = (select id from lg) and f.username = fo.username
+                where f.snapshot_id = ${followingSnapId} and f.username = fo.username
               )
           ) as fans
       `;
 
-      // Affidabilità: se l'export follower è molto più piccolo del conteggio
-      // reale dell'account, la lista è inquinata da falsi positivi (export con
-      // periodo ristretto). Soglia all'85%.
-      const exportFollowers = await sql<{ total_count: number }[]>`
-        select total_count from instagram.follower_snapshots
-        order by captured_at desc limit 1
-      `;
-      const accountFollowers = latest[0]?.followers_count ?? 0;
-      const reliable =
-        accountFollowers === 0 ||
-        (exportFollowers[0]?.total_count ?? 0) >= accountFollowers * 0.85;
+      // Le correzioni manuali "ora mi segue" spostano il profilo tra i reciproci
+      // finché il prossimo export non conferma (o smentisce).
+      const overrideSet = new Set(overrides);
+      const notFollowingBack = (diff[0]?.not_following_back ?? []).filter(
+        (u) => !overrideSet.has(u),
+      );
+      const mutuals = [
+        ...(diff[0]?.mutuals ?? []),
+        ...(diff[0]?.not_following_back ?? []).filter((u) =>
+          overrideSet.has(u),
+        ),
+      ].sort((a, b) => a.localeCompare(b));
 
-      nonMutuals = {
+      relationships = {
         available: true,
-        reliable,
-        notFollowingBack: diff[0]?.not_following_back ?? [],
+        reliable: snap[0]?.reliable ?? true,
+        capturedAt: snap[0]?.captured_at ?? null,
+        followingCapturedAt: snap[0]?.following_captured_at ?? null,
+        mutuals,
+        notFollowingBack,
         fans: diff[0]?.fans ?? [],
+        overrides,
       };
     }
+
+    // Universo corrente: marks e tag fuori da qui sono residui di fotografie
+    // vecchie e non devono riemergere (facevano ricomparire profili già barrati).
+    const known = new Set([
+      ...relationships.mutuals,
+      ...relationships.notFollowingBack,
+      ...relationships.fans,
+    ]);
 
     const marked = await sql<{ username: string }[]>`
       select username from instagram.marked_unfollowed
@@ -260,7 +313,9 @@ Deno.serve(async (req) => {
     `;
     const tags: Record<string, string> = {};
 
-    for (const r of tagRows) tags[r.username] = r.tag;
+    for (const r of tagRows) {
+      if (!known.size || known.has(r.username)) tags[r.username] = r.tag;
+    }
 
     const token = await sql<{ token_expires_at: string | null }[]>`
       select token_expires_at from instagram.app_config where id = 1
@@ -362,8 +417,10 @@ Deno.serve(async (req) => {
         flow,
         velocity,
         followingChanges: { stoppedFollowing, startedFollowing },
-        nonMutuals,
-        markedUnfollowed: marked.map((m) => m.username),
+        relationships,
+        markedUnfollowed: marked
+          .map((m) => m.username)
+          .filter((u) => !known.size || known.has(u)),
         tags,
         demographics: latest[0]?.insights?.demographics ?? null,
         accountEngagement,
